@@ -1,0 +1,4 @@
+CQUtil
+======
+
+Qt Utility Library
