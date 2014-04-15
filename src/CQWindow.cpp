@@ -2,13 +2,15 @@
 #include <CQUtil.h>
 
 #include <QApplication>
-#include <QX11Info>
+
+//#include <QX11Info>
+#define QT_NO_X11 1
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-#ifndef OS_OSX
+#ifndef QT_NO_X11
 namespace CQWindowUtil {
   void getWMNormalHints(Window xwin, XSizeHints **size_hints, int *supplied) {
     static XSizeHints size_hints1;
@@ -263,7 +265,7 @@ bool
 CQWindow::
 setProperty(const std::string &name, const std::string &value)
 {
-#ifndef OS_OSX
+#ifndef QT_NO_X11
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
@@ -451,7 +453,7 @@ void
 CQWindow::
 setMinSize(int width, int height)
 {
-#ifndef OS_OSX
+#ifndef QT_NO_X11
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
@@ -478,7 +480,7 @@ void
 CQWindow::
 setBaseSize(int width, int height)
 {
-#ifndef OS_OSX
+#ifndef QT_NO_X11
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
@@ -505,7 +507,7 @@ void
 CQWindow::
 setResizeInc(int width, int height)
 {
-#ifndef OS_OSX
+#ifndef QT_NO_X11
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();

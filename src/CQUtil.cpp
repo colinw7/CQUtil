@@ -586,12 +586,12 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   const QMetaObject *meta = obj->metaObject();
 
   if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toAscii().data());
+    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
 
     if (propIndex >= 0) {
       //QMetaProperty mP = meta->property(propIndex);
 
-      v = obj->property(propName.toAscii().data());
+      v = obj->property(propName.toLatin1().data());
 
       return true;
     }
@@ -615,7 +615,7 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   const QMetaObject *meta = obj->metaObject();
 
   if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toAscii().data());
+    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
 
     QMetaProperty mP;
 
@@ -625,7 +625,7 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
       if (! mP.isWritable())
         return false;
 
-      return obj->setProperty(propName.toAscii().data(), v);
+      return obj->setProperty(propName.toLatin1().data(), v);
     }
   }
 
@@ -647,7 +647,7 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   const QMetaObject *meta = obj->metaObject();
 
   if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toAscii().data());
+    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
 
     if (propIndex >= 0) {
       QMetaProperty mP = meta->property(propIndex);
@@ -696,7 +696,7 @@ signalNames(const QObject *object, bool hierarchical)
       continue;
 
     if (metaMethod.methodType() == QMetaMethod::Signal)
-      names.append(metaMethod.signature());
+      names.append(metaMethod.methodSignature());
   }
 
   return names;
@@ -719,7 +719,7 @@ slotNames(const QObject *object, bool hierarchical)
       continue;
 
     if (metaMethod.methodType() == QMetaMethod::Slot)
-      names.append(metaMethod.signature());
+      names.append(metaMethod.methodSignature());
   }
 
   return names;
@@ -1014,7 +1014,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
       if (metaMethod.methodType() != QMetaMethod::Slot)
         continue;
 
-      if (slotNameStr == metaMethod.signature()) {
+      if (slotNameStr == metaMethod.methodSignature()) {
         found = true;
         break;
       }
@@ -1048,11 +1048,11 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
     QString typeString(argTypeList[iArg]);
 
-    QVariant::Type type = QVariant::nameToType(typeString.toAscii().data());
+    QVariant::Type type = QVariant::nameToType(typeString.toLatin1().data());
 
     if (! v.canConvert(type)) {
       qDebug("cannot convert slot argument '%s' to type '%s'",
-             valueList[iArg].toAscii().data(), typeString.toAscii().data());
+             valueList[iArg].toLatin1().data(), typeString.toLatin1().data());
       return false;
     }
 
@@ -1087,13 +1087,13 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
       default:
         qDebug("slot argument of type '%s' not supported",
-               typeString.toAscii().data());
+               typeString.toLatin1().data());
         break;
     }
   }
 
   bool bReturn =
-    QMetaObject::invokeMethod(receiver, plainSlotName.toAscii().data(),
+    QMetaObject::invokeMethod(receiver, plainSlotName.toLatin1().data(),
                               Qt::AutoConnection,
                               qArgs[0], qArgs[1], qArgs[2], qArgs[3], qArgs[4],
                               qArgs[5], qArgs[6], qArgs[7], qArgs[8], qArgs[9]);
@@ -1140,7 +1140,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
       if (metaMethod.methodType() != QMetaMethod::Signal)
         continue;
 
-      if (signalNameStr == metaMethod.signature()) {
+      if (signalNameStr == metaMethod.methodSignature()) {
         found = true;
         break;
       }
@@ -1174,11 +1174,11 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
     QString typeString(argTypeList[iArg]);
 
-    QVariant::Type type = QVariant::nameToType(typeString.toAscii().data());
+    QVariant::Type type = QVariant::nameToType(typeString.toLatin1().data());
 
     if (! v.canConvert(type)) {
       qDebug("cannot convert signal argument '%s' to type '%s'",
-             valueList[iArg].toAscii().data(), typeString.toAscii().data());
+             valueList[iArg].toLatin1().data(), typeString.toLatin1().data());
       return false;
     }
 
@@ -1213,13 +1213,13 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
       default:
         qDebug("signal argument of type '%s' not supported",
-               typeString.toAscii().data());
+               typeString.toLatin1().data());
         break;
     }
   }
 
   bool bReturn =
-    QMetaObject::invokeMethod(sender, plainSignalName.toAscii().data(),
+    QMetaObject::invokeMethod(sender, plainSignalName.toLatin1().data(),
                               Qt::AutoConnection,
                               qArgs[0], qArgs[1], qArgs[2], qArgs[3], qArgs[4],
                               qArgs[5], qArgs[6], qArgs[7], qArgs[8], qArgs[9]);

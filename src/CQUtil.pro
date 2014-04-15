@@ -4,6 +4,8 @@ TARGET = CQUtil
 
 DEPENDPATH += .
 
+QT += widgets
+
 CONFIG += staticlib
 
 # Input
