@@ -1,9 +1,8 @@
 *.o
 
-moc_*
+moc_*.cpp
 
 src/Makefile
-
 test/Makefile
 
 bin/
