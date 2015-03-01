@@ -30,25 +30,25 @@ class CRadialGradient;
 
 namespace CQUtil {
   class PropInfo {
-   private:
-    QString        _name;
-    QVariant::Type _type;
-    QString        _typeName;
-    bool           _is_writable;
-    bool           _is_enum_type;
-    QStringList    _enumNames;
-
    public:
     void init(QMetaProperty mp);
 
-    QString        name    () const { return _name; }
-    QVariant::Type type    () const { return _type; }
-    QString        typeName() const { return _typeName; }
+    QString        name    () const { return name_; }
+    QVariant::Type type    () const { return type_; }
+    QString        typeName() const { return typeName_; }
 
-    bool isWritable() const { return _is_writable ; }
-    bool isEnumType() const { return _is_enum_type; }
+    bool isWritable() const { return is_writable_ ; }
+    bool isEnumType() const { return is_enum_type_; }
 
-    const QStringList &enumNames() { return _enumNames; }
+    const QStringList &enumNames() { return enumNames_; }
+
+   private:
+    QString        name_;
+    QVariant::Type type_;
+    QString        typeName_;
+    bool           is_writable_;
+    bool           is_enum_type_;
+    QStringList    enumNames_;
   };
 
   CMouseEvent *convertEvent(QMouseEvent *event);
@@ -83,6 +83,7 @@ namespace CQUtil {
 
   bool getProperty(const QObject *object, const QString &name, QVariant &value);
 
+  bool setProperty(const QObject *object, const QString &name, const QString &value);
   bool setProperty(const QObject *object, const QString &name, const QVariant &value);
 
   bool getPropInfo(const QObject *object, const QString &name, PropInfo *info);
@@ -101,11 +102,17 @@ namespace CQUtil {
   QColor getBackground(QWidget *widget);
   void   setBackground(QWidget *widget, const QColor &color);
 
-  QPointF   toQPoint  (const CPoint2D &point);
-  CPoint2D  fromQPoint(const QPointF &point);
+  QPointF  toQPoint  (const CPoint2D &point);
+  CPoint2D fromQPoint(const QPointF &point);
 
   QPoint    toQPoint  (const CIPoint2D &point);
   CIPoint2D fromQPoint(const QPoint &point);
+
+  QSizeF  toQSize  (const CSize2D &size);
+  CSize2D fromQSize(const QSizeF &size);
+
+  QSize    toQSize  (const CISize2D &size);
+  CISize2D fromQSize(const QSize &size);
 
   QRectF  toQRect  (const CBBox2D &rect);
   CBBox2D fromQRect(const QRectF &rect);
@@ -122,7 +129,9 @@ namespace CQUtil {
   QFont    toQFont  (CFontPtr font);
   CFontPtr fromQFont(QFont font);
 
-  QString variantToString(QVariant var);
+  QString variantToString(const QVariant &var);
+
+  bool stringToVariant(const QString &str, QVariant::Type type, QVariant &var);
 
   bool paletteFromString(QPalette &palette, const QString &paletteDef);
   QString paletteToString(const QPalette &palette);
@@ -154,6 +163,9 @@ namespace CQUtil {
   Qt::Alignment toQAlign(CHAlignType halign);
   Qt::Alignment toQAlign(CVAlignType valign);
 
+  CHAlignType toHAlign(Qt::Alignment align);
+  CVAlignType toVAlign(Qt::Alignment align);
+
   //-----
 
   QPixmap getPixmap(const QString &name);
@@ -164,9 +176,11 @@ namespace CQUtil {
 
   uint nameWidgetTree(QWidget *widget);
 
-  void nameWidget(QAbstractButton *button);
-  void nameWidget(QLabel *label);
   void nameWidget(QWidget *widget);
+
+  void nameWidgetButton(QAbstractButton *button);
+  void nameWidgetLabel(QLabel *label);
+  void nameWidgetGen(QWidget *widget);
 
   //-----
 

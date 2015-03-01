@@ -602,6 +602,35 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
 
 bool
 CQUtil::
+setProperty(const QObject *object, const QString &propName, const QString &str)
+{
+  if (! object)
+    return false;
+
+  if (propName.isEmpty())
+    return false;
+
+  QObject *obj = const_cast<QObject *>(object);
+
+  const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
+
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
+
+  QMetaProperty mP = meta->property(propIndex);
+  if (! mP.isWritable()) return false;
+
+  QVariant v;
+
+  if (! stringToVariant(str, mP.type(), v))
+    return false;
+
+  return obj->setProperty(propName.toLatin1().data(), v);
+}
+
+bool
+CQUtil::
 setProperty(const QObject *object, const QString &propName, const QVariant &v)
 {
   if (! object)
@@ -613,23 +642,15 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   QObject *obj = const_cast<QObject *>(object);
 
   const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
 
-  if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
 
-    QMetaProperty mP;
+  QMetaProperty mP = meta->property(propIndex);
+  if (! mP.isWritable()) return false;
 
-    if (propIndex >= 0) {
-      QMetaProperty mP = meta->property(propIndex);
-
-      if (! mP.isWritable())
-        return false;
-
-      return obj->setProperty(propName.toLatin1().data(), v);
-    }
-  }
-
-  return false;
+  return obj->setProperty(propName.toLatin1().data(), v);
 }
 
 bool
@@ -802,7 +823,7 @@ getBackground(QWidget *widget)
 
 QString
 CQUtil::
-variantToString(QVariant var)
+variantToString(const QVariant &var)
 {
   QString valueStr;
 
@@ -813,22 +834,39 @@ variantToString(QVariant var)
 
     valueStr = CQUtil::paletteToString(palette);
   }
+  else if (type == QVariant::Point) {
+    QPoint point = var.value<QPoint>();
+
+    valueStr = QString("%1 %2").arg(point.x()).arg(point.y());
+  }
+  else if (type == QVariant::PointF) {
+    QPointF point = var.value<QPointF>();
+
+    valueStr = QString("%1 %2").arg(point.x()).arg(point.y());
+  }
   else if (type == QVariant::Rect) {
     QRect rect = var.value<QRect>();
 
-    valueStr = QString("{{%1 %2} {%3 %4}}").
+    valueStr = QString("{%1 %2} {%3 %4}").
+               arg(rect.left ()).arg(rect.bottom()).
+               arg(rect.right()).arg(rect.top   ());
+  }
+  else if (type == QVariant::RectF) {
+    QRectF rect = var.value<QRectF>();
+
+    valueStr = QString("{%1 %2} {%3 %4}").
                arg(rect.left ()).arg(rect.bottom()).
                arg(rect.right()).arg(rect.top   ());
   }
   else if (type == QVariant::Size) {
     QSize size = var.value<QSize>();
 
-    valueStr = QString("{%1 %2}").arg(size.width()).arg(size.height());
+    valueStr = QString("%1 %2").arg(size.width()).arg(size.height());
   }
-  else if (type == QVariant::Point) {
-    QPoint point = var.value<QPoint>();
+  else if (type == QVariant::SizeF) {
+    QSizeF size = var.value<QSizeF>();
 
-    valueStr = QString("{%1 %2}").arg(point.x()).arg(point.y());
+    valueStr = QString("%1 %2").arg(size.width()).arg(size.height());
   }
   else if (type == QVariant::Bool) {
     bool b = var.value<bool>();
@@ -839,6 +877,155 @@ variantToString(QVariant var)
     valueStr = var.toString();
 
   return valueStr;
+}
+
+bool
+CQUtil::
+stringToVariant(const QString &str, QVariant::Type type, QVariant &var)
+{
+  // Qt suuports QString ->
+  //   QVariant::StringList, QVariant::ByteArray, QVariant::Int      , QVariant::UInt,
+  //   QVariant::Bool      , QVariant::Double   , QVariant::Date     , QVariant::Time,
+  //   QVariant::DateTime  , QVariant::LongLong , QVariant::ULongLong, QVariant::Char,
+  //   QVariant::Url       , QVariant::Uuid
+
+  if      (type == QVariant::Bool) {
+    QString lstr = str.toLower();
+
+    if      (lstr == "0" || lstr == "false" || lstr == "no"  || lstr == "off")
+      var = QVariant(false);
+    else if (lstr == "1" || lstr == "true"  || lstr == "yes" || lstr == "on" )
+      var = QVariant(true);
+    else
+      return false;
+  }
+  else if (type == QVariant::Point) {
+    QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; int x = rx.cap(1).toInt(&b1);
+    bool b2; int y = rx.cap(2).toInt(&b2);
+
+    if (! b1 && ! b2)
+      return false;
+
+    QPoint p(x, y);
+
+    var = QVariant(p);
+  }
+  else if (type == QVariant::PointF) {
+    QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; double x = rx.cap(1).toDouble(&b1);
+    bool b2; double y = rx.cap(2).toDouble(&b2);
+
+    if (! b1 && ! b2)
+      return false;
+
+    QPointF p(x, y);
+
+    var = QVariant(p);
+  }
+  else if (type == QVariant::Rect) {
+    QRegExp rx("\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}\\s*\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; int x1 = rx.cap(1).toInt(&b1);
+    bool b2; int y1 = rx.cap(2).toInt(&b2);
+    bool b3; int x2 = rx.cap(3).toInt(&b3);
+    bool b4; int y2 = rx.cap(4).toInt(&b4);
+
+    if (! b1 && ! b2 && ! b3 && ! b4)
+      return false;
+
+    QRect r;
+
+    r.setCoords(x1, y1, x2, y2);
+
+    var = QVariant(r);
+  }
+  else if (type == QVariant::RectF) {
+    QRegExp rx("\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}\\s*\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; double x1 = rx.cap(1).toDouble(&b1);
+    bool b2; double y1 = rx.cap(2).toDouble(&b2);
+    bool b3; double x2 = rx.cap(3).toDouble(&b3);
+    bool b4; double y2 = rx.cap(4).toDouble(&b4);
+
+    if (! b1 && ! b2 && ! b3 && ! b4)
+      return false;
+
+    QRectF r;
+
+    r.setCoords(x1, y1, x2, y2);
+
+    var = QVariant(r);
+  }
+  else if (type == QVariant::Size) {
+    QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; int w = rx.cap(1).toInt(&b1);
+    bool b2; int h = rx.cap(2).toInt(&b2);
+
+    if (! b1 && ! b2)
+      return false;
+
+    QSize s(w, h);
+
+    var = QVariant(s);
+  }
+  else if (type == QVariant::SizeF) {
+    QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
+
+    int pos = rx.indexIn(str);
+
+    if (pos == -1)
+      return false;
+
+    bool b1; double w = rx.cap(1).toDouble(&b1);
+    bool b2; double h = rx.cap(2).toDouble(&b2);
+
+    if (! b1 && ! b2)
+      return false;
+
+    QSizeF s(w, h);
+
+    var = QVariant(s);
+  }
+  else {
+    var = QVariant(str);
+
+    if (! var.canConvert(type))
+      return false;
+
+    if (! var.convert(type))
+      return false;
+  }
+
+  return true;
 }
 
 bool
@@ -1358,6 +1545,34 @@ fromQPoint(const QPointF &point)
   return CPoint2D(point.x(), point.y());
 }
 
+QSize
+CQUtil::
+toQSize(const CISize2D &size)
+{
+  return QSize(size.width, size.height);
+}
+
+CISize2D
+CQUtil::
+fromQSize(const QSize &size)
+{
+  return CISize2D(size.width(), size.height());
+}
+
+QSizeF
+CQUtil::
+toQSize(const CSize2D &size)
+{
+  return QSizeF(size.width, size.height);
+}
+
+CSize2D
+CQUtil::
+fromQSize(const QSizeF &size)
+{
+  return CSize2D(size.width(), size.height());
+}
+
 QRectF
 CQUtil::
 toQRect(const CBBox2D &rect)
@@ -1478,14 +1693,39 @@ toQAlign(CHAlignType halign)
 
 Qt::Alignment
 CQUtil::
-toQAlign(CVAlignType halign)
+toQAlign(CVAlignType valign)
 {
-  switch (halign) {
+  switch (valign) {
     case CVALIGN_TYPE_TOP     : return Qt::AlignTop;
     case CVALIGN_TYPE_CENTER  : return Qt::AlignVCenter;
     case CVALIGN_TYPE_BOTTOM  : return Qt::AlignBottom;
     case CVALIGN_TYPE_BASELINE: return Qt::AlignBottom;
     default                   : return Qt::AlignVCenter;
+  }
+}
+
+CHAlignType
+CQUtil::
+toHAlign(Qt::Alignment align)
+{
+  switch (align) {
+    case Qt::AlignLeft:    return CHALIGN_TYPE_LEFT;
+    case Qt::AlignHCenter: return CHALIGN_TYPE_CENTER;
+    case Qt::AlignRight:   return CHALIGN_TYPE_RIGHT;
+    case Qt::AlignJustify: return CHALIGN_TYPE_JUSTIFY;
+    default:               return CHALIGN_TYPE_CENTER;
+  }
+}
+
+CVAlignType
+CQUtil::
+toVAlign(Qt::Alignment align)
+{
+  switch (align) {
+    case Qt::AlignTop:     return CVALIGN_TYPE_TOP;
+    case Qt::AlignVCenter: return CVALIGN_TYPE_CENTER;
+    case Qt::AlignBottom:  return CVALIGN_TYPE_BOTTOM;
+    default:               return CVALIGN_TYPE_CENTER;
   }
 }
 
@@ -1523,18 +1763,7 @@ nameWidgetTree(QWidget *widget)
   QString name = widget->objectName();
 
   if (name.isNull() || name.isEmpty()) {
-    QAbstractButton *button = qobject_cast<QAbstractButton *>(widget);
-
-    if (button)
-      nameWidget(button);
-    else {
-      QLabel *label = qobject_cast<QLabel *>(widget);
-
-      if (label)
-        nameWidget(label);
-      else
-        nameWidget(widget);
-    }
+    nameWidget(widget);
 
     ++num;
   }
@@ -1556,7 +1785,25 @@ nameWidgetTree(QWidget *widget)
 
 void
 CQUtil::
-nameWidget(QAbstractButton *button)
+nameWidget(QWidget *widget)
+{
+  QAbstractButton *button = qobject_cast<QAbstractButton *>(widget);
+
+  if (button)
+    nameWidgetButton(button);
+  else {
+    QLabel *label = qobject_cast<QLabel *>(widget);
+
+    if (label)
+      nameWidgetLabel(label);
+    else
+      nameWidgetGen(widget);
+  }
+}
+
+void
+CQUtil::
+nameWidgetButton(QAbstractButton *button)
 {
   QString text = button->text();
 
@@ -1572,7 +1819,7 @@ nameWidget(QAbstractButton *button)
 
 void
 CQUtil::
-nameWidget(QLabel *label)
+nameWidgetLabel(QLabel *label)
 {
   QString text = label->text();
 
@@ -1588,7 +1835,7 @@ nameWidget(QLabel *label)
 
 void
 CQUtil::
-nameWidget(QWidget *widget)
+nameWidgetGen(QWidget *widget)
 {
   const QMetaObject *mo = widget->metaObject();
 
@@ -1665,18 +1912,18 @@ void
 CQUtil::PropInfo::
 init(QMetaProperty mp)
 {
-  _name         = mp.name();
-  _type         = mp.type();
-  _typeName     = mp.typeName();
-  _is_writable  = mp.isWritable();
-  _is_enum_type = mp.isEnumType();
+  name_         = mp.name();
+  type_         = mp.type();
+  typeName_     = mp.typeName();
+  is_writable_  = mp.isWritable();
+  is_enum_type_ = mp.isEnumType();
 
   QMetaEnum me = mp.enumerator();
 
   int num_enums = me.keyCount();
 
-  _enumNames.clear();
+  enumNames_.clear();
 
   for (int i = 0; i < num_enums; ++i)
-    _enumNames.push_back(me.valueToKey(i));
+    enumNames_.push_back(me.valueToKey(i));
 }
