@@ -11,12 +11,16 @@
 #include <CEvent.h>
 #include <CRGBA.h>
 #include <CLineDash.h>
+#include <CAngle.h>
 #include <CFontStyle.h>
 #include <CFont.h>
 #include <CImageLib.h>
 #include <CPoint2D.h>
 #include <CBBox2D.h>
 #include <CMatrix2D.h>
+
+Q_DECLARE_METATYPE(CLineDash)
+Q_DECLARE_METATYPE(CAngle)
 
 class QMouseEvent;
 class QKeyEvent;
@@ -50,6 +54,8 @@ namespace CQUtil {
     bool           is_enum_type_;
     QStringList    enumNames_;
   };
+
+  void initProperties();
 
   CMouseEvent *convertEvent(QMouseEvent *event);
   CKeyEvent   *convertEvent(QKeyEvent *event);
@@ -131,7 +137,8 @@ namespace CQUtil {
 
   QString variantToString(const QVariant &var);
 
-  bool stringToVariant(const QString &str, QVariant::Type type, QVariant &var);
+  bool stringToVariant(const QString &str, QVariant::Type type,
+                       const char *typeName, QVariant &var);
 
   bool paletteFromString(QPalette &palette, const QString &paletteDef);
   QString paletteToString(const QPalette &palette);

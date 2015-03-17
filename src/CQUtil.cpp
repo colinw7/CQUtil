@@ -1,9 +1,11 @@
 #include <CQUtil.h>
-#include <CEvent.h>
-#include <CRegExp.h>
 #include <CQApp.h>
 #include <CQImage.h>
 #include <CQFont.h>
+#include <CEvent.h>
+#include <CRegExp.h>
+#include <CLineDash.h>
+#include <CAngle.h>
 #include <CLinearGradient.h>
 #include <CRadialGradient.h>
 
@@ -19,6 +21,14 @@
 #include <QLabel>
 #include <QClipboard>
 #include <QAbstractButton>
+
+void
+CQUtil::
+initProperties()
+{
+  qRegisterMetaType<CLineDash>("CLineDash");
+  qRegisterMetaType<CAngle>   ("CAngle");
+}
 
 CMouseEvent *
 CQUtil::
@@ -623,7 +633,7 @@ setProperty(const QObject *object, const QString &propName, const QString &str)
 
   QVariant v;
 
-  if (! stringToVariant(str, mP.type(), v))
+  if (! stringToVariant(str, mP.type(), mP.typeName(), v))
     return false;
 
   return obj->setProperty(propName.toLatin1().data(), v);
@@ -873,6 +883,20 @@ variantToString(const QVariant &var)
 
     valueStr = (b ? "true" : "false");
   }
+  else if (type == QVariant::UserType) {
+    if      (strcmp(var.typeName(), "CLineDash") == 0) {
+      CLineDash lineDash = var.value<CLineDash>();
+
+      valueStr = lineDash.toString().c_str();
+    }
+    else if (strcmp(var.typeName(), "CAngle") == 0) {
+      CAngle angle = var.value<CAngle>();
+
+      valueStr = angle.toString().c_str();
+    }
+    else
+      valueStr = "";
+  }
   else
     valueStr = var.toString();
 
@@ -881,7 +905,7 @@ variantToString(const QVariant &var)
 
 bool
 CQUtil::
-stringToVariant(const QString &str, QVariant::Type type, QVariant &var)
+stringToVariant(const QString &str, QVariant::Type type, const char *typeName, QVariant &var)
 {
   // Qt suuports QString ->
   //   QVariant::StringList, QVariant::ByteArray, QVariant::Int      , QVariant::UInt,
@@ -1014,6 +1038,22 @@ stringToVariant(const QString &str, QVariant::Type type, QVariant &var)
     QSizeF s(w, h);
 
     var = QVariant(s);
+  }
+  else if (type == QVariant::UserType) {
+    if      (strcmp(typeName, "CLineDash") == 0) {
+      CLineDash lineDash(str.toStdString());
+
+      var = QVariant::fromValue(lineDash);
+    }
+    else if (strcmp(typeName, "CAngle") == 0) {
+      CAngle angle;
+
+      angle.fromString(str.toStdString());
+
+      var = QVariant::fromValue(angle);
+    }
+    else
+      return false;
   }
   else {
     var = QVariant(str);
@@ -1667,10 +1707,10 @@ penSetLineDash(QPen &pen, const CLineDash &dash)
     if (w <= 0.0) w = 1.0;
 
     for (int i = 0; i < num; ++i)
-      dashes << dash.getLength(i)/w;
+      dashes << dash.getLength(i)*w;
 
     if (num & 1)
-      dashes << dash.getLength(0)/w;
+      dashes << dash.getLength(0)*w;
 
     pen.setDashPattern(dashes);
   }
@@ -1824,7 +1864,7 @@ nameWidgetLabel(QLabel *label)
   QString text = label->text();
 
   if (text.isNull() || text.isEmpty())
-    return CQUtil::nameWidget(static_cast<QWidget*>(label));
+    return CQUtil::nameWidgetGen(static_cast<QWidget*>(label));
 
   text.replace(QChar(' '),QChar('_'));
   text.replace(QChar('&'),QString(""));

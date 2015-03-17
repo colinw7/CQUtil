@@ -8,6 +8,8 @@ QT += widgets
 
 CONFIG += staticlib
 
+QMAKE_CXXFLAGS += -std=c++11
+
 # Input
 HEADERS += \
 ../include/CQUtil.h \
