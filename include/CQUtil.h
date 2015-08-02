@@ -35,6 +35,12 @@ class CRadialGradient;
 namespace CQUtil {
   class PropInfo {
    public:
+    PropInfo() {
+     type_         = QVariant::Invalid;
+     is_writable_  = false;
+     is_enum_type_ = false;
+    }
+
     void init(QMetaProperty mp);
 
     QString        name    () const { return name_; }
@@ -136,6 +142,7 @@ namespace CQUtil {
   CFontPtr fromQFont(QFont font);
 
   QString variantToString(const QVariant &var);
+  bool variantToString(const QVariant &var, QString &str);
 
   bool stringToVariant(const QString &str, QVariant::Type type,
                        const char *typeName, QVariant &var);

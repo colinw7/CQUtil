@@ -660,7 +660,14 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   QMetaProperty mP = meta->property(propIndex);
   if (! mP.isWritable()) return false;
 
-  return obj->setProperty(propName.toLatin1().data(), v);
+  QVariant v1 = v;
+
+  QString typeName = v1.typeName();
+
+  if (typeName == "QString" && ! stringToVariant(v.toString(), mP.type(), mP.typeName(), v1))
+    return false;
+
+  return obj->setProperty(propName.toLatin1().data(), v1);
 }
 
 bool
@@ -837,6 +844,17 @@ variantToString(const QVariant &var)
 {
   QString valueStr;
 
+  variantToString(var, valueStr);
+
+  return valueStr;
+}
+
+bool
+CQUtil::
+variantToString(const QVariant &var, QString &valueStr)
+{
+  valueStr = "";
+
   QVariant::Type type = var.type();
 
   if      (type == QVariant::Palette) {
@@ -895,12 +913,16 @@ variantToString(const QVariant &var)
       valueStr = angle.toString().c_str();
     }
     else
-      valueStr = "";
+      return false;
   }
-  else
-    valueStr = var.toString();
+  else {
+    if (! var.canConvert(QVariant::String))
+      return false;
 
-  return valueStr;
+    valueStr = var.toString();
+  }
+
+  return true;
 }
 
 bool
@@ -1848,7 +1870,7 @@ nameWidgetButton(QAbstractButton *button)
   QString text = button->text();
 
   if (text.isNull() || text.isEmpty())
-    return CQUtil::nameWidget(static_cast<QWidget*>(button));
+    return CQUtil::nameWidgetGen(static_cast<QWidget*>(button));
 
   text.replace(QChar(' '),QChar('_'));
   text.replace(QChar('&'),QString(""));
