@@ -16,32 +16,34 @@ CQFontChooser::
 CQFontChooser(QWidget *parent) :
  QWidget(parent), style_(FontButton), fixedWidth_(false), exampleText_("Abc")
 {
+  setObjectName("fontChooser");
+
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
   font_     = font();
   fontName_ = font_.toString();
 
   //-----
 
   QHBoxLayout *layout = new QHBoxLayout(this);
+  layout->setMargin(0); layout->setSpacing(0);
 
-  layout->setMargin (2);
-  layout->setSpacing(2);
+  cedit_   = new QLineEdit  (this); cedit_  ->setObjectName("cedit");
+  cbutton_ = new QToolButton(this); cbutton_->setObjectName("cbutton");
+  clabel_  = new QLabel     (this); clabel_ ->setObjectName("clabel");
+  button_  = new QToolButton(this); button_ ->setObjectName("button");
 
-  cedit_   = new QLineEdit  (this);
-  cbutton_ = new QToolButton(this);
-  clabel_  = new QLabel     (this);
-  button_  = new QToolButton(this);
-
-  ncombo_ = new QFontComboBox(this);
-  scombo_ = new QComboBox(this);
-  zcombo_ = new QComboBox(this);
+  ncombo_ = new QFontComboBox(this); ncombo_->setObjectName("ncombo");
+  scombo_ = new QComboBox    (this); scombo_->setObjectName("scombo");
+  zcombo_ = new QComboBox    (this); zcombo_->setObjectName("zcombo");
 
   button_->setIcon(QIcon(QPixmap((const char **) font_dialog_data)));
 
   ncombo_->setWritingSystem(QFontDatabase::Latin);
 
-  cbutton_->setFixedSize(QSize(24,24));
+//cbutton_->setFixedSize(QSize(24,24));
 //clabel_ ->setFixedSize(QSize(24,24));
-  button_ ->setFixedSize(QSize(24,24));
+//button_ ->setFixedSize(QSize(24,24));
 
   cbutton_->setText(exampleText_);
   clabel_ ->setText(exampleText_);
@@ -53,12 +55,18 @@ CQFontChooser(QWidget *parent) :
   layout->addWidget(ncombo_ );
   layout->addWidget(scombo_ );
   layout->addWidget(zcombo_ );
-  layout->addStretch();
+
+// TODO: add strecth widget and hide if any of the stretchable widgets are visible
+//layout->addStretch();
 
   cedit_  ->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   cbutton_->setSizePolicy(QSizePolicy::Fixed    , QSizePolicy::Fixed);
-  clabel_ ->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  clabel_ ->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   button_ ->setSizePolicy(QSizePolicy::Fixed    , QSizePolicy::Fixed);
+
+  ncombo_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  scombo_->setSizePolicy(QSizePolicy::Fixed    , QSizePolicy::Fixed);
+  zcombo_->setSizePolicy(QSizePolicy::Fixed    , QSizePolicy::Fixed);
 
   connect(cedit_  , SIGNAL(editingFinished()), this, SLOT(editFont  ()));
   connect(cbutton_, SIGNAL(clicked()        ), this, SLOT(applyFont ()));
@@ -75,6 +83,8 @@ CQFontChooser(QWidget *parent) :
   //-----
 
   updateWidgets();
+
+  setFocusProxy(cedit_);
 }
 
 void
@@ -192,6 +202,8 @@ updateWidgets()
   updateSizes ();
 
   updateCombos();
+
+  layout()->invalidate();
 }
 
 void

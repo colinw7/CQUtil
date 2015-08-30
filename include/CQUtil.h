@@ -73,10 +73,15 @@ namespace CQUtil {
   QColor rgbToColor(const CRGB &rgb);
   QColor rgbaToColor(const CRGBA &rgba);
 
+  inline QColor toQColor(const CRGB  &rgb ) { return rgbToColor (rgb ); }
+  inline QColor toQColor(const CRGBA &rgba) { return rgbaToColor(rgba); }
+
   uint rgbaToInt(const CRGBA &rgba);
 
-  CRGB  colorToRGB(QColor color);
-  CRGBA colorToRGBA(QColor color);
+  CRGB  colorToRGB(const QColor &color);
+  CRGBA colorToRGBA(const QColor &color);
+
+  inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
 
   void decodeFont(const QFont &font, QString &family, CFontStyle &style, int &pixelSize);
 
@@ -199,6 +204,13 @@ namespace CQUtil {
   //-----
 
   void recolorImage(QImage &image, const QColor &fg, const QColor &bg);
+
+  //-----
+
+  void drawHtmlText(QWidget *w, QPainter *painter, const QString &text,
+                    const QPalette &palette, const QRect &rect, bool active=false);
+
+  QString colorToHtml(const QColor &c);
 };
 
 class CQWidgetPtr : public QObject {

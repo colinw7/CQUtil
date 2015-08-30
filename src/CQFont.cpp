@@ -55,7 +55,7 @@ lookupFont(const std::string &family, CFontStyle style, double size, double angl
 {
   CFontPtr font = CFontMgrInst->lookupFont(family, style, size, angle, char_angle, x_res, y_res);
 
-  assert(font.cast<CQFont>() != NULL);
+  assert(font.cast<CQFont>() != 0);
 
   return font;
 }
@@ -127,7 +127,7 @@ CQFont(const std::string &family, CFontStyle style, double size, double angle, d
 
 CQFont::
 CQFont(const std::string &full_name) :
- CFont(full_name), qfont_(NULL), qmetrics_(NULL)
+ CFont(full_name), qfont_(0), qmetrics_(0)
 {
 }
 

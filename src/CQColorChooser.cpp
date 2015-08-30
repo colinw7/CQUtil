@@ -28,6 +28,10 @@ void
 CQColorChooser::
 init()
 {
+  setObjectName("colorChooser");
+
+  setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
   color_     = QColor(1,2,3);
   alpha_     = 0.456;
   colorName_ = "abcdef";
@@ -35,19 +39,17 @@ init()
   //-----
 
   QHBoxLayout *layout = new QHBoxLayout(this);
+  layout->setMargin(0); layout->setSpacing(2);
 
-  layout->setMargin (2);
-  layout->setSpacing(2);
+  cedit_   = new QLineEdit    (this); cedit_  ->setObjectName("cedit"  ); // text color
+  cbutton_ = new QToolButton  (this); cbutton_->setObjectName("cbutton"); // click color button
+  clabel_  = new QLabel       (this); clabel_ ->setObjectName("clabel" ); // static color button
+  button_  = new QToolButton  (this); button_ ->setObjectName("button" ); // image click button
+  alphab_  = new CQAlphaButton(this); alphab_ ->setObjectName("alphab" ); // alpha button
 
-  cedit_   = new QLineEdit  (this); // text color
-  cbutton_ = new QToolButton(this); // click color button
-  clabel_  = new QLabel     (this); // static color button
-  button_  = new QToolButton(this); // image click button
-  alphab_  = new CQAlphaButton(this);
-
-  cbutton_->setFixedSize(QSize(24,24));
-  clabel_ ->setFixedSize(QSize(24,24));
-  button_ ->setFixedSize(QSize(24,24));
+  //cbutton_->setFixedSize(QSize(24,24));
+  //clabel_ ->setFixedSize(QSize(24,24));
+  //button_ ->setFixedSize(QSize(24,24));
 
   button_->setIcon(QIcon(QPixmap((const char **) color_dialog_data)));
 
@@ -56,7 +58,9 @@ init()
   layout->addWidget(clabel_ );
   layout->addWidget(alphab_ );
   layout->addWidget(button_ );
-  layout->addStretch();
+
+// TODO: add stretch widget and hide if any of the stretchable widgets are visible
+//layout->addStretch();
 
   cedit_  ->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   cbutton_->setSizePolicy(QSizePolicy::Fixed    , QSizePolicy::Fixed);

@@ -21,6 +21,8 @@
 #include <QLabel>
 #include <QClipboard>
 #include <QAbstractButton>
+#include <QAbstractTextDocumentLayout>
+#include <QPainter>
 
 void
 CQUtil::
@@ -413,14 +415,14 @@ rgbaToInt(const CRGBA &rgba)
 
 CRGB
 CQUtil::
-colorToRGB(QColor color)
+colorToRGB(const QColor &color)
 {
   return CRGB(color.redF(), color.greenF(), color.blueF());
 }
 
 CRGBA
 CQUtil::
-colorToRGBA(QColor color)
+colorToRGBA(const QColor &color)
 {
   return CRGBA(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
@@ -1966,6 +1968,52 @@ recolorImage(QImage &image, const QColor &fg, const QColor &bg)
   }
   else
     assert(false);
+}
+
+//------------
+
+void
+CQUtil::
+drawHtmlText(QWidget *w, QPainter *painter, const QString &text,
+             const QPalette &palette, const QRect &rect, bool active)
+{
+  painter->setRenderHints(QPainter::Antialiasing);
+
+  QTextDocument td;
+
+  td.setHtml(text);
+
+  QRect trect = rect.translated(-rect.x(), -rect.y());
+
+  painter->translate(rect.x(), rect.y());
+
+  painter->setClipRect(trect);
+
+  QAbstractTextDocumentLayout::PaintContext ctx;
+
+  if (active)
+    ctx.palette.setColor(QPalette::Text, palette.highlightedText().color());
+  else
+    ctx.palette.setColor(QPalette::Text, palette.text().color());
+
+  QAbstractTextDocumentLayout *layout = td.documentLayout();
+
+  layout->setPaintDevice(w);
+
+  layout->draw(painter, ctx);
+
+  painter->translate(-rect.x(), -rect.y());
+}
+
+QString
+CQUtil::
+colorToHtml(const QColor &c)
+{
+  // TODO: transparency
+  QChar pad('0');
+
+  return QString("#%1%2%3").
+    arg(c.red(), 2, 16, pad).arg(c.green(), 2, 16, pad).arg(c.blue(), 2, 16, pad);
 }
 
 //------------
