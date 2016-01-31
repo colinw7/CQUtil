@@ -12,9 +12,6 @@ class CConfig;
 #define CQFontMgrInst CQFontMgr::getInstance()
 
 class CQFontMgr {
- private:
-  CConfig *config_;
-
  public:
   static CQFontMgr *getInstance();
 
@@ -33,15 +30,12 @@ class CQFontMgr {
 
  private:
   CQFontMgr();
+
+ private:
+  CConfig *config_;
 };
 
 class CQFont : public CFont {
- private:
-  QFont         *qfont_;
-  QFontMetricsF *qmetrics_;
-
-  friend class CQFontMgr;
-
  protected:
   CQFont(const std::string &family, CFontStyle style, double size, double angle=0,
          double char_angle=0, int x_res=100, int y_res=100);
@@ -76,6 +70,12 @@ class CQFont : public CFont {
   bool isProportional() const;
 
   CImagePtr getStringImage(const std::string &str);
+
+ private:
+  QFont         *qfont_;
+  QFontMetricsF *qmetrics_;
+
+  friend class CQFontMgr;
 };
 
 #endif

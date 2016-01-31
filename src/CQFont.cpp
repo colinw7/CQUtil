@@ -2,7 +2,9 @@
 #include <CConfig.h>
 #include <CFontMgr.h>
 #include <CQImage.h>
+#include <CImageMgr.h>
 
+#include <QFontMetricsF>
 #include <QPainter>
 
 CQFontMgr *
@@ -221,7 +223,6 @@ isProportional() const
   return ! qfont_->fixedPitch();
 }
 
-#if 0
 CImagePtr
 CQFont::
 getStringImage(const std::string &str)
@@ -269,4 +270,3 @@ getStringImage(const std::string &str)
 
   return image;
 }
-#endif
