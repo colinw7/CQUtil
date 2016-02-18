@@ -1,5 +1,6 @@
 #include <CQColorChooser.h>
 #include <CQAlphaButton.h>
+#include <CQPixmapCache.h>
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -8,7 +9,7 @@
 #include <QHBoxLayout>
 #include <QColorDialog>
 
-#include <color_dialog.xpm>
+#include <svg/color_dialog_svg.h>
 
 CQColorChooser::
 CQColorChooser(QWidget *parent) :
@@ -51,7 +52,7 @@ init()
   //clabel_ ->setFixedSize(QSize(24,24));
   //button_ ->setFixedSize(QSize(24,24));
 
-  button_->setIcon(QIcon(QPixmap((const char **) color_dialog_data)));
+  button_->setIcon(CQPixmapCacheInst->getIcon("COLOR_DIALOG"));
 
   layout->addWidget(cedit_  );
   layout->addWidget(cbutton_);
