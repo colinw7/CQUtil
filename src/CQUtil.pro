@@ -23,6 +23,7 @@ HEADERS += \
 ../include/CQColorChooser.h \
 ../include/CQFontChooser.h \
 ../include/CQAlphaButton.h \
+../include/CQStyle.h \
 
 SOURCES += \
 CQUtil.cpp \
@@ -34,6 +35,7 @@ CQFont.cpp \
 CQColorChooser.cpp \
 CQFontChooser.cpp \
 CQAlphaButton.cpp \
+CQStyle.cpp \
 
 OBJECTS_DIR = ../obj
 

@@ -1,4 +1,5 @@
 #include <CQApp.h>
+#include <CQStyle.h>
 #include <CQFont.h>
 #include <CQImage.h>
 #include <CQWindow.h>
@@ -62,6 +63,8 @@ CQApp::
 CQApp(int &argc, char **argv) :
  QApplication(argc, argv)
 {
+  setStyle(new CQStyle);
+
   CQImage::setPrototype();
 
   CQFontMgrInst->setPrototype();
