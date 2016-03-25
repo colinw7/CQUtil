@@ -41,7 +41,7 @@ namespace CQUtil {
      is_enum_type_ = false;
     }
 
-    void init(QMetaProperty mp);
+    void init(const QMetaProperty &mp);
 
     QString        name    () const { return name_; }
     QVariant::Type type    () const { return type_; }

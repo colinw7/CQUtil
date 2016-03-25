@@ -2020,7 +2020,7 @@ colorToHtml(const QColor &c)
 
 void
 CQUtil::PropInfo::
-init(QMetaProperty mp)
+init(const QMetaProperty &mp)
 {
   name_         = mp.name();
   type_         = mp.type();
