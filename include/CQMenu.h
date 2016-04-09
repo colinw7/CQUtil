@@ -149,6 +149,10 @@ class CQMenuItem {
 
   QAction *getAction() const { return action_; }
 
+  void setShortcut(const QKeySequence &key) {
+    action_->setShortcut(key);
+  }
+
   void setShortcut(const QString &shortcut) {
     action_->setShortcut(shortcut);
   }
@@ -164,6 +168,10 @@ class CQMenuItem {
 
     QIcon icon(pixmap);
 
+    action_->setIcon(icon);
+  }
+
+  void setIcon(const QIcon &icon) {
     action_->setIcon(icon);
   }
 
