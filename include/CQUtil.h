@@ -168,8 +168,10 @@ namespace CQUtil {
 
   QImage toQImage(CImagePtr image);
 
-  QLinearGradient toQGradient(const CLinearGradient *lgradient);
-  QRadialGradient toQGradient(const CRadialGradient *rgradient);
+  QLinearGradient toQGradient(const CLinearGradient *lgradient,
+                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
+  QRadialGradient toQGradient(const CRadialGradient *rgradient,
+                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
 
   void getScreenSize(uint *w, uint *h);
 

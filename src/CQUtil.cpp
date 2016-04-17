@@ -1501,7 +1501,7 @@ toQImage(CImagePtr image)
 
 QLinearGradient
 CQUtil::
-toQGradient(const CLinearGradient *lgradient)
+toQGradient(const CLinearGradient *lgradient, QGradient::CoordinateMode mode)
 {
   QLinearGradient qgradient(lgradient->getX1(), lgradient->getY1(),
                             lgradient->getX2(), lgradient->getY2());
@@ -1513,7 +1513,7 @@ toQGradient(const CLinearGradient *lgradient)
   else if (lgradient->getSpread() == CGRADIENT_SPREAD_REFLECT)
     qgradient.setSpread(QGradient::ReflectSpread);
 
-  qgradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+  qgradient.setCoordinateMode(mode);
 
   QGradientStops stops;
 
@@ -1532,7 +1532,7 @@ toQGradient(const CLinearGradient *lgradient)
 
 QRadialGradient
 CQUtil::
-toQGradient(const CRadialGradient *rgradient)
+toQGradient(const CRadialGradient *rgradient, QGradient::CoordinateMode mode)
 {
   QRadialGradient qgradient(rgradient->getCenterX(), rgradient->getCenterY(),
                             rgradient->getRadius(),
@@ -1545,7 +1545,7 @@ toQGradient(const CRadialGradient *rgradient)
   else if (rgradient->getSpread() == CGRADIENT_SPREAD_REFLECT)
     qgradient.setSpread(QGradient::ReflectSpread);
 
-  qgradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+  qgradient.setCoordinateMode(mode);
 
   QGradientStops stops;
 
