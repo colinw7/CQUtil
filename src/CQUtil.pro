@@ -10,6 +10,8 @@ CONFIG += staticlib
 
 QMAKE_CXXFLAGS += -std=c++11
 
+MOC_DIR = .moc
+
 # Input
 HEADERS += \
 ../include/CQUtil.h \
@@ -18,13 +20,19 @@ HEADERS += \
 ../include/CQWindow.h \
 ../include/CQImage.h \
 ../include/CQFont.h \
+\
+../include/CQPixmapCache.h \
+../include/CQStyle.h \
 ../include/CQMenu.h \
 ../include/CQWidgetUtil.h \
+\
 ../include/CQColorChooser.h \
 ../include/CQFontChooser.h \
 ../include/CQAlphaButton.h \
-../include/CQPixmapCache.h \
-../include/CQStyle.h \
+../include/CQIntegerEdit.h \
+../include/CQRealEdit.h \
+../include/CQRealSpin.h \
+../include/CQPoint2DEdit.h \
 
 SOURCES += \
 CQUtil.cpp \
@@ -33,11 +41,17 @@ CQMainWindow.cpp \
 CQWindow.cpp \
 CQImage.cpp \
 CQFont.cpp \
+\
+CQPixmapCache.cpp \
+CQStyle.cpp \
+\
 CQColorChooser.cpp \
 CQFontChooser.cpp \
 CQAlphaButton.cpp \
-CQPixmapCache.cpp \
-CQStyle.cpp \
+CQIntegerEdit.cpp \
+CQRealEdit.cpp \
+CQRealSpin.cpp \
+CQPoint2DEdit.cpp \
 
 OBJECTS_DIR = ../obj
 
