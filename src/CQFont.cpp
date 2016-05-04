@@ -122,14 +122,49 @@ CQFont(const std::string &family, CFontStyle style, double size, double angle, d
 
   std::string qfamily = CQFontMgrInst->lookupFamily(family);
 
-  qfont_ = new QFont(qfamily.c_str(), int(size), weight, italic);
+  //---
 
-  qmetrics_ = new QFontMetricsF(*qfont_);
+  double size1  = size;
+  int    isize1 = qRound(size1);
+
+  // ensure that actual font size matches size as closely as possible
+  // if CFONT_STYLE_FULL_SIZE is set then size is full char height (ascent + descent)
+  // if CFONT_STYLE_FULL_SIZE is NOT set then size is char ascent.
+  for (int n = 0; n < 8; ++n) {
+    qfont_ = new QFont(qfamily.c_str(), isize1, weight, italic);
+
+    QFontMetricsF fm(*qfont_);
+
+    double th = (style & CFONT_STYLE_FULL_SIZE ? fm.ascent() + fm.descent() : fm.ascent());
+
+    double scale = th/isize1;
+//std::cerr << isize1 << "->" << th << ":" << scale << std::endl;
+
+    double size2  = size/scale;
+    int    isize2 = qRound(size2);
+
+    if (isize2 == isize1)
+      break;
+
+    size1  = size2;
+    isize1 = isize2;
+  }
+
+  //---
+
+  if (style & CFONT_STYLE_UNDERLINE)
+    qfont_->setUnderline(true);
+
+  if (style & CFONT_STYLE_OVERLINE)
+    qfont_->setOverline(true);
+
+  if (style & CFONT_STYLE_STRIKEOUT)
+    qfont_->setStrikeOut(true);
 }
 
 CQFont::
 CQFont(const std::string &full_name) :
- CFont(full_name), qfont_(0), qmetrics_(0)
+ CFont(full_name)
 {
 }
 
@@ -138,8 +173,6 @@ CQFont(const QFont &qfont) :
  CFont(qfont.family().toStdString(), CQFontMgr::fontStyle(qfont), CQFontMgr::getPixelSize(qfont))
 {
   qfont_ = new QFont(qfont);
-
-  qmetrics_ = new QFontMetricsF(*qfont_);
 }
 
 CQFont::
@@ -147,15 +180,12 @@ CQFont(const CQFont &qfont) :
  CFont(qfont)
 {
   qfont_ = new QFont(*qfont.qfont_);
-
-  qmetrics_ = new QFontMetricsF(*qfont_);
 }
 
 CQFont::
 ~CQFont()
 {
   delete qfont_;
-  delete qmetrics_;
 }
 
 CFontPtr
@@ -174,8 +204,6 @@ operator=(const CQFont &qfont)
 {
   qfont_ = new QFont(*qfont.qfont_);
 
-  qmetrics_ = new QFontMetricsF(*qfont_);
-
   return *this;
 }
 
@@ -183,28 +211,36 @@ double
 CQFont::
 getCharWidth() const
 {
-  return getQMetrics().maxWidth();
+  QFontMetricsF fm(*qfont_);
+
+  return fm.maxWidth();
 }
 
 double
 CQFont::
 getCharAscent() const
 {
-  return getQMetrics().ascent();
+  QFontMetricsF fm(*qfont_);
+
+  return fm.ascent();
 }
 
 double
 CQFont::
 getCharDescent() const
 {
-  return getQMetrics().descent();
+  QFontMetricsF fm(*qfont_);
+
+  return fm.descent();
 }
 
 double
 CQFont::
 getCharHeight() const
 {
-  return getQMetrics().height();
+  QFontMetricsF fm(*qfont_);
+
+  return fm.height();
 }
 
 double
@@ -213,7 +249,10 @@ getStringWidth(const std::string &str) const
 {
   QString qstr(str.c_str());
 
-  return getQMetrics().size(0, qstr).width();
+  QFontMetricsF fm(*qfont_);
+
+  //return fm.size(0, qstr).width();
+  return fm.width(qstr);
 }
 
 bool

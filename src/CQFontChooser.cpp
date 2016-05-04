@@ -1,4 +1,5 @@
 #include <CQFontChooser.h>
+#include <CQPixmapCache.h>
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -10,7 +11,7 @@
 #include <QFontDialog>
 #include <QFontDatabase>
 
-#include <font_dialog.xpm>
+#include <svg/font_dialog_svg.h>
 
 CQFontChooser::
 CQFontChooser(QWidget *parent) :
@@ -37,7 +38,7 @@ CQFontChooser(QWidget *parent) :
   scombo_ = new QComboBox    (this); scombo_->setObjectName("scombo");
   zcombo_ = new QComboBox    (this); zcombo_->setObjectName("zcombo");
 
-  button_->setIcon(QIcon(QPixmap((const char **) font_dialog_data)));
+  button_->setIcon(CQPixmapCacheInst->getIcon("FONT_DIALOG"));
 
   ncombo_->setWritingSystem(QFontDatabase::Latin);
 

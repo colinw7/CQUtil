@@ -13,20 +13,19 @@ setPrototype()
 }
 
 CQImage::
-CQImage() :
- initialized_(false)
+CQImage()
 {
 }
 
 CQImage::
 CQImage(int width, int height) :
- CImage(width, height), initialized_(false)
+ CImage(width, height)
 {
 }
 
 CQImage::
 CQImage(const CImage &image) :
- CImage(image), initialized_(false)
+ CImage(image)
 {
 }
 
@@ -34,6 +33,7 @@ void
 CQImage::
 initQImage()
 {
+  // set qimage from cimage
   int x1, y1, x2, y2;
 
   getWindow(&x1, &y1, &x2, &y2);
@@ -63,6 +63,7 @@ void
 CQImage::
 updateCImage()
 {
+  // set cimage from qimage
   if (! initialized_)
     return;
 

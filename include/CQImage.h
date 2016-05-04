@@ -6,10 +6,6 @@
 #include <CImage.h>
 
 class CQImage : public CImage {
- private:
-  QImage qimage_;
-  bool   initialized_;
-
   // Create
 
  protected:
@@ -59,6 +55,10 @@ class CQImage : public CImage {
 
  private:
   void initQImage();
+
+ private:
+  QImage qimage_;
+  bool   initialized_ { false };
 };
 
 #endif

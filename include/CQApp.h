@@ -18,7 +18,7 @@ class CQApp : public QApplication {
  ~CQApp() { }
 
 #ifdef USE_OBJEDIT
-  void addObjEditFilter(QWidget *widget);
+  void addObjEditFilter(QObject *o);
 #endif
 
  private:

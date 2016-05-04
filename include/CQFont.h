@@ -4,7 +4,6 @@
 #include <CFont.h>
 
 #include <QFont>
-#include <QFontMetricsF>
 #include <CImagePtr.h>
 
 class CConfig;
@@ -32,7 +31,7 @@ class CQFontMgr {
   CQFontMgr();
 
  private:
-  CConfig *config_;
+  CConfig *config_ { 0 };
 };
 
 class CQFont : public CFont {
@@ -58,8 +57,6 @@ class CQFont : public CFont {
  public:
   const QFont &getQFont() const { return *qfont_; }
 
-  const QFontMetricsF &getQMetrics() const { return *qmetrics_; }
-
   double getCharWidth () const;
   double getCharAscent() const;
   double getCharDescent() const;
@@ -72,8 +69,7 @@ class CQFont : public CFont {
   CImagePtr getStringImage(const std::string &str);
 
  private:
-  QFont         *qfont_;
-  QFontMetricsF *qmetrics_;
+  QFont *qfont_ { 0 };
 
   friend class CQFontMgr;
 };

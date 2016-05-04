@@ -28,6 +28,8 @@ CQAppEventFilter(void *message, long *)
     CQObjEdit *objEdit = CQObjEdit::createInstance();
 
     objEdit->show();
+
+    objEdit->raise();
   }
 
   return show;
@@ -79,8 +81,8 @@ CQApp(int &argc, char **argv) :
 #ifdef USE_OBJEDIT
 void
 CQApp::
-addObjEditFilter(QWidget *widget)
+addObjEditFilter(QObject *o)
 {
-  widget->installEventFilter(new CQAppObjEditFilter);
+  o->installEventFilter(new CQAppObjEditFilter);
 }
 #endif

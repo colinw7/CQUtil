@@ -39,6 +39,73 @@ class CQColorChooser : public QWidget {
   uint getStyles() const { return styles_; }
   void setStyles(uint styles);
 
+  //---
+
+  void setTextStyle(bool b) {
+    uint styles = getStyles();
+
+    if (b) styles |=  Text;
+    else   styles &= ~Text;
+
+    setStyles(styles);
+  }
+
+  bool hasTextStyle() const { return styles_ & Text; }
+
+  //---
+
+  void setColorButtonStyle(bool b) {
+    uint styles = getStyles();
+
+    if (b) styles |=  ColorButton;
+    else   styles &= ~ColorButton;
+
+    setStyles(styles);
+  }
+
+  bool hasColorButtonStyle() const { return styles_ & ColorButton; }
+
+  //---
+
+  void setColorLabelStyle(bool b) {
+    uint styles = getStyles();
+
+    if (b) styles |=  ColorLabel;
+    else   styles &= ~ColorLabel;
+
+    setStyles(styles);
+  }
+
+  bool hasColorLabelStyle() const { return styles_ & ColorLabel; }
+
+  //---
+
+  void setImageButtonStyle(bool b) {
+    uint styles = getStyles();
+
+    if (b) styles |=  ImageButton;
+    else   styles &= ~ImageButton;
+
+    setStyles(styles);
+  }
+
+  bool hasImageButtonStyle() const { return styles_ & ImageButton; }
+
+  //---
+
+  void setAlphaButtonStyle(bool b) {
+    uint styles = getStyles();
+
+    if (b) styles |=  AlphaButton;
+    else   styles &= ~AlphaButton;
+
+    setStyles(styles);
+  }
+
+  bool hasAlphaButtonStyle() const { return styles_ & AlphaButton; }
+
+  //---
+
   const QColor &color() const;
   void setColor(const QColor &color, double alpha=1.0);
 

@@ -13,7 +13,7 @@
 
 CQColorChooser::
 CQColorChooser(QWidget *parent) :
- QWidget(parent), styles_(Text), editable_(true)
+ QWidget(parent), styles_(Text | ColorButton), editable_(true)
 {
   init();
 }
