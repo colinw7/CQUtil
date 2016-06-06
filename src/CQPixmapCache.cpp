@@ -1,5 +1,6 @@
 #include <CQPixmapCache.h>
 #include <cassert>
+#include <iostream>
 
 CQPixmapCache *
 CQPixmapCache::
@@ -30,6 +31,9 @@ CQPixmapCache::
 getPixmap(const QString &id)
 {
   auto p = idData_.find(id);
+
+  if (p == idData_.end())
+    std::cout << "Pixmap not found: " << id.toStdString() << std::endl;
 
   assert(p != idData_.end());
 
