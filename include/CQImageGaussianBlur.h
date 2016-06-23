@@ -65,7 +65,7 @@ class CQImageGaussianBlur {
     wsrc_.setWindow(x1, y1, x2, y2);
   }
 
-  void blur(QImage &dst, double bx=1, double by=1, int nx=0, int ny=0) {
+  bool blur(QImage &dst, double bx=1, double by=1, int nx=0, int ny=0) {
     if (dst.isNull()) {
       int iw = src_.width ();
       int ih = src_.height();
@@ -79,7 +79,7 @@ class CQImageGaussianBlur {
 
     CQImageWrapper wdst(dst);
 
-    blur.blur(wsrc_, wdst, bx, by, nx, ny);
+    return blur.blur(wsrc_, wdst, bx, by, nx, ny);
   }
 
  private:
