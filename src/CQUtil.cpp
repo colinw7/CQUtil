@@ -1101,7 +1101,7 @@ paletteFromString(QPalette &palette, const QString &paletteDef)
   if (regexp.find(paletteDef.toStdString())) {
     std::vector<std::string> matches;
 
-    regexp.getMatches(matches);
+    regexp.getSubMatches(matches);
 
     palette.setColor(QPalette::WindowText, QString(matches[0].c_str()));
     palette.setColor(QPalette::Window    , QString(matches[1].c_str()));
