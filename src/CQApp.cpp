@@ -3,6 +3,8 @@
 #include <CQFont.h>
 #include <CQImage.h>
 #include <CQWindow.h>
+#include <CConfig.h>
+#include <CScreenUnits.h>
 
 //#define USE_OBJEDIT 1
 
@@ -10,6 +12,7 @@
 #include <CQObjEdit.h>
 #endif
 
+#include <QScreen>
 #include <QKeyEvent>
 
 CQApp *CQApp::app_;
@@ -76,6 +79,29 @@ CQApp(int &argc, char **argv) :
 #endif
 
   CQWindow::setFactory();
+
+  //---
+
+  // TODO: handle application font change
+  QFont font("Helveltica", 16);
+
+  qApp->setFont(font);
+
+  QFontMetrics fm(qApp->font());
+
+  CScreenUnitsMgrInst->setEmSize(fm.height());
+  CScreenUnitsMgrInst->setExSize(fm.width("x"));
+
+  QScreen *srn = QApplication::screens().at(0);
+  double dotsPerInch = srn->logicalDotsPerInch();
+  CScreenUnitsMgrInst->setDpi(dotsPerInch);
+
+  config_ = new CConfig("CQApp");
+
+  double dpi;
+
+  if (config_->getValue("dpi", &dpi))
+    CScreenUnitsMgrInst->setDpi(dpi);
 }
 
 #ifdef USE_OBJEDIT

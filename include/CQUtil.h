@@ -18,6 +18,8 @@
 #include <CPoint2D.h>
 #include <CBBox2D.h>
 #include <CMatrix2D.h>
+#include <CBrush.h>
+#include <CPen.h>
 
 Q_DECLARE_METATYPE(CLineDash)
 Q_DECLARE_METATYPE(CAngle)
@@ -80,6 +82,12 @@ namespace CQUtil {
 
   CRGB  colorToRGB(const QColor &color);
   CRGBA colorToRGBA(const QColor &color);
+
+  QBrush toQBrush(const CBrush &brush);
+  QPen   toQPen  (const CPen   &pen);
+
+  Qt::PenCapStyle toPenCapStyle(const CLineCapType &lineCap);
+  Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
 
   inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
 

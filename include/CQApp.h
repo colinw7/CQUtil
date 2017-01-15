@@ -5,6 +5,8 @@
 
 #include <QApplication>
 
+class CConfig;
+
 #define CQAppInst CQApp::getApp()
 
 class CQApp : public QApplication {
@@ -23,6 +25,8 @@ class CQApp : public QApplication {
 
  private:
   static CQApp *app_;
+
+  CConfig *config_ { 0 };
 };
 
 #ifdef USE_OBJEDIT

@@ -29,10 +29,13 @@ class CQFontMgr {
 
  private:
   CQFontMgr();
+ ~CQFontMgr();
 
  private:
   CConfig *config_ { 0 };
 };
+
+//------
 
 class CQFont : public CFont {
  protected:
@@ -69,9 +72,9 @@ class CQFont : public CFont {
   CImagePtr getStringImage(const std::string &str);
 
  private:
-  QFont *qfont_ { 0 };
-
   friend class CQFontMgr;
+
+  QFont *qfont_ { 0 };
 };
 
 #endif

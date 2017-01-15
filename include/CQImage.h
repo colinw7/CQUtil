@@ -5,9 +5,11 @@
 
 #include <CImage.h>
 
+/* Qt override for CImage to allow procesing either QImage or CImage data
+   and sync the two when needed */
+
 class CQImage : public CImage {
   // Create
-
  protected:
   CQImage();
 

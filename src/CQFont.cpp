@@ -25,6 +25,12 @@ CQFontMgr()
   config_ = new CConfig("CQFont");
 }
 
+CQFontMgr::
+~CQFontMgr()
+{
+  delete config_;
+}
+
 void
 CQFontMgr::
 setPrototype()

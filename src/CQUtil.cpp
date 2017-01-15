@@ -427,6 +427,60 @@ colorToRGBA(const QColor &color)
   return CRGBA(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
+QBrush
+CQUtil::
+toQBrush(const CBrush &brush)
+{
+  QBrush qbrush;
+
+  if      (brush.getStyle() == CBRUSH_STYLE_SOLID)
+    qbrush = QBrush(CQUtil::rgbaToColor(brush.getColor()));
+  else if (brush.getStyle() == CBRUSH_STYLE_TEXTURE)
+    qbrush = QBrush(CQUtil::toQImage(brush.getTexture()));
+
+  return qbrush;
+}
+
+QPen
+CQUtil::
+toQPen(const CPen &pen)
+{
+  QPen qpen;
+
+  penSetLineDash(qpen, pen.getLineDash());
+
+  qpen.setColor    (rgbaToColor(pen.getColor()));
+  qpen.setWidthF   (pen.getWidth());
+  qpen.setCapStyle (toPenCapStyle(pen.getLineCap()));
+  qpen.setJoinStyle(toPenJoinStyle(pen.getLineJoin()));
+
+  return qpen;
+}
+
+Qt::PenCapStyle
+CQUtil::
+toPenCapStyle(const CLineCapType &lineCap)
+{
+  switch (lineCap) {
+    default:
+    case LINE_CAP_TYPE_BUTT  : return Qt::FlatCap;
+    case LINE_CAP_TYPE_ROUND : return Qt::RoundCap;
+    case LINE_CAP_TYPE_SQUARE: return Qt::SquareCap;
+  }
+}
+
+Qt::PenJoinStyle
+CQUtil::
+toPenJoinStyle(const CLineJoinType &lineJoin)
+{
+  switch (lineJoin) {
+    default:
+    case LINE_JOIN_TYPE_MITRE: return Qt::MiterJoin;
+    case LINE_JOIN_TYPE_ROUND: return Qt::RoundJoin;
+    case LINE_JOIN_TYPE_BEVEL: return Qt::BevelJoin;
+  }
+}
+
 void
 CQUtil::
 decodeFont(const QFont &qfont, QString &family, CFontStyle &style, int &pixelSize)
