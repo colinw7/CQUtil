@@ -433,10 +433,30 @@ toQBrush(const CBrush &brush)
 {
   QBrush qbrush;
 
-  if      (brush.getStyle() == CBRUSH_STYLE_SOLID)
+  if      (brush.getStyle() == CBRUSH_STYLE_SOLID) {
     qbrush = QBrush(CQUtil::rgbaToColor(brush.getColor()));
-  else if (brush.getStyle() == CBRUSH_STYLE_TEXTURE)
+  }
+  else if (brush.getStyle() == CBRUSH_STYLE_PATTERN) {
+    //qbrush = QBrush(CQUtil::toQPattern(brush.getPattern()));
+    std::cerr << "Invalid pattern brush" << std::endl;
+  }
+  else if (brush.getStyle() == CBRUSH_STYLE_GRADIENT) {
+    CLinearGradient *lgradient = dynamic_cast<CLinearGradient *>(brush.getGradient().get());
+    CRadialGradient *rgradient = dynamic_cast<CRadialGradient *>(brush.getGradient().get());
+
+    if      (lgradient)
+      qbrush = QBrush(CQUtil::toQGradient(lgradient));
+    else if (rgradient)
+      qbrush = QBrush(CQUtil::toQGradient(rgradient));
+    else
+      std::cerr << "Invalid gradient type" << std::endl;
+  }
+  else if (brush.getStyle() == CBRUSH_STYLE_TEXTURE) {
     qbrush = QBrush(CQUtil::toQImage(brush.getTexture()));
+  }
+  else {
+    std::cerr << "Invalid brush" << std::endl;
+  }
 
   return qbrush;
 }
