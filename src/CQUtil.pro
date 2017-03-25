@@ -12,7 +12,29 @@ QMAKE_CXXFLAGS += -std=c++11
 
 MOC_DIR = .moc
 
-# Input
+SOURCES += \
+CQUtil.cpp \
+CQApp.cpp \
+CQMainWindow.cpp \
+CQToolBar.cpp \
+CQWindow.cpp \
+CQImage.cpp \
+CQFont.cpp \
+\
+CQPixmapCache.cpp \
+CQStyle.cpp \
+\
+CQColorChooser.cpp \
+CQFontChooser.cpp \
+CQAlphaButton.cpp \
+CQIntegerEdit.cpp \
+CQRealEdit.cpp \
+CQRealSpin.cpp \
+CQPoint2DEdit.cpp \
+CQImageButton.cpp \
+CQFloatEdit.cpp \
+CQAutoHide.cpp \
+
 HEADERS += \
 ../include/CQUtil.h \
 ../include/CQApp.h \
@@ -34,26 +56,9 @@ HEADERS += \
 ../include/CQRealEdit.h \
 ../include/CQRealSpin.h \
 ../include/CQPoint2DEdit.h \
-
-SOURCES += \
-CQUtil.cpp \
-CQApp.cpp \
-CQMainWindow.cpp \
-CQToolBar.cpp \
-CQWindow.cpp \
-CQImage.cpp \
-CQFont.cpp \
-\
-CQPixmapCache.cpp \
-CQStyle.cpp \
-\
-CQColorChooser.cpp \
-CQFontChooser.cpp \
-CQAlphaButton.cpp \
-CQIntegerEdit.cpp \
-CQRealEdit.cpp \
-CQRealSpin.cpp \
-CQPoint2DEdit.cpp \
+../include/CQImageButton.h \
+../include/CQFloatEdit.h \
+../include/CQAutoHide.h \
 
 OBJECTS_DIR = ../obj
 
