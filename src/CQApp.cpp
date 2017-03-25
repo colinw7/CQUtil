@@ -83,7 +83,11 @@ CQApp(int &argc, char **argv) :
   //---
 
   // TODO: handle application font change
-  QFont font("Helveltica", 16);
+  QScreen *srn = QApplication::screens().at(0);
+  double dotsPerInch = srn->logicalDotsPerInch();
+  CScreenUnitsMgrInst->setDpi(dotsPerInch);
+
+  QFont font("Helveltica", dotsPerInch/8);
 
   qApp->setFont(font);
 
@@ -91,10 +95,6 @@ CQApp(int &argc, char **argv) :
 
   CScreenUnitsMgrInst->setEmSize(fm.height());
   CScreenUnitsMgrInst->setExSize(fm.width("x"));
-
-  QScreen *srn = QApplication::screens().at(0);
-  double dotsPerInch = srn->logicalDotsPerInch();
-  CScreenUnitsMgrInst->setDpi(dotsPerInch);
 
   config_ = new CConfig("CQApp");
 

@@ -55,6 +55,9 @@ class CQImage : public CImage {
 
   void dataChanged();
 
+ public:
+  bool gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny);
+
  private:
   void initQImage();
 

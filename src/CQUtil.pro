@@ -34,6 +34,9 @@ CQPoint2DEdit.cpp \
 CQImageButton.cpp \
 CQFloatEdit.cpp \
 CQAutoHide.cpp \
+CQRadioButtons.cpp \
+CQAngleSpinBox.cpp \
+CQToolTip.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -59,6 +62,9 @@ HEADERS += \
 ../include/CQImageButton.h \
 ../include/CQFloatEdit.h \
 ../include/CQAutoHide.h \
+../include/CQRadioButtons.h \
+../include/CQAngleSpinBox.h \
+../include/CQToolTip.h \
 
 OBJECTS_DIR = ../obj
 

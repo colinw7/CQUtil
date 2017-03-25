@@ -4,7 +4,6 @@
 #include <CFont.h>
 
 #include <QFont>
-#include <CImagePtr.h>
 
 class CConfig;
 

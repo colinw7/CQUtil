@@ -6,7 +6,7 @@
 
 class CQImageWrapper {
  public:
-  CQImageWrapper(QImage &image) :
+  explicit CQImageWrapper(QImage &image) :
    image_(image) {
     px1_ = 0; px2_ = image_.width () - 1;
     py1_ = 0; py2_ = image_.height() - 1;
@@ -57,7 +57,7 @@ class CQImageWrapper {
 
 class CQImageGaussianBlur {
  public:
-  CQImageGaussianBlur(const QImage &src) :
+  explicit CQImageGaussianBlur(const QImage &src) :
    src_(src), wsrc_(src_) {
   }
 

@@ -1,4 +1,5 @@
 #include <CQImage.h>
+#include <CQImageGaussianBlur.h>
 #include <CQUtil.h>
 #include <CImageLib.h>
 #include <QImage>
@@ -245,4 +246,23 @@ CQImage::
 dataChanged()
 {
   initialized_ = false;
+}
+
+//------
+
+bool
+CQImage::
+gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny)
+{
+  QImage *image1 = getQImageP();
+  QImage *image2 = dynamic_cast<CQImage *>(dst.getPtr())->getQImageP();
+
+  CQImageGaussianBlur blur(*image1);
+
+  int x1, y1, x2, y2;
+
+  if (getWindow(&x1, &y1, &x2, &y2))
+    blur.setWindow(x1, y1, x2, y2);
+
+  return blur.blur(*image2, bx, by, nx, ny);
 }

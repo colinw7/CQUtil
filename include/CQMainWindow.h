@@ -10,7 +10,7 @@ class CQMainWindow : public QMainWindow {
   QString title_;
 
  public:
-  CQMainWindow(const QString &title="");
+  explicit CQMainWindow(const QString &title="");
 
   virtual ~CQMainWindow() { }
 
