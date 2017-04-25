@@ -15,7 +15,7 @@ namespace CQWindowUtil {
   void getWMNormalHints(Window xwin, XSizeHints **size_hints, int *supplied) {
     static XSizeHints size_hints1;
 
-    long supplied1;
+    long supplied1 = 0;
 
     if (! XGetWMNormalHints(QX11Info::display(), xwin, &size_hints1, &supplied1))
       size_hints1.flags = 0;
@@ -79,13 +79,20 @@ CQWindow(CQWindow *parent) :
 
 CQWindow::
 CQWindow(QWidget *parent) :
- QWidget(parent), CWindow(NULL), pressed_(false)
+ QWidget(parent), CWindow(nullptr), pressed_(false)
 {
 }
 
 CQWindow::
 ~CQWindow()
 {
+}
+
+void
+CQWindow::
+setPressed(bool b)
+{
+  pressed_ = b;
 }
 
 void
@@ -302,7 +309,7 @@ void
 CQWindow::
 mousePressEvent(QMouseEvent *event)
 {
-  pressed_ = true;
+  setPressed(true);
 
   buttonPressEvent(*CQUtil::convertEvent(event));
 }
@@ -313,7 +320,7 @@ mouseReleaseEvent(QMouseEvent *event)
 {
   buttonReleaseEvent(*CQUtil::convertEvent(event));
 
-  pressed_ = false;
+  setPressed(false);
 }
 
 void
@@ -331,7 +338,7 @@ void
 CQWindow::
 mouseMoveEvent(QMouseEvent *event)
 {
-  if (! pressed_)
+  if (! isPressed())
     pointerMotionEvent(*CQUtil::convertEvent(event));
   else
     buttonMotionEvent(*CQUtil::convertEvent(event));
@@ -457,13 +464,15 @@ setMinSize(int width, int height)
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
-
   if (xwin == 0) return;
 
-  XSizeHints *hints;
-  int         supplied;
+  XSizeHints *hints { nullptr };
+  int         supplied { 0 };
 
   CQWindowUtil::getWMNormalHints(xwin, &hints, &supplied);
+
+  if ((supplied & PMinSize) && hints->min_width == width && hints->min_height == height)
+    return;
 
   hints->flags |= PMinSize;
 
@@ -484,13 +493,15 @@ setBaseSize(int width, int height)
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
-
   if (xwin == 0) return;
 
-  XSizeHints *hints;
-  int         supplied;
+  XSizeHints *hints { nullptr };
+  int         supplied { 0 };
 
   CQWindowUtil::getWMNormalHints(xwin, &hints, &supplied);
+
+  if ((supplied & PBaseSize) && hints->base_width == width && hints->base_height == height)
+    return;
 
   hints->flags |= PBaseSize;
 
@@ -511,13 +522,15 @@ setResizeInc(int width, int height)
   QWidget *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
-
   if (xwin == 0) return;
 
-  XSizeHints *hints;
-  int         supplied;
+  XSizeHints *hints { nullptr };
+  int         supplied { 0 };
 
   CQWindowUtil::getWMNormalHints(xwin, &hints, &supplied);
+
+  if ((supplied & PResizeInc) && hints->width_inc == width && hints->height_inc == height)
+    return;
 
   hints->flags |= PResizeInc;
 

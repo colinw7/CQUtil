@@ -12,86 +12,90 @@ class CQWindowFactory : public CWindowFactory {
   CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height);
 };
 
+//------
+
 class CQWindow : public QWidget, public CWindow {
   Q_OBJECT
-
- private:
-  bool pressed_;
 
  public:
   static void setFactory();
 
-  CQWindow(CQWindow *parent=NULL);
+ public:
+  CQWindow(CQWindow *parent=nullptr);
+
   CQWindow(QWidget *parent);
 
- ~CQWindow();
+  virtual ~CQWindow();
+
+  virtual bool isPressed() const { return pressed_; }
+  virtual void setPressed(bool b);
 
   // get current position and size
-  void getPosition(int *x, int *y) const;
-  void getSize(uint *w, uint *h) const;
+  virtual void getPosition(int *x, int *y) const;
+  virtual void getSize(uint *w, uint *h) const;
 
-  void getScreenSize(uint *w, uint *h) const;
+  virtual void getScreenSize(uint *w, uint *h) const;
 
   // destrow window
-  void destroy();
+  virtual void destroy();
 
   // move window
-  void move(int x, int y);
+  virtual void move(int x, int y);
 
   // resize window
-  void resize(uint width, uint height);
+  virtual void resize(uint width, uint height);
 
   // map/unmap window
-  void map  ();
-  void unmap();
+  virtual void map  ();
+  virtual void unmap();
 
   // get if window is mapped
-  bool isMapped();
+  virtual bool isMapped();
 
   // iconize/deiconize window
-  void iconize  ();
-  void deiconize();
+  virtual void iconize  ();
+  virtual void deiconize();
 
   // maximize/demaximize window
-  void maximize  ();
-  void demaximize();
+  virtual void maximize  ();
+  virtual void demaximize();
 
   // lower/raise window
-  void lower();
-  void raise();
+  virtual void lower();
+  virtual void raise();
 
   // set window/icon title
-  void setWindowTitle(const std::string &title);
-  void setIconTitle(const std::string &);
+  virtual void setWindowTitle(const std::string &title);
+  virtual void setIconTitle(const std::string &);
 
   // get window/icon title
-  void getWindowTitle(std::string &title) const;
-  void getIconTitle(std::string &title) const;
+  virtual void getWindowTitle(std::string &title) const;
+  virtual void getIconTitle(std::string &title) const;
 
   // signal expose event
-  void expose();
+  virtual void expose();
 
   // set event adapter
-  void setEventAdapter(CEventAdapter *eventAdpater);
+  virtual void setEventAdapter(CEventAdapter *eventAdpater);
 
   // property
-  bool setProperty(const std::string &name, const std::string &value);
+  virtual bool setProperty(const std::string &name, const std::string &value);
 
   // selection
-  bool setSelectText(const std::string &text);
+  virtual bool setSelectText(const std::string &text);
 
   // draw window contents
-  void redraw();
+  virtual void redraw();
 
-  void beep();
+  virtual void beep();
 
   //------
 
   // hints
 
-  void setMinSize(int width, int height);
-  void setBaseSize(int width, int height);
-  void setResizeInc(int width, int height);
+  virtual void setMinSize(int width, int height);
+  virtual void setBaseSize(int width, int height);
+  virtual void setResizeInc(int width, int height);
 
   //------
 
@@ -119,6 +123,9 @@ class CQWindow : public QWidget, public CWindow {
   virtual bool enterEvent();
   virtual void leaveEvent(QEvent *);
   virtual bool leaveEvent();
+
+ private:
+  bool pressed_ { false };
 };
 
 #endif
