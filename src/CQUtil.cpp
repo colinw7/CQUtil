@@ -87,7 +87,7 @@ convertKey(int key, Qt::KeyboardModifiers modifiers)
   switch (key) {
     case Qt::Key_Escape:                return CKEY_TYPE_Escape;
     case Qt::Key_Tab:                   return CKEY_TYPE_Tab;
-    case Qt::Key_Backtab:               return CKEY_TYPE_NUL;
+    case Qt::Key_Backtab:               return CKEY_TYPE_Backtab;
     case Qt::Key_Backspace:             return CKEY_TYPE_BackSpace;
     case Qt::Key_Return:                return CKEY_TYPE_Return;
     case Qt::Key_Enter:                 return CKEY_TYPE_KP_Enter;
@@ -564,7 +564,7 @@ CQUtil::
 nameToObject(const QString &name)
 {
   if (! name.length())
-    return NULL;
+    return nullptr;
 
   if (name == QApplication::applicationName())
     return qApp;
@@ -574,11 +574,11 @@ nameToObject(const QString &name)
   int num_names = names.size();
 
   if (num_names == 0)
-    return NULL;
+    return nullptr;
 
   QString baseName = names[0];
 
-  QObject *current = NULL;
+  QObject *current = nullptr;
 
   QWidgetList wlist = QApplication::topLevelWidgets();
 
@@ -592,14 +592,14 @@ nameToObject(const QString &name)
     }
   }
 
-  if (current == NULL)
-    return NULL;
+  if (current == nullptr)
+    return nullptr;
 
   for (int i = 1; i < num_names; ++i) {
     QObject *child = childObject(current, names[i]);
 
     if (! child)
-      return NULL;
+      return nullptr;
 
     current = child;
   }
@@ -622,7 +622,7 @@ getToplevelWidget(QWidget *widget)
 
   QWidget *parent1;
 
-  while ((parent1 = parent->parentWidget()) != NULL)
+  while ((parent1 = parent->parentWidget()) != nullptr)
     parent = parent1;
 
   return parent;
@@ -1894,7 +1894,7 @@ uint
 CQUtil::
 nameWidgetTree(QWidget *widget)
 {
-  assert(widget != NULL);
+  assert(widget != nullptr);
 
   uint num = 0;
 

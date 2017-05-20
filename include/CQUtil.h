@@ -227,13 +227,13 @@ class CQWidgetPtr : public QObject {
   Q_OBJECT
 
  public:
-  CQWidgetPtr(QWidget *w=NULL) :
+  CQWidgetPtr(QWidget *w=nullptr) :
    w_(w) {
     watch();
   }
 
   bool isValid() const {
-    return (w_ != NULL);
+    return (w_ != nullptr);
   }
 
   void set(QWidget *w) {
@@ -259,7 +259,7 @@ class CQWidgetPtr : public QObject {
 
  private slots:
   void resetSlot() {
-    w_ = NULL;
+    w_ = nullptr;
   }
 
  private:

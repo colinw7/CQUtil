@@ -11,76 +11,65 @@
 class CQMenuItem;
 
 class CQMenu {
- private:
-  typedef std::map<QString, CQMenuItem *> MenuItemMap;
-  typedef std::map<QString, QAction *>    ActionMap;
-
-  QMainWindow  *main_window_;
-  QMenu        *menu_;
-  QActionGroup *action_group_;
-  MenuItemMap   menu_item_map_;
-  ActionMap     action_map_;
-
  public:
-  CQMenu(QMainWindow *main_window, const QString &name) :
-   main_window_(main_window), menu_(NULL), action_group_(NULL) {
+  CQMenu(QMainWindow *mainWindow, const QString &name) :
+   mainWindow_(mainWindow) {
     if (name == "|")
-      main_window->menuBar()->addSeparator();
+      mainWindow->menuBar()->addSeparator();
     else
-      menu_ = main_window->menuBar()->addMenu(name);
+      menu_ = mainWindow->menuBar()->addMenu(name);
   }
 
-  CQMenu(QWidget *widget, const QString &name="") :
-   main_window_(NULL), menu_(NULL), action_group_(NULL) {
+  CQMenu(QWidget *widget, const QString &name="") {
     menu_ = new QMenu(widget);
 
     if (name.length())
       menu_->setObjectName(name);
   }
 
-  QMainWindow *getMainWindow() const { return main_window_; }
+  QMainWindow *getMainWindow() const { return mainWindow_; }
 
   QWidget *getParent() const {
-    return (main_window_ ? main_window_ : menu_->parentWidget());
+    return (mainWindow_ ? mainWindow_ : menu_->parentWidget());
   }
 
   QMenu *getMenu() const { return menu_; }
 
   void startGroup() {
-    action_group_ = new QActionGroup(main_window_);
+    actionGroup_ = new QActionGroup(mainWindow_);
   }
 
   void endGroup() {
-    action_group_ = NULL;
+    actionGroup_ = nullptr;
   }
 
-  void addMenuItem(CQMenuItem *menu_item);
+  void addMenuItem(CQMenuItem *menuItem);
 
   void addAction(QAction *action) {
-    if (action_group_)
-      action_group_->addAction(action);
+    if (actionGroup_)
+      actionGroup_->addAction(action);
 
     menu_->addAction(action);
 
-    action_map_[action->text()] = action;
+    actionMap_[action->text()] = action;
   }
 
   CQMenuItem *getMenuItem(const QString &name) {
-    MenuItemMap::const_iterator p = menu_item_map_.find(name);
+    auto p = menuItemMap_.find(name);
 
-    if (p != menu_item_map_.end())
+    if (p != menuItemMap_.end())
       return (*p).second;
-    else
-      return NULL;
+
+    return nullptr;
   }
 
   QAction *getAction(const QString &name) {
-    ActionMap::const_iterator p = action_map_.find(name);
+    auto p = actionMap_.find(name);
 
-    if (p != action_map_.end())
+    if (p != actionMap_.end())
       return (*p).second;
-    else
-      return NULL;
+
+    return nullptr;
   }
 
   void addSeparator() {
@@ -90,13 +79,21 @@ class CQMenu {
   void exec(const QPoint &pos) {
     (void) menu_->exec(pos);
   }
+
+ private:
+  typedef std::map<QString, CQMenuItem *> MenuItemMap;
+  typedef std::map<QString, QAction *>    ActionMap;
+
+  QMainWindow  *mainWindow_ { nullptr };
+  QMenu        *menu_ { nullptr };
+  QActionGroup *actionGroup_ { nullptr };
+  MenuItemMap   menuItemMap_;
+  ActionMap     actionMap_;
 };
 
-class CQMenuItem {
- private:
-  CQMenu  *menu_;
-  QAction *action_;
+//------
 
+class CQMenuItem {
  public:
   enum Type {
     NORMAL    = 0,
@@ -175,8 +172,8 @@ class CQMenuItem {
     action_->setIcon(icon);
   }
 
-  void setXPMIcon(const char **xpm_data) {
-    action_->setIcon(QIcon(QPixmap(xpm_data)));
+  void setXPMIcon(const char **xpmData) {
+    action_->setIcon(QIcon(QPixmap(xpmData)));
   }
 
   bool isChecked() const {
@@ -204,17 +201,26 @@ class CQMenuItem {
   }
 
   bool connect(const QObject *recv, const char *method) {
-    return QObject::connect(getAction(), SIGNAL(triggered()), recv, method);
+    if (strstr(method, "(bool)"))
+      return QObject::connect(getAction(), SIGNAL(triggered(bool)), recv, method);
+    else
+      return QObject::connect(getAction(), SIGNAL(triggered()), recv, method);
   }
+
+ private:
+  CQMenu  *menu_ { nullptr };
+  QAction *action_ { nullptr };
 };
+
+//------
 
 inline void
 CQMenu::
-addMenuItem(CQMenuItem *menu_item)
+addMenuItem(CQMenuItem *menuItem)
 {
-  addAction(menu_item->getAction());
+  addAction(menuItem->getAction());
 
-  menu_item_map_[menu_item->getName()] = menu_item;
+  menuItemMap_[menuItem->getName()] = menuItem;
 }
 
 #endif

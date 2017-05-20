@@ -466,6 +466,8 @@ setMinSize(int width, int height)
   Window xwin = parent->winId();
   if (xwin == 0) return;
 
+  parent->setMinimumSize(width, height);
+
   XSizeHints *hints { nullptr };
   int         supplied { 0 };
 
@@ -495,6 +497,8 @@ setBaseSize(int width, int height)
   Window xwin = parent->winId();
   if (xwin == 0) return;
 
+  parent->setBaseSize(width, height);
+
   XSizeHints *hints { nullptr };
   int         supplied { 0 };
 
@@ -523,6 +527,8 @@ setResizeInc(int width, int height)
 
   Window xwin = parent->winId();
   if (xwin == 0) return;
+
+  parent->setSizeIncrement(width, height);
 
   XSizeHints *hints { nullptr };
   int         supplied { 0 };

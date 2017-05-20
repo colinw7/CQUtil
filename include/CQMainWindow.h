@@ -6,9 +6,6 @@
 class CQMainWindow : public QMainWindow {
   Q_OBJECT
 
- private:
-  QString title_;
-
  public:
   explicit CQMainWindow(const QString &title="");
 
@@ -17,7 +14,7 @@ class CQMainWindow : public QMainWindow {
   void init();
 
  protected:
-  virtual QWidget *createCentralWidget() { return NULL; }
+  virtual QWidget *createCentralWidget() { return nullptr; }
 
   virtual void createWorkspace() { }
   virtual void createMenus() { }
@@ -26,6 +23,9 @@ class CQMainWindow : public QMainWindow {
   virtual void createDockWindows() { }
 
   virtual void initTerm() { }
+
+ private:
+  QString title_;
 };
 
 #endif
