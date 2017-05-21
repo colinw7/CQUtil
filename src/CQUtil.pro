@@ -37,6 +37,8 @@ CQAutoHide.cpp \
 CQRadioButtons.cpp \
 CQAngleSpinBox.cpp \
 CQToolTip.cpp \
+\
+CQWinWidget.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -65,6 +67,8 @@ HEADERS += \
 ../include/CQRadioButtons.h \
 ../include/CQAngleSpinBox.h \
 ../include/CQToolTip.h \
+\
+../include/CQWinWidget.h \
 
 OBJECTS_DIR = ../obj
 
