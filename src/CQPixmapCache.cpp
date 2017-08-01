@@ -46,6 +46,13 @@ getPixmap(const QString &id)
   return *(*p).second.pixmap;
 }
 
+QPixmap
+CQPixmapCache::
+getSizedPixmap(const QString &id, const QSize &s)
+{
+  return getPixmap(id).scaled(s, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+}
+
 QIcon
 CQPixmapCache::
 getIcon(const QString &id)

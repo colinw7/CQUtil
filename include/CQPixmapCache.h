@@ -18,6 +18,8 @@ class CQPixmapCache {
 
   QIcon getIcon(const QString &id);
 
+  QPixmap getSizedPixmap(const QString &id, const QSize &s);
+
  private:
   CQPixmapCache();
 
