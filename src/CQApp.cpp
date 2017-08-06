@@ -104,6 +104,12 @@ CQApp(int &argc, char **argv) :
     CScreenUnitsMgrInst->setDpi(dpi);
 }
 
+CQApp::
+~CQApp()
+{
+  delete config_;
+}
+
 #ifdef USE_OBJEDIT
 void
 CQApp::

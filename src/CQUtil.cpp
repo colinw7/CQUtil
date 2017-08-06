@@ -582,17 +582,14 @@ nameToObject(const QString &name)
 
   QWidgetList wlist = QApplication::topLevelWidgets();
 
-  QWidgetList::const_iterator p1 = wlist.begin();
-  QWidgetList::const_iterator p2 = wlist.end  ();
-
-  for ( ; p1 != p2; ++p1) {
-    if ((*p1)->objectName() == baseName) {
-      current = *p1;
+  for (QWidgetList::const_iterator pw = wlist.begin(); pw != wlist.end(); ++pw) {
+    if ((*pw)->objectName() == baseName) {
+      current = *pw;
       break;
     }
   }
 
-  if (current == nullptr)
+  if (! current)
     return nullptr;
 
   for (int i = 1; i < num_names; ++i) {
@@ -2088,6 +2085,20 @@ colorToHtml(const QColor &c)
 
   return QString("#%1%2%3").
     arg(c.red(), 2, 16, pad).arg(c.green(), 2, 16, pad).arg(c.blue(), 2, 16, pad);
+}
+
+//------------
+
+QColor
+CQUtil::
+blendColors(const QColor &c1, const QColor &c2, double f)
+{
+  CRGBA rgba1 = colorToRGBA(c1);
+  CRGBA rgba2 = colorToRGBA(c2);
+
+  CRGBA rgba = rgba1.blended(rgba2, f);
+
+  return rgbaToColor(rgba);
 }
 
 //------------

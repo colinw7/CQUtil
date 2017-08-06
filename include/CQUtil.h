@@ -221,6 +221,8 @@ namespace CQUtil {
                     const QPalette &palette, const QRect &rect, bool active=false);
 
   QString colorToHtml(const QColor &c);
+
+  QColor blendColors(const QColor &c1, const QColor &c2, double f);
 };
 
 class CQWidgetPtr : public QObject {

@@ -17,7 +17,7 @@ class CQApp : public QApplication {
 
   CQApp(int &argc, char **argv);
 
- ~CQApp() { }
+ ~CQApp();
 
 #ifdef USE_OBJEDIT
   void addObjEditFilter(QObject *o);
@@ -26,7 +26,7 @@ class CQApp : public QApplication {
  private:
   static CQApp *app_;
 
-  CConfig *config_ { 0 };
+  CConfig *config_ { nullptr };
 };
 
 #ifdef USE_OBJEDIT
