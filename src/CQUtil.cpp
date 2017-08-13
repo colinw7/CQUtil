@@ -1666,6 +1666,13 @@ fromQPoint(const QPoint &point)
   return CIPoint2D(point.x(), point.y());
 }
 
+CPoint2D
+CQUtil::
+fromQPointF(const QPoint &point)
+{
+  return CPoint2D(point.x(), point.y());
+}
+
 QPointF
 CQUtil::
 toQPoint(const CPoint2D &point)

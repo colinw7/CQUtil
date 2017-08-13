@@ -130,8 +130,9 @@ namespace CQUtil {
   QPointF  toQPoint  (const CPoint2D &point);
   CPoint2D fromQPoint(const QPointF &point);
 
-  QPoint    toQPoint  (const CIPoint2D &point);
-  CIPoint2D fromQPoint(const QPoint &point);
+  QPoint    toQPoint   (const CIPoint2D &point);
+  CIPoint2D fromQPoint (const QPoint &point);
+  CPoint2D  fromQPointF(const QPoint &point);
 
   QSizeF  toQSize  (const CSize2D &size);
   CSize2D fromQSize(const QSizeF &size);
