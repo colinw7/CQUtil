@@ -35,6 +35,8 @@ class CQToolTipIFace {
   virtual bool outside() const { return false; }
 };
 
+//---
+
 class CQToolTipWidgetIFace : public CQToolTipIFace {
  public:
   CQToolTipWidgetIFace(QWidget *w) :
@@ -48,6 +50,8 @@ class CQToolTipWidgetIFace : public CQToolTipIFace {
 
   QWidgetP w_;
 };
+
+//---
 
 class CQToolTip : public QWidget {
   Q_OBJECT
@@ -97,14 +101,14 @@ class CQToolTip : public QWidget {
 
   typedef QMap<QWidgetP,CQToolTipIFace *> WidgetMap;
 
-  QVBoxLayout *layout_;
+  QVBoxLayout *layout_    { nullptr };
   WidgetMap    tooltips_;
   QWidgetP     tooltip_;
   QWidgetP     parent_;
-  double       hideSecs_;
-  int          hideTimer_;
-  int          margin_;
-  double       opacity_;
+  double       hideSecs_  { 3 };
+  int          hideTimer_ { 0 };
+  int          margin_    { 1 };
+  double       opacity_   { 0.8 };
 };
 
 #endif

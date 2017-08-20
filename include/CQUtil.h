@@ -98,25 +98,76 @@ namespace CQUtil {
   QObject *nameToObject(const QString &name);
   QObject *nameToObject(QObject *parent, const QString &name);
 
+  QObject *hierChildObject(QObject *object, int ind, const QStringList &names);
+
   QObject *childObject(QObject *parent, const QString &name);
 
   QWidget *getToplevelWidget(QWidget *widget);
 
-  QStringList getPropertyList(const QObject *object, bool inherited);
+  //---
+
+  int getNumProperties(const QObject *object, bool inherited=true);
+
+  QStringList getPropertyList(const QObject *object, bool inherited=true);
+
   QStringList getPropertyList(const QObject *object, bool inherited,
                               const QMetaObject* metaObject);
 
+  QString getPropertyName(const QObject *object, int ind, bool inherited=true);
+
+  QVariant::Type getPropertyType(const QObject *object, int ind, bool inherited=true);
+
+  QVariant getPropertyValue(const QObject *object, int ind, bool inherited=true);
+
+  bool getPropertyValueIsEnum(const QObject *object, int ind, bool inherited=true);
+
+  QString getPropertyEnumName(const QObject *object, int ind, bool inherited=true);
+
+  QString getPropertyEnumValue(const QObject *object, int ind, bool inherited=true);
+
+  QStringList getMetaPropertyEnumNames(const QObject *object, int ind, bool inherited=true);
+
+  QList<int> getMetaPropertyEnumValues(const QObject *object, int ind, bool inherited=true);
+
+  bool getMetaProperty(const QObject *object, int ind, bool inherited,
+                       QMetaProperty &metaProperty);
+
   bool getProperty(const QObject *object, const QString &name, QVariant &value);
+
+  bool setPropertyValue(QObject *object, int ind, const QVariant &value, bool inherited=true);
 
   bool setProperty(const QObject *object, const QString &name, const QString &value);
   bool setProperty(const QObject *object, const QString &name, const QVariant &value);
 
+  bool getPropertyInfo(const QObject *object, int ind, PropInfo *info, bool inherited=true);
+
   bool getPropInfo(const QObject *object, const QString &name, PropInfo *info);
+
+  //---
+
+  QString className(const QObject *object);
+
+  QStringList hierClassNames(const QObject *object);
 
   const QMetaObject *baseClass(QMetaObject *metaObject, const char *name);
 
-  QStringList signalNames(const QObject* object, bool inherited);
-  QStringList slotNames(const QObject* object, bool inherited);
+  //---
+
+  int numSignals(const QObject *object, bool hierarchical=true);
+
+  QString signalName(const QObject *object, int ind, bool hierarchical=true);
+
+  QStringList signalNames(const QObject* object, bool inherited=true);
+
+  //---
+
+  int numSlots(const QObject *object, bool hierarchical=true);
+
+  QString slotName(const QObject *object, int ind, bool hierarchical=true);
+
+  QStringList slotNames(const QObject* object, bool inherited=true);
+
+  //---
 
   QString eventTypeToName(QEvent::Type type);
   QString eventToString(QEvent *event);
@@ -223,8 +274,45 @@ namespace CQUtil {
 
   QString colorToHtml(const QColor &c);
 
+  //----
+
+  QString policyToString(QSizePolicy::Policy policy);
+
+  //----
+
   QColor blendColors(const QColor &c1, const QColor &c2, double f);
-};
+}
+
+namespace CQUtil {
+  template<class T>
+  T *makeWidget(const QString &name) {
+    T *t = new T;
+
+    t->setObjectName(name);
+
+    return t;
+  }
+
+  template<class T>
+  T *makeLayout(QWidget *parent, int margin=2, int spacing=2) {
+    T *t = new T(parent);
+
+    t->setMargin (margin );
+    t->setSpacing(spacing);
+
+    return t;
+  }
+
+  template<class T>
+  T *makeLayout(int border=2, int spacing=2) {
+    T *t = new T;
+
+    t->setBorder (border );
+    t->setSpacing(spacing);
+
+    return t;
+  }
+}
 
 class CQWidgetPtr : public QObject {
   Q_OBJECT

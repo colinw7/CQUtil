@@ -31,6 +31,7 @@ CQIntegerEdit.cpp \
 CQRealEdit.cpp \
 CQRealSpin.cpp \
 CQPoint2DEdit.cpp \
+CQBBox2DEdit.cpp \
 CQImageButton.cpp \
 CQFloatEdit.cpp \
 CQAutoHide.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
 ../include/CQRealEdit.h \
 ../include/CQRealSpin.h \
 ../include/CQPoint2DEdit.h \
+../include/CQBBox2DEdit.h \
 ../include/CQImageButton.h \
 ../include/CQFloatEdit.h \
 ../include/CQAutoHide.h \

@@ -24,12 +24,37 @@
 #include <QAbstractTextDocumentLayout>
 #include <QPainter>
 
+#define DCL_META_STREAM(TYPE, GETTER, SETTER) \
+QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
+  QString str = t.GETTER().c_str(); \
+\
+  out << str; \
+\
+  return out; \
+} \
+\
+QDataStream &operator>>(QDataStream &in, TYPE &t) {\
+  QString str; \
+\
+  in >> str; \
+\
+  t.fromString(str.toStdString()); \
+\
+  return in; \
+}
+
+DCL_META_STREAM(CLineDash, toString, fromString)
+DCL_META_STREAM(CAngle   , toString, fromString)
+
 void
 CQUtil::
 initProperties()
 {
   qRegisterMetaType<CLineDash>("CLineDash");
-  qRegisterMetaType<CAngle>   ("CAngle");
+  qRegisterMetaTypeStreamOperators<CLineDash>("CLineDash");
+
+  qRegisterMetaType<CAngle>("CAngle");
+  qRegisterMetaTypeStreamOperators<CAngle>("CAngle");
 }
 
 CMouseEvent *
@@ -566,7 +591,8 @@ nameToObject(const QString &name)
   if (! name.length())
     return nullptr;
 
-  if (name == QApplication::applicationName())
+//if (name == QApplication::applicationName())
+  if (name == "APPLICATION")
     return qApp;
 
   QStringList names = name.split("|");
@@ -592,16 +618,39 @@ nameToObject(const QString &name)
   if (! current)
     return nullptr;
 
-  for (int i = 1; i < num_names; ++i) {
-    QObject *child = childObject(current, names[i]);
+  if (names.size() > 1)
+    return hierChildObject(current, 1, names);
+  else
+    return current;
+}
 
-    if (! child)
-      return nullptr;
+QObject *
+CQUtil::
+hierChildObject(QObject *object, int ind, const QStringList &names)
+{
+  QObject *child = childObject(object, names[ind]);
 
-    current = child;
+  if (child) {
+    ++ind;
+
+    if (ind < names.size())
+      return hierChildObject(child, ind, names);
+    else
+      return child;
   }
 
-  return current;
+  if (names[ind] == "*") {
+    const QObjectList &children = object->children();
+
+    for (QObjectList::const_iterator po = children.begin(); po != children.end(); ++po) {
+      QObject *child1 = hierChildObject(*po, ind + 1, names);
+
+      if (child1)
+        return child1;
+    }
+  }
+
+  return nullptr;
 }
 
 QObject *
@@ -623,6 +672,23 @@ getToplevelWidget(QWidget *widget)
     parent = parent1;
 
   return parent;
+}
+
+int
+CQUtil::
+getNumProperties(const QObject *object, bool inherited)
+{
+  if (! object)
+    return 0;
+
+  const QMetaObject *metaObject = object->metaObject();
+
+  if (! metaObject)
+    return 0;
+
+  int firstProp = (inherited ? 0 : metaObject->propertyOffset());
+
+  return metaObject->propertyCount() - firstProp;
 }
 
 QStringList
@@ -654,6 +720,165 @@ getPropertyList(const QObject *object, bool inherited, const QMetaObject *metaOb
   return names;
 }
 
+QString
+CQUtil::
+getPropertyName(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QString();
+
+  return metaProperty.name();
+}
+
+QVariant::Type
+CQUtil::
+getPropertyType(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QVariant::Invalid;
+
+  return metaProperty.type();
+}
+
+QVariant
+CQUtil::
+getPropertyValue(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QVariant();
+
+  return object->property(metaProperty.name());
+}
+
+bool
+CQUtil::
+getPropertyValueIsEnum(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  return metaProperty.isEnumType();
+}
+
+QString
+CQUtil::
+getPropertyEnumName(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QString();
+
+  if (! metaProperty.isEnumType())
+    return QString();
+
+  QVariant value = object->property(metaProperty.name());
+
+  QMetaEnum me = metaProperty.enumerator();
+
+  return me.name();
+}
+
+QString
+CQUtil::
+getPropertyEnumValue(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QString();
+
+  if (! metaProperty.isEnumType())
+    return QString();
+
+  QVariant value = object->property(metaProperty.name());
+
+  int eind = value.toInt();
+
+  QMetaEnum me = metaProperty.enumerator();
+
+  int numEnums = me.keyCount();
+
+  if (eind < 0 || eind >= numEnums)
+    return QString();
+
+  return me.valueToKey(eind);
+}
+
+QStringList
+CQUtil::
+getMetaPropertyEnumNames(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QStringList();
+
+  if (! metaProperty.isEnumType())
+    return QStringList();
+
+  QMetaEnum me = metaProperty.enumerator();
+
+  QStringList names;
+
+  for (int i = 0; i < me.keyCount(); ++i)
+    names.push_back(me.key(i));
+
+  return names;
+}
+
+QList<int>
+CQUtil::
+getMetaPropertyEnumValues(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return QList<int>();
+
+  if (! metaProperty.isEnumType())
+    return QList<int>();
+
+  QMetaEnum me = metaProperty.enumerator();
+
+  QList<int> values;
+
+  for (int i = 0; i < me.keyCount(); ++i)
+    values.push_back(me.value(i));
+
+  return values;
+}
+
+bool
+CQUtil::
+getMetaProperty(const QObject *object, int ind, bool inherited, QMetaProperty &metaProperty)
+{
+  if (! object)
+    return false;
+
+  const QMetaObject *metaObject = object->metaObject();
+
+  if (! metaObject)
+    return false;
+
+  int firstProp = (inherited ? 0 : metaObject->propertyOffset());
+
+  if (ind < 0 || firstProp + ind >= metaObject->propertyCount())
+    return false;
+
+  metaProperty = metaObject->property(firstProp + ind);
+
+  return true;
+}
+
 bool
 CQUtil::
 getProperty(const QObject *object, const QString &propName, QVariant &v)
@@ -681,6 +906,24 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   }
 
   return false;
+}
+
+bool
+CQUtil::
+setPropertyValue(QObject *object, int ind, const QVariant &value, bool inherited)
+{
+  if (! object)
+    return false;
+
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  if (! metaProperty.isWritable())
+    return false;
+
+  return object->setProperty(metaProperty.name(), value);
 }
 
 bool
@@ -745,6 +988,30 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
 
 bool
 CQUtil::
+getPropertyInfo(const QObject *object, int ind, PropInfo *propInfo, bool inherited)
+{
+  if (! object)
+    return false;
+
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  QObject *obj = const_cast<QObject *>(object);
+
+  const QMetaObject *meta = obj->metaObject();
+
+  if (! meta)
+    return false;
+
+  propInfo->init(metaProperty);
+
+  return true;
+}
+
+bool
+CQUtil::
 getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
 {
   if (! object)
@@ -772,6 +1039,35 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   return false;
 }
 
+QString
+CQUtil::
+className(const QObject *object)
+{
+  const QMetaObject *mo = object->metaObject();
+
+  if (! mo)
+    return "";
+
+  return mo->className();
+}
+
+QStringList
+CQUtil::
+hierClassNames(const QObject *object)
+{
+  QStringList names;
+
+  const QMetaObject *mo = object->metaObject();
+
+  while (mo) {
+    names.push_back(mo->className());
+
+    mo = mo->superClass();
+  }
+
+  return names;
+}
+
 const QMetaObject *
 CQUtil::
 baseClass(QMetaObject *metaObject, const char *name)
@@ -790,15 +1086,18 @@ baseClass(QMetaObject *metaObject, const char *name)
   return baseMetaObject;
 }
 
-QStringList
+int
 CQUtil::
-signalNames(const QObject *object, bool hierarchical)
+numSignals(const QObject *object, bool inherited)
 {
-  QStringList names;
+  if (! object)
+    return 0;
 
   const QMetaObject *meta = object->metaObject();
 
-  int start = (hierarchical ? 0 : meta->methodOffset());
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
     QMetaMethod metaMethod = meta->method(pos);
@@ -806,22 +1105,86 @@ signalNames(const QObject *object, bool hierarchical)
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
 
-    if (metaMethod.methodType() == QMetaMethod::Signal)
-      names.append(metaMethod.methodSignature());
+    if (metaMethod.methodType() != QMetaMethod::Signal)
+      continue;
+
+    ++num;
+  }
+
+  return num;
+}
+
+QString
+CQUtil::
+signalName(const QObject *object, int ind, bool inherited)
+{
+  if (! object)
+    return QString();
+
+  const QMetaObject *meta = object->metaObject();
+
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  int num = 0;
+
+  for (int pos = start; pos < meta->methodCount(); ++pos) {
+    QMetaMethod metaMethod = meta->method(pos);
+
+    if (metaMethod.attributes() & QMetaMethod::Compatibility)
+      continue;
+
+    if (metaMethod.methodType() != QMetaMethod::Signal)
+      continue;
+
+    if (num == ind)
+      return metaMethod.methodSignature();
+
+    ++num;
+  }
+
+  return "";
+}
+
+QStringList
+CQUtil::
+signalNames(const QObject *object, bool inherited)
+{
+  QStringList names;
+
+  if (! object)
+    return names;
+
+  const QMetaObject *meta = object->metaObject();
+
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  for (int pos = start; pos < meta->methodCount(); ++pos) {
+    QMetaMethod metaMethod = meta->method(pos);
+
+    if (metaMethod.attributes() & QMetaMethod::Compatibility)
+      continue;
+
+    if (metaMethod.methodType() != QMetaMethod::Signal)
+      continue;
+
+    names.append(metaMethod.methodSignature());
   }
 
   return names;
 }
 
-QStringList
+int
 CQUtil::
-slotNames(const QObject *object, bool hierarchical)
+numSlots(const QObject *object, bool inherited)
 {
-  QStringList names;
+  if (! object)
+    return 0;
 
   const QMetaObject *meta = object->metaObject();
 
-  int start = (hierarchical ? 0 : meta->methodOffset());
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
     QMetaMethod metaMethod = meta->method(pos);
@@ -829,8 +1192,66 @@ slotNames(const QObject *object, bool hierarchical)
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
 
-    if (metaMethod.methodType() == QMetaMethod::Slot)
-      names.append(metaMethod.methodSignature());
+    if (metaMethod.methodType() != QMetaMethod::Slot)
+      continue;
+
+    ++num;
+  }
+
+  return num;
+}
+
+QString
+CQUtil::
+slotName(const QObject *object, int ind, bool inherited)
+{
+  if (! object)
+    return QString();
+
+  const QMetaObject *meta = object->metaObject();
+
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  int num = 0;
+
+  for (int pos = start; pos < meta->methodCount(); ++pos) {
+    QMetaMethod metaMethod = meta->method(pos);
+
+    if (metaMethod.attributes() & QMetaMethod::Compatibility)
+      continue;
+
+    if (metaMethod.methodType() != QMetaMethod::Slot)
+      continue;
+
+    if (ind == num)
+      return metaMethod.methodSignature();
+
+    ++num;
+  }
+
+  return QString();
+}
+
+QStringList
+CQUtil::
+slotNames(const QObject *object, bool inherited)
+{
+  QStringList names;
+
+  const QMetaObject *meta = object->metaObject();
+
+  int start = (inherited ? 0 : meta->methodOffset());
+
+  for (int pos = start; pos < meta->methodCount(); ++pos) {
+    QMetaMethod metaMethod = meta->method(pos);
+
+    if (metaMethod.attributes() & QMetaMethod::Compatibility)
+      continue;
+
+    if (metaMethod.methodType() != QMetaMethod::Slot)
+      continue;
+
+    names.append(metaMethod.methodSignature());
   }
 
   return names;
@@ -973,6 +1394,28 @@ variantToString(const QVariant &var, QString &valueStr)
     bool b = var.value<bool>();
 
     valueStr = (b ? "true" : "false");
+  }
+  else if (type == QVariant::Region) {
+    QRegion region = var.value<QRegion>();
+
+    QRect r = region.boundingRect();
+
+    valueStr = QString("{%1 %2} {%3 %4}").
+               arg(r.left ()).arg(r.bottom()).
+               arg(r.right()).arg(r.top   ());
+  }
+  else if (type == QVariant::Locale) {
+    QLocale locale = var.value<QLocale>();
+
+    valueStr = locale.name();
+  }
+  else if (type == QVariant::SizePolicy) {
+    QSizePolicy sp = var.value<QSizePolicy>();
+
+    valueStr = QString("%1 %2 %3 %4").arg(policyToString(sp.horizontalPolicy())).
+                                      arg(policyToString(sp.verticalPolicy  ())).
+                                      arg(sp.horizontalStretch()).
+                                      arg(sp.verticalStretch  ());
   }
   else if (type == QVariant::UserType) {
     if      (strcmp(var.typeName(), "CLineDash") == 0) {
@@ -1588,10 +2031,9 @@ toQGradient(const CLinearGradient *lgradient, QGradient::CoordinateMode mode)
 
   QGradientStops stops;
 
-  CLinearGradient::StopList::const_iterator p1, p2;
-
-  for (p1 = lgradient->beginStops(), p2 = lgradient->endStops(); p1 != p2; ++p1) {
-    const CGradientStop &stop = *p1;
+  for (CLinearGradient::StopList::const_iterator ps = lgradient->beginStops();
+         ps != lgradient->endStops(); ++ps) {
+    const CGradientStop &stop = *ps;
 
     stops.push_back(QGradientStop(stop.getOffset(), CQUtil::rgbaToColor(stop.getColor())));
   }
@@ -1620,10 +2062,9 @@ toQGradient(const CRadialGradient *rgradient, QGradient::CoordinateMode mode)
 
   QGradientStops stops;
 
-  CRadialGradient::StopList::const_iterator p1, p2;
-
-  for (p1 = rgradient->beginStops(), p2 = rgradient->endStops(); p1 != p2; ++p1) {
-    const CGradientStop &stop = *p1;
+  for (CRadialGradient::StopList::const_iterator ps = rgradient->beginStops();
+         ps != rgradient->endStops(); ++ps) {
+    const CGradientStop &stop = *ps;
 
     stops.push_back(QGradientStop(stop.getOffset(), CQUtil::rgbaToColor(stop.getColor())));
   }
@@ -1912,11 +2353,8 @@ nameWidgetTree(QWidget *widget)
 
   const QObjectList &children = widget->children();
 
-  QObjectList::const_iterator p1 = children.begin();
-  QObjectList::const_iterator p2 = children.end  ();
-
-  for ( ; p1 != p2; ++p1) {
-    QWidget *widget1 = qobject_cast<QWidget *>(*p1);
+  for (QObjectList::const_iterator po = children.begin(); po != children.end(); ++po) {
+    QWidget *widget1 = qobject_cast<QWidget *>(*po);
 
     if (widget1)
       num += nameWidgetTree(widget1);
@@ -2092,6 +2530,22 @@ colorToHtml(const QColor &c)
 
   return QString("#%1%2%3").
     arg(c.red(), 2, 16, pad).arg(c.green(), 2, 16, pad).arg(c.blue(), 2, 16, pad);
+}
+
+QString
+CQUtil::
+policyToString(QSizePolicy::Policy policy)
+{
+  switch (policy) {
+    case QSizePolicy::Fixed           : return "Fixed";
+    case QSizePolicy::Minimum         : return "Minimum";
+    case QSizePolicy::Maximum         : return "Maximum";
+    case QSizePolicy::Preferred       : return "Preferred";
+    case QSizePolicy::Expanding       : return "Expanding";
+    case QSizePolicy::MinimumExpanding: return "MinimumExpanding";
+    case QSizePolicy::Ignored         : return "Ignored";
+    default                           : return QString("%1").arg(policy);
+  }
 }
 
 //------------

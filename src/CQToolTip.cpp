@@ -31,9 +31,8 @@ getInstance()
 CQToolTip::
 CQToolTip() :
  QWidget(0, Qt::Window | Qt::FramelessWindowHint),
- tooltips_(), tooltip_(), parent_(), hideSecs_(3), hideTimer_(0),
- margin_(style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth)),
- opacity_(style()->styleHint(QStyle::SH_ToolTipLabel_Opacity)/255.0)
+ margin_ (style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth)),
+ opacity_(style()->styleHint  (QStyle::SH_ToolTipLabel_Opacity)/255.0)
 {
   setAttribute(Qt::WA_TranslucentBackground);
 
@@ -71,6 +70,9 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
   setWindowFlags(Qt::ToolTip);
 
   QWidget *tipWidget = tooltip->showWidget(pos);
+
+  if (! tipWidget)
+    return;
 
   tooltip_ = tipWidget;
   parent_  = parent;
@@ -287,12 +289,13 @@ eventFilter(QObject *o, QEvent *e)
         if (tooltip) {
           QPoint pos = ((QMouseEvent *) e)->globalPos();
 
-          showAtPos(pos);
-
           if (! tooltip->updateWidget(pos)) {
-            //hideLater();
+            hideLater();
+
             return false;
           }
+
+          showAtPos(pos);
 
           updateSize();
 
