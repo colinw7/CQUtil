@@ -179,6 +179,7 @@ namespace CQUtil {
   void   setBackground(QWidget *widget, const QColor &color);
 
   QPointF  toQPoint  (const CPoint2D &point);
+  QPoint   toQPointI (const CPoint2D &point);
   CPoint2D fromQPoint(const QPointF &point);
 
   QPoint    toQPoint   (const CIPoint2D &point);
@@ -192,6 +193,7 @@ namespace CQUtil {
   CISize2D fromQSize(const QSize &size);
 
   QRectF  toQRect  (const CBBox2D &rect);
+  QRect   toQRectI (const CBBox2D &rect);
   CBBox2D fromQRect(const QRectF &rect);
 
   QRect    toQRect  (const CIBBox2D &rect);

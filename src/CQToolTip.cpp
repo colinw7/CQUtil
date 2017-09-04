@@ -39,8 +39,7 @@ CQToolTip() :
   //setPalette(QToolTip::palette());
   setWindowOpacity(opacity_);
 
-  layout_ = new QVBoxLayout(this);
-  layout_->setMargin(margin_); layout_->setSpacing(0);
+  setContentsMargins(margin_, margin_, margin_, margin_);
 
   qApp->installEventFilter(this);
 }
@@ -62,10 +61,14 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
 
   QDesktopWidget *desktop = QApplication::desktop();
 
+  int snum;
+
   if (desktop->isVirtualDesktop())
-    setParent(desktop->screen(desktop->screenNumber(pos)));
+    snum = desktop->screenNumber(pos);
   else
-    setParent(desktop->screen(desktop->screenNumber(this)));
+    snum = desktop->screenNumber(this);
+
+  setParent(desktop->screen(snum));
 
   setWindowFlags(Qt::ToolTip);
 
@@ -77,21 +80,9 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
   tooltip_ = tipWidget;
   parent_  = parent;
 
-  for (int i = 0; i < layout_->count(); ++i) {
-    QLayoutItem *item = layout_->takeAt(i);
+  int margin = calcMargin();
 
-    if (item->widget())
-      item->widget()->hide();
-  }
-
-  layout_->addWidget(tooltip_);
-
-  if (tooltip->margin() >= 0)
-    layout_->setMargin(tooltip->margin());
-  else
-    layout_->setMargin(margin_);
-
-  tooltip_->show();
+  setContentsMargins(margin, margin, margin, margin);
 
   showAtPos(pos);
 
@@ -106,23 +97,29 @@ void
 CQToolTip::
 updateSize()
 {
-  resize(sizeHint());
+  QSize s = sizeHint();
+
+  resize(s);
+
+  int margin = calcMargin();
+
+  tooltip_->setParent(this);
+
+  tooltip_->move(margin, margin);
+
+  tooltip_->resize(s.width() - 2*margin, s.height() - 2*margin);
+
+  tooltip_->show();
 }
 
 QSize
 CQToolTip::
 sizeHint() const
 {
-  QSize s = tooltip_->sizeHint();
+  QSize s      = calcSize();
+  int   margin = calcMargin();
 
-  CQToolTipIFace *tooltip = getToolTip(parent_);
-
-  int m = margin_;
-
-  if (tooltip && tooltip->margin() >= 0)
-    m = tooltip->margin();
-
-  return QSize(s.width() + 2*m, s.height() + 2*m);
+  return QSize(s.width() + 2*margin, s.height() + 2*margin);
 }
 
 void
@@ -143,6 +140,10 @@ void
 CQToolTip::
 showAtPos(const QPoint &pos)
 {
+  QRect drect = desktopRect(pos);
+
+  //---
+
   QCursor c = parent_->cursor();
 
   CQToolTipIFace *tooltip = getToolTip(parent_);
@@ -220,7 +221,30 @@ showAtPos(const QPoint &pos)
     pos1 = parent_->mapToGlobal(QPoint(x, y));
   }
 
+  //---
+
+  QSize s = this->sizeHint();
+
+  int w = s.width ();
+  int h = s.height();
+
+  if (pos1.x() + w > drect.right()) {
+    if (w < drect.width())
+      pos1.setX(drect.right() - w);
+    else
+      pos1.setX(drect.left());
+  }
+
+  if (pos1.y() + h > drect.bottom()) {
+    if (h < drect.height())
+      pos1.setY(drect.bottom() - h);
+    else
+      pos1.setY(drect.top());
+  }
+
   move(pos1);
+
+  updateSize();
 
   QWidget::show();
 }
@@ -296,8 +320,6 @@ eventFilter(QObject *o, QEvent *e)
           }
 
           showAtPos(pos);
-
-          updateSize();
 
           updateOpacity(tooltip);
 
@@ -434,4 +456,46 @@ CQToolTip::
 unsetToolTip(QWidget *parent)
 {
   setToolTip(parent, (CQToolTipIFace *) 0);
+}
+
+int
+CQToolTip::
+calcMargin() const
+{
+  CQToolTipIFace *tooltip = getToolTip(parent_);
+
+  if (tooltip->margin() >= 0)
+    return tooltip->margin();
+  else
+    return margin_;
+}
+
+QSize
+CQToolTip::
+calcSize() const
+{
+  CQToolTipIFace *tooltip = getToolTip(parent_);
+
+  QSize s = tooltip->sizeHint();
+
+  if (! s.isValid())
+    s = tooltip_->sizeHint();
+
+  return s;
+}
+
+QRect
+CQToolTip::
+desktopRect(const QPoint &pos) const
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+
+  int snum;
+
+  if (desktop->isVirtualDesktop())
+    snum = desktop->screenNumber(pos);
+  else
+    snum = desktop->screenNumber(this);
+
+  return desktop->availableGeometry(snum);
 }

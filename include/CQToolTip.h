@@ -33,6 +33,8 @@ class CQToolTipIFace {
   virtual Qt::Alignment alignment() const { return Qt::AlignLeft | Qt::AlignTop; }
 
   virtual bool outside() const { return false; }
+
+  virtual QSize sizeHint() const { return QSize(); }
 };
 
 //---
@@ -93,6 +95,12 @@ class CQToolTip : public QWidget {
 
   QSize sizeHint() const;
 
+  int calcMargin() const;
+
+  QSize calcSize() const;
+
+  QRect desktopRect(const QPoint &pos) const;
+
  private slots:
   void hideSlot();
 
@@ -101,14 +109,13 @@ class CQToolTip : public QWidget {
 
   typedef QMap<QWidgetP,CQToolTipIFace *> WidgetMap;
 
-  QVBoxLayout *layout_    { nullptr };
-  WidgetMap    tooltips_;
-  QWidgetP     tooltip_;
-  QWidgetP     parent_;
-  double       hideSecs_  { 3 };
-  int          hideTimer_ { 0 };
-  int          margin_    { 1 };
-  double       opacity_   { 0.8 };
+  WidgetMap tooltips_;
+  QWidgetP  tooltip_;
+  QWidgetP  parent_;
+  double    hideSecs_  { 3 };
+  int       hideTimer_ { 0 };
+  int       margin_    { 1 };
+  double    opacity_   { 0.8 };
 };
 
 #endif

@@ -16,6 +16,7 @@ SOURCES += \
 CQUtil.cpp \
 CQApp.cpp \
 CQMainWindow.cpp \
+CQWorkspace.cpp \
 CQToolBar.cpp \
 CQWindow.cpp \
 CQImage.cpp \
@@ -46,6 +47,8 @@ HEADERS += \
 ../include/CQApp.h \
 ../include/CQMainWindow.h \
 ../include/CQToolBar.h \
+../include/CQWorkspace.h \
+../include/CQMidArea.h \
 ../include/CQWindow.h \
 ../include/CQImage.h \
 ../include/CQFont.h \

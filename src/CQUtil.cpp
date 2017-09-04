@@ -2121,6 +2121,13 @@ toQPoint(const CPoint2D &point)
   return QPointF(point.x, point.y);
 }
 
+QPoint
+CQUtil::
+toQPointI(const CPoint2D &point)
+{
+  return QPoint(point.x, point.y);
+}
+
 CPoint2D
 CQUtil::
 fromQPoint(const QPointF &point)
@@ -2161,6 +2168,13 @@ CQUtil::
 toQRect(const CBBox2D &rect)
 {
   return QRectF(toQPoint(rect.getLL()), toQPoint(rect.getUR())).normalized();
+}
+
+QRect
+CQUtil::
+toQRectI(const CBBox2D &rect)
+{
+  return QRect(toQPointI(rect.getLL()), toQPointI(rect.getUR())).normalized();
 }
 
 CBBox2D
