@@ -48,7 +48,7 @@ HEADERS += \
 ../include/CQMainWindow.h \
 ../include/CQToolBar.h \
 ../include/CQWorkspace.h \
-../include/CQMidArea.h \
+../include/CQMdiArea.h \
 ../include/CQWindow.h \
 ../include/CQImage.h \
 ../include/CQFont.h \

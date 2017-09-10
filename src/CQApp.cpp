@@ -68,6 +68,8 @@ CQApp::
 CQApp(int &argc, char **argv) :
  QApplication(argc, argv)
 {
+  setObjectName("app");
+
   setStyle(new CQStyle);
 
   CQImage::setPrototype();

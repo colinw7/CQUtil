@@ -46,6 +46,22 @@ QDataStream &operator>>(QDataStream &in, TYPE &t) {\
 DCL_META_STREAM(CLineDash, toString, fromString)
 DCL_META_STREAM(CAngle   , toString, fromString)
 
+//------
+
+namespace {
+
+QString metaMethodSignature(QMetaMethod &m) {
+#if QT_VERSION < 0x050000
+  return m.signature();
+#else
+  return m.methodSignature();
+#endif
+}
+
+}
+
+//------
+
 void
 CQUtil::
 initProperties()
@@ -1137,7 +1153,7 @@ signalName(const QObject *object, int ind, bool inherited)
       continue;
 
     if (num == ind)
-      return metaMethod.methodSignature();
+      return metaMethodSignature(metaMethod);
 
     ++num;
   }
@@ -1167,7 +1183,7 @@ signalNames(const QObject *object, bool inherited)
     if (metaMethod.methodType() != QMetaMethod::Signal)
       continue;
 
-    names.append(metaMethod.methodSignature());
+    names.append(metaMethodSignature(metaMethod));
   }
 
   return names;
@@ -1224,7 +1240,7 @@ slotName(const QObject *object, int ind, bool inherited)
       continue;
 
     if (ind == num)
-      return metaMethod.methodSignature();
+      return metaMethodSignature(metaMethod);
 
     ++num;
   }
@@ -1251,7 +1267,7 @@ slotNames(const QObject *object, bool inherited)
     if (metaMethod.methodType() != QMetaMethod::Slot)
       continue;
 
-    names.append(metaMethod.methodSignature());
+    names.append(metaMethodSignature(metaMethod));
   }
 
   return names;
@@ -1779,7 +1795,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
       if (metaMethod.methodType() != QMetaMethod::Slot)
         continue;
 
-      if (slotNameStr == metaMethod.methodSignature()) {
+      if (slotNameStr == metaMethodSignature(metaMethod)) {
         found = true;
         break;
       }
@@ -1905,7 +1921,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
       if (metaMethod.methodType() != QMetaMethod::Signal)
         continue;
 
-      if (signalNameStr == metaMethod.methodSignature()) {
+      if (signalNameStr == metaMethodSignature(metaMethod)) {
         found = true;
         break;
       }

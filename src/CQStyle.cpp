@@ -192,7 +192,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         QRect checkBoxRect =
           proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
         if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
-          QStyleOptionFrame frame;
+          QStyleOptionFrameV2 frame;
           frame.QStyleOption::operator=(*groupBox);
           frame.features = groupBox->features;
           frame.lineWidth = groupBox->lineWidth;
@@ -609,8 +609,8 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
   switch (element) {
     case PE_FrameGroupBox: {
-      if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame *>(option)) {
-        if (frame->features & QStyleOptionFrame::Flat) {
+      if (const QStyleOptionFrameV2 *frame = qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
+        if (frame->features & QStyleOptionFrameV2::Flat) {
           QRect fr = frame->rect;
           QPoint p1(fr.x(), fr.y() + 1);
           QPoint p2(fr.x() + fr.width(), p1.y());
@@ -956,7 +956,7 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
             }
 
             int frameWidth = 0;
-            if ((groupBox->features & QStyleOptionFrame::Flat) == 0)
+            if ((groupBox->features & QStyleOptionFrameV2::Flat) == 0)
               frameWidth = proxy()->pixelMetric(PM_DefaultFrameWidth, groupBox, widget);
             ret = frameRect.adjusted(frameWidth, frameWidth + topHeight - topMargin,
                                      -frameWidth, -frameWidth);
@@ -969,7 +969,7 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
             int h = fontMetrics.height();
             int tw = fontMetrics.size(Qt::TextShowMnemonic,
                        groupBox->text + QLatin1Char(' ')).width();
-            int marg = (groupBox->features & QStyleOptionFrame::Flat) ? 0 : 8;
+            int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : 8;
             ret = groupBox->rect.adjusted(marg, 0, -marg, 0);
             ret.setHeight(h);
 
