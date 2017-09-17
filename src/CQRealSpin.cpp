@@ -2,6 +2,7 @@
 #include <QLineEdit>
 //#include <iostream>
 //#include <cassert>
+#include <cmath>
 
 CQRealSpin::
 CQRealSpin(QWidget *parent, double value) :
