@@ -33,11 +33,25 @@ init(double value)
   updateStep();
 }
 
+int
+CQRealSpin::
+cursorPosition() const
+{
+  return lineEdit()->cursorPosition();
+}
+
+void
+CQRealSpin::
+setCursorPosition(int pos)
+{
+  lineEdit()->setCursorPosition(pos);
+}
+
 void
 CQRealSpin::
 updateStep()
 {
-  int pos = lineEdit()->cursorPosition();
+  int pos = cursorPosition();
 
   double s = posToStep(pos);
 
@@ -108,7 +122,7 @@ stepBy(int n)
   double v = value();
   double s = step();
 
-  int pos    = lineEdit()->cursorPosition();
+  int pos    = cursorPosition();
   int dotPos = this->dotPos();
 
   bool negative = isNegative();
@@ -129,7 +143,7 @@ stepBy(int n)
   int pos1 = dotPos1 - dotPos + pos;
 
   if (pos1 != pos)
-    lineEdit()->setCursorPosition(pos1);
+    setCursorPosition(pos1);
 
   updateStep();
 }

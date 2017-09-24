@@ -52,7 +52,7 @@ namespace CQUtil {
     bool isWritable() const { return is_writable_ ; }
     bool isEnumType() const { return is_enum_type_; }
 
-    const QStringList &enumNames() { return enumNames_; }
+    const QStringList &enumNames() const { return enumNames_; }
 
    private:
     QString        name_;
@@ -84,7 +84,8 @@ namespace CQUtil {
   CRGBA colorToRGBA(const QColor &color);
 
   QBrush toQBrush(const CBrush &brush);
-  QPen   toQPen  (const CPen   &pen);
+
+  QPen toQPen(const CPen &pen);
 
   Qt::PenCapStyle toPenCapStyle(const CLineCapType &lineCap);
   Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);

@@ -1461,7 +1461,7 @@ bool
 CQUtil::
 stringToVariant(const QString &str, QVariant::Type type, const char *typeName, QVariant &var)
 {
-  // Qt suuports QString ->
+  // Qt supports QString ->
   //   QVariant::StringList, QVariant::ByteArray, QVariant::Int      , QVariant::UInt,
   //   QVariant::Bool      , QVariant::Double   , QVariant::Date     , QVariant::Time,
   //   QVariant::DateTime  , QVariant::LongLong , QVariant::ULongLong, QVariant::Char,
