@@ -26,8 +26,12 @@ CQPixmapCache.cpp \
 CQStyle.cpp \
 \
 CQColorChooser.cpp \
-CQFontChooser.cpp \
 CQAlphaButton.cpp \
+\
+CQFontChooser.cpp \
+CQFontDialog.cpp \
+CQFontListView.cpp \
+\
 CQIntegerEdit.cpp \
 CQRealEdit.cpp \
 CQRealSpin.cpp \
@@ -55,12 +59,17 @@ HEADERS += \
 \
 ../include/CQPixmapCache.h \
 ../include/CQStyle.h \
+\
 ../include/CQMenu.h \
 ../include/CQWidgetUtil.h \
 \
 ../include/CQColorChooser.h \
-../include/CQFontChooser.h \
 ../include/CQAlphaButton.h \
+\
+../include/CQFontChooser.h \
+../include/CQFontDialog.h \
+CQFontListView.h \
+\
 ../include/CQIntegerEdit.h \
 ../include/CQRealEdit.h \
 ../include/CQRealSpin.h \

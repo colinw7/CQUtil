@@ -119,6 +119,10 @@ void
 CQRealSpin::
 stepBy(int n)
 {
+  lineEdit()->deselect();
+
+  //---
+
   double v = value();
   double s = step();
 

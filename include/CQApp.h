@@ -6,6 +6,7 @@
 #include <QApplication>
 
 class CConfig;
+class CQAppObjEditFilter;
 
 #define CQAppInst CQApp::getApp()
 
@@ -26,7 +27,8 @@ class CQApp : public QApplication {
  private:
   static CQApp *app_;
 
-  CConfig *config_ { nullptr };
+  CConfig*            config_        { nullptr };
+  CQAppObjEditFilter* objEditFilter_ { nullptr };
 };
 
 #ifdef USE_OBJEDIT

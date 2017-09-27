@@ -1,4 +1,5 @@
 #include <CQFontChooser.h>
+#include <CQFontDialog.h>
 #include <CQPixmapCache.h>
 
 #include <QLineEdit>
@@ -6,7 +7,6 @@
 #include <QToolButton>
 #include <QLabel>
 #include <QFontComboBox>
-#include <QComboBox>
 #include <QHBoxLayout>
 #include <QFontDialog>
 #include <QFontDatabase>
@@ -174,7 +174,8 @@ updateWidgets()
   else
     ncombo_->setFontFilters(QFontComboBox::AllFonts);
 
-  ncombo_->setCurrentIndex(1);
+  ncombo_->setWritingSystem(QFontDatabase::Latin);
+//ncombo_->setCurrentIndex(1);
 
   cedit_->setText(fontName_);
 
@@ -268,12 +269,25 @@ void
 CQFontChooser::
 chooseFont()
 {
+#if 0
   bool ok;
 
   QFont font = QFontDialog::getFont(&ok, font_, this);
 
   if (ok)
     setFont(font);
+#else
+  CQFontDialog dlg(this);
+
+  dlg.setCurrentFont(font_);
+
+  dlg.setWritingSystem(QFontDatabase::Latin);
+
+  int ret = dlg.exec();
+
+  if (ret)
+    setFont(dlg.selectedFont());
+#endif
 }
 
 void

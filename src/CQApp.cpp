@@ -47,7 +47,7 @@ eventFilter(QObject *obj, QEvent *event)
   if (event->type() == QEvent::KeyPress) {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-    if (keyEvent->key() == Qt::Key_Home) {
+    if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Home) {
       CQObjEdit *objEdit = CQObjEdit::createInstance();
 
       objEdit->show();
@@ -70,6 +70,8 @@ CQApp(int &argc, char **argv) :
 {
   setObjectName("app");
 
+  //---
+
   setStyle(new CQStyle);
 
   CQImage::setPrototype();
@@ -77,7 +79,8 @@ CQApp(int &argc, char **argv) :
   CQFontMgrInst->setPrototype();
 
 #ifdef USE_OBJEDIT
-  setEventFilter(CQAppEventFilter);
+  addObjEditFilter(this);
+  //setEventFilter(CQAppEventFilter);
 #endif
 
   CQWindow::setFactory();
@@ -86,10 +89,33 @@ CQApp(int &argc, char **argv) :
 
   // TODO: handle application font change
   QScreen *srn = QApplication::screens().at(0);
+
   double dotsPerInch = srn->logicalDotsPerInch();
+
   CScreenUnitsMgrInst->setDpi(dotsPerInch);
 
-  QFont font("Helveltica", dotsPerInch/8);
+  //---
+
+  config_ = new CConfig("CQApp");
+
+  std::string fontName;
+
+  if (! config_->getValue("fontName", fontName))
+    fontName = "Helvetica";
+
+  double fontSize = 12;
+
+  if (! config_->getValue("fontSize", &fontSize))
+    fontSize = dotsPerInch/8.0;
+
+  double dpi;
+
+  if (config_->getValue("dpi", &dpi))
+    CScreenUnitsMgrInst->setDpi(dpi);
+
+  //---
+
+  QFont font(fontName.c_str(), fontSize);
 
   qApp->setFont(font);
 
@@ -97,19 +123,16 @@ CQApp(int &argc, char **argv) :
 
   CScreenUnitsMgrInst->setEmSize(fm.height());
   CScreenUnitsMgrInst->setExSize(fm.width("x"));
-
-  config_ = new CConfig("CQApp");
-
-  double dpi;
-
-  if (config_->getValue("dpi", &dpi))
-    CScreenUnitsMgrInst->setDpi(dpi);
 }
 
 CQApp::
 ~CQApp()
 {
   delete config_;
+
+#ifdef USE_OBJEDIT
+  delete objEditFilter_;
+#endif
 }
 
 #ifdef USE_OBJEDIT
@@ -117,6 +140,8 @@ void
 CQApp::
 addObjEditFilter(QObject *o)
 {
-  o->installEventFilter(new CQAppObjEditFilter);
+  objEditFilter_ = new CQAppObjEditFilter;
+
+  o->installEventFilter(objEditFilter_);
 }
 #endif
