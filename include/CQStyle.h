@@ -4,8 +4,23 @@
 #include <QProxyStyle>
 
 class CQStyle : public QProxyStyle {
+  Q_PROPERTY(Theme theme READ theme WRITE setTheme)
+
+  Q_ENUMS(Theme)
+
+ public:
+  enum class Theme {
+    LIGHT,
+    DARK
+  };
+
  public:
   CQStyle();
+
+  const Theme &theme() const { return theme_; }
+  void setTheme(const Theme &t);
+
+  //---
 
   void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
                            QPainter *painter, const QWidget *widget = 0) const override;
@@ -48,10 +63,11 @@ class CQStyle : public QProxyStyle {
   QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size,
                          const QWidget *widget) const override;
 
-#if 0
   QPalette standardPalette() const override;
-  QPixmap  standardPixmap(StandardPixmap standardPixmap, const QStyleOption *opt,
-                          const QWidget *widget = 0) const override;
+
+#if 0
+  QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *opt,
+                         const QWidget *widget = 0) const override;
 #endif
 
   int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0,
@@ -69,6 +85,10 @@ class CQStyle : public QProxyStyle {
 
  private:
   void drawCheck(QPainter *p, const QRectF &r, const QBrush &b) const;
+
+ private:
+  Theme    theme_ { Theme::LIGHT };
+  QPalette palette_;
 };
 
 #endif

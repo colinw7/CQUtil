@@ -1,9 +1,11 @@
 #include <CQStyle.h>
 
+#include <QApplication>
 #include <QGroupBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyleOption>
+
 #include <qdrawutil.h>
 
 //------
@@ -16,13 +18,14 @@ enum Direction {
 };
 
 static void
-qt_cleanlooks_draw_gradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
-                            const QColor &gradientStop, Direction direction = TopDown,
-                            QBrush bgBrush = QBrush())
+drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
+             const QColor &gradientStop, Direction direction=TopDown, QBrush bgBrush=QBrush())
 {
   int x = rect.center().x();
   int y = rect.center().y();
+
   QLinearGradient *gradient;
+
   switch(direction) {
     case FromLeft:
       gradient = new QLinearGradient(rect.left(), y, rect.right(), y);
@@ -38,13 +41,16 @@ qt_cleanlooks_draw_gradient(QPainter *painter, const QRect &rect, const QColor &
       gradient = new QLinearGradient(x, rect.top(), x, rect.bottom());
       break;
   }
+
   if (bgBrush.gradient())
     gradient->setStops(bgBrush.gradient()->stops());
   else {
     gradient->setColorAt(0, gradientStart);
     gradient->setColorAt(1, gradientStop);
   }
+
   painter->fillRect(rect, *gradient);
+
   delete gradient;
 }
 
@@ -176,6 +182,136 @@ CQStyle::
 CQStyle() :
  QProxyStyle()
 {
+  setTheme(Theme::LIGHT);
+}
+
+void
+CQStyle::
+setTheme(const Theme &t)
+{
+  theme_ = t;
+
+  palette_ = qApp->palette();
+
+  QColor windowTextColor    = QColor("#000000");
+  QColor buttonColor        = QColor("#efebe7");
+  QColor textColor          = QColor("#000000");
+  QColor buttonTextColor    = QColor("#000000");
+  QColor baseColor          = QColor("#ffffff");
+  QColor windowColor        = QColor("#efebe7");
+  QColor altBaseColor       = baseColor.darker(110);
+  QColor highlightColor     = Qt::darkBlue;
+  QColor highlightTextColor = Qt::darkBlue;
+  QColor linkColor          = Qt::blue;
+  QColor linkVisitedColor   = Qt::magenta;
+
+  if      (theme_ == Theme::LIGHT) {
+    windowTextColor    = QColor("#000000");
+    buttonColor        = QColor("#efebe7");
+    textColor          = QColor("#000000");
+    buttonTextColor    = QColor("#000000");
+    baseColor          = QColor("#ffffff");
+    windowColor        = QColor("#efebe7");
+    altBaseColor       = baseColor.darker(110);
+    highlightColor     = Qt::darkBlue;
+    highlightTextColor = Qt::black;
+    linkColor          = Qt::blue;
+    linkVisitedColor   = Qt::magenta;
+  }
+  else if (theme_ == Theme::DARK) {
+    windowTextColor    = QColor("#efefef");
+    buttonColor        = QColor("#323232");
+    textColor          = QColor("#efefef");
+    buttonTextColor    = QColor("#efefef");
+    baseColor          = QColor("#282828");
+    windowColor        = QColor("#282828");
+    altBaseColor       = baseColor.lighter(120);
+    highlightColor     = QColor("#408020");
+    highlightTextColor = Qt::white;
+    linkColor          = Qt::blue;
+    linkVisitedColor   = Qt::magenta;
+  }
+
+  palette_.setColor(QPalette::Normal  , QPalette::WindowText, windowTextColor);
+  palette_.setColor(QPalette::Active  , QPalette::WindowText, windowTextColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::WindowText, windowTextColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Button, buttonColor);
+  palette_.setColor(QPalette::Active  , QPalette::Button, buttonColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Button, buttonColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Text, textColor);
+  palette_.setColor(QPalette::Active  , QPalette::Text, textColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Text, textColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::ButtonText, buttonTextColor);
+  palette_.setColor(QPalette::Active  , QPalette::ButtonText, buttonTextColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::ButtonText, buttonTextColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Window, windowColor);
+  palette_.setColor(QPalette::Active  , QPalette::Window, windowColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Window, windowColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Base, baseColor);
+  palette_.setColor(QPalette::Active  , QPalette::Base, baseColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Base, baseColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::AlternateBase, altBaseColor);
+  palette_.setColor(QPalette::Active  , QPalette::AlternateBase, altBaseColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::AlternateBase, altBaseColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Highlight, highlightColor);
+  palette_.setColor(QPalette::Active  , QPalette::Highlight, highlightColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Highlight, highlightColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::HighlightedText, highlightTextColor);
+  palette_.setColor(QPalette::Active  , QPalette::HighlightedText, highlightTextColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::HighlightedText, highlightTextColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Link, linkColor);
+  palette_.setColor(QPalette::Active  , QPalette::Link, linkColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Link, linkColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::LinkVisited, linkVisitedColor);
+  palette_.setColor(QPalette::Active  , QPalette::LinkVisited, linkVisitedColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::LinkVisited, linkVisitedColor);
+
+  //---
+
+  QColor lightColor      = buttonColor.lighter(110);
+  QColor midlightColor   = buttonColor.lighter(105);
+  QColor darkColor       = buttonColor.lighter(110);
+  QColor midColor        = buttonColor.lighter(105);
+  QColor shadowColor     = buttonColor.darker (120);
+  QColor brightTextColor = textColor  .lighter(120);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Light, lightColor);
+  palette_.setColor(QPalette::Active  , QPalette::Light, lightColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Light, lightColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Midlight, midlightColor);
+  palette_.setColor(QPalette::Active  , QPalette::Midlight, midlightColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Midlight, midlightColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Dark, darkColor);
+  palette_.setColor(QPalette::Active  , QPalette::Dark, darkColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Dark, darkColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Mid, midColor);
+  palette_.setColor(QPalette::Active  , QPalette::Mid, midColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Mid, midColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::Shadow, shadowColor);
+  palette_.setColor(QPalette::Active  , QPalette::Shadow, shadowColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::Shadow, shadowColor);
+
+  palette_.setColor(QPalette::Normal  , QPalette::BrightText, brightTextColor);
+  palette_.setColor(QPalette::Active  , QPalette::BrightText, brightTextColor.lighter(110));
+  palette_.setColor(QPalette::Inactive, QPalette::BrightText, brightTextColor);
+
+  //---
+
+  qApp->setPalette(palette_);
 }
 
 void
@@ -189,41 +325,59 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
             qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
         // Draw frame
         QRect textRect = proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
+
         QRect checkBoxRect =
           proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+
         if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
           QStyleOptionFrameV2 frame;
+
           frame.QStyleOption::operator=(*groupBox);
-          frame.features = groupBox->features;
-          frame.lineWidth = groupBox->lineWidth;
+
+          frame.features     = groupBox->features;
+          frame.lineWidth    = groupBox->lineWidth;
           frame.midLineWidth = groupBox->midLineWidth;
-          frame.rect = proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxFrame, widget);
+          frame.rect         = proxy()->subControlRect(CC_GroupBox, option,
+                                                       SC_GroupBoxFrame, widget);
+
           painter->save();
+
           QRegion region(groupBox->rect);
-          if (!groupBox->text.isEmpty()) {
+
+          if (! groupBox->text.isEmpty()) {
             bool ltr = groupBox->direction == Qt::LeftToRight;
+
             QRect finalRect;
+
             if (groupBox->subControls & QStyle::SC_GroupBoxCheckBox) {
               finalRect = checkBoxRect.united(textRect);
+
               finalRect.adjust(ltr ? -4 : 0, 0, ltr ? 0 : 4, 0);
             }
             else {
               finalRect = textRect;
             }
+
             region -= finalRect;
           }
+
           painter->setClipRegion(region);
+
           proxy()->drawPrimitive(PE_FrameGroupBox, &frame, painter, widget);
+
           painter->restore();
         }
 
         // Draw title
         if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) && !groupBox->text.isEmpty()) {
           QColor textColor = groupBox->textColor;
+
           if (textColor.isValid())
             painter->setPen(textColor);
+
           int alignment = int(groupBox->textAlignment);
-          if (!proxy()->styleHint(QStyle::SH_UnderlineShortcut, option, widget))
+
+          if (! proxy()->styleHint(QStyle::SH_UnderlineShortcut, option, widget))
             alignment |= Qt::TextHideMnemonic;
 
           proxy()->drawItemText(painter, textRect,
@@ -233,8 +387,11 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
           if (groupBox->state & State_HasFocus) {
             QStyleOptionFocusRect fropt;
+
             fropt.QStyleOption::operator=(*groupBox);
+
             fropt.rect = textRect;
+
             proxy()->drawPrimitive(PE_FrameFocusRect, &fropt, painter, widget);
           }
         }
@@ -242,11 +399,15 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         // Draw checkbox
         if (groupBox->subControls & SC_GroupBoxCheckBox) {
           QStyleOptionButton box;
+
           box.QStyleOption::operator=(*groupBox);
+
           box.rect = checkBoxRect;
+
           proxy()->drawPrimitive(PE_IndicatorCheckBox, &box, painter, widget);
         }
       }
+
       break;
     }
     case CC_ScrollBar: {
@@ -255,21 +416,25 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
       QColor button = palette.button().color();
 
       QColor dark;
+
       dark.setHsv(button.hue(),
                   qMin(255, (int)(button.saturation()*1.9)),
                   qMin(255, (int)(button.value()*0.7)));
 
       QColor grooveColor;
+
       grooveColor.setHsv(button.hue(),
                          qMin(255, (int)(button.saturation()*2.6)),
                          qMin(255, (int)(button.value()*0.9)));
 
       QColor darkOutline;
+
       darkOutline.setHsv(button.hue(),
                          qMin(255, (int)(button.saturation()*3.0)),
                          qMin(255, (int)(button.value()*0.6)));
 
       QColor alphaCornerColor;
+
       if (widget) {
         // ### backgroundrole/foregroundrole should be part of the style option
         alphaCornerColor = mergedColors(palette.color(widget->backgroundRole()), darkOutline);
@@ -277,12 +442,11 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         alphaCornerColor = mergedColors(palette.background().color(), darkOutline);
       }
 
-      QColor gripShadow = grooveColor.darker(110);
-    //QColor buttonShadow = palette.button().color().darker(110);
-
+      QColor gripShadow         = grooveColor.darker(110);
+    //QColor buttonShadow       = palette.button().color().darker(110);
       QColor gradientStartColor = palette.button().color().lighter(108);
-      QColor gradientStopColor  =
-        mergedColors(palette.button().color().darker(108), dark.lighter(150), 70);
+      QColor gradientStopColor  = mergedColors(palette.button().color().darker(108),
+                                               dark.lighter(150), 70);
 
       //---
 
@@ -311,14 +475,17 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         // paint groove
         if (scrollBar->subControls & SC_ScrollBarGroove) {
           painter->setBrush(grooveColor);
-          painter->setPen(Qt::NoPen);
+          painter->setPen  (Qt::NoPen);
+
           if (horizontal) {
             painter->drawRect(grooveRect);
+
             painter->setPen(darkOutline);
             painter->drawLine(grooveRect.topLeft(), grooveRect.topRight());
             painter->drawLine(grooveRect.bottomLeft(), grooveRect.bottomRight());
           } else {
             painter->drawRect(grooveRect);
+
             painter->setPen(darkOutline);
             painter->drawLine(grooveRect.topLeft(), grooveRect.bottomLeft());
             painter->drawLine(grooveRect.topRight(), grooveRect.bottomRight());
@@ -336,37 +503,46 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           if (isEnabled) {
             QLinearGradient gradient(pixmapRect.center().x(), pixmapRect.top(),
                                      pixmapRect.center().x(), pixmapRect.bottom());
-            if (!horizontal)
+
+            if (! horizontal)
               gradient = QLinearGradient(pixmapRect.left(), pixmapRect.center().y(),
                                          pixmapRect.right(), pixmapRect.center().y());
 
             if (palette.button().gradient()) {
               gradient.setStops(palette.button().gradient()->stops());
-            } else {
+            }
+            else {
               if (sunken || (option->state & State_MouseOver &&
                   (scrollBar->activeSubControls & SC_ScrollBarSlider))) {
                 gradient.setColorAt(0, gradientStartColor.lighter(110));
                 gradient.setColorAt(1, gradientStopColor.lighter(110));
-              } else {
+              }
+              else {
                 gradient.setColorAt(0, gradientStartColor);
                 gradient.setColorAt(1, gradientStopColor);
               }
             }
-            painter->setPen(QPen(darkOutline, 0));
+
+            painter->setPen  (QPen(darkOutline, 0));
             painter->setBrush(gradient);
+
             painter->drawRect(pixmapRect);
 
             //calculate offsets used by highlight and shadow
             int yoffset, xoffset;
+
             if (option->state & State_Horizontal) {
               xoffset = 0;
               yoffset = 1;
-            } else {
+            }
+            else {
               xoffset = 1;
               yoffset = 0;
             }
+
             //draw slider highlights
             painter->setPen(QPen(gradientStopColor, 0));
+
             painter->drawLine(scrollBarSlider.left  () + xoffset,
                               scrollBarSlider.bottom() - yoffset,
                               scrollBarSlider.right () - xoffset,
@@ -378,6 +554,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
             //draw slider shadow
             painter->setPen(QPen(gradientStartColor, 0));
+
             painter->drawLine(scrollBarSlider.left  () + xoffset,
                               scrollBarSlider.top   () + yoffset,
                               scrollBarSlider.right () - xoffset,
@@ -386,34 +563,45 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
                               scrollBarSlider.top   () + yoffset,
                               scrollBarSlider.left  () + xoffset,
                               scrollBarSlider.bottom() - yoffset);
-          } else {
+          }
+          else {
             QLinearGradient gradient(pixmapRect.center().x(), pixmapRect.top(),
                                      pixmapRect.center().x(), pixmapRect.bottom());
-            if (!horizontal) {
+
+            if (! horizontal) {
               gradient = QLinearGradient(pixmapRect.left (), pixmapRect.center().y(),
                                          pixmapRect.right(), pixmapRect.center().y());
             }
+
             if (sunken) {
               gradient.setColorAt(0, gradientStartColor.lighter(110));
               gradient.setColorAt(1, gradientStopColor .lighter(110));
-            } else {
+            }
+            else {
               gradient.setColorAt(0, gradientStartColor);
               gradient.setColorAt(1, gradientStopColor );
             }
-            painter->setPen(darkOutline);
+
+            painter->setPen  (darkOutline);
             painter->setBrush(gradient);
+
             painter->drawRect(pixmapRect);
           }
+
           int gripMargin = 4;
-          //draw grips
+
+          // draw grips
           if (horizontal) {
             for (int i = -3; i< 6 ; i += 3) {
               painter->setPen(QPen(gripShadow, 1));
+
               painter->drawLine(QPoint(scrollBarSlider.center().x() + i ,
                                        scrollBarSlider.top   () + gripMargin),
                                 QPoint(scrollBarSlider.center().x() + i,
                                        scrollBarSlider.bottom() - gripMargin));
+
               painter->setPen(QPen(palette.light(), 1));
+
               painter->drawLine(QPoint(scrollBarSlider.center().x() + i + 1,
                                        scrollBarSlider.top   () + gripMargin  ),
                                 QPoint(scrollBarSlider.center().x() + i + 1,
@@ -422,11 +610,14 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           } else {
             for (int i = -3; i < 6 ; i += 3) {
               painter->setPen(QPen(gripShadow, 1));
+
               painter->drawLine(QPoint(scrollBarSlider.left  () + gripMargin ,
                                        scrollBarSlider.center().y()+ i),
                                 QPoint(scrollBarSlider.right () - gripMargin,
                                        scrollBarSlider.center().y()+ i));
+
               painter->setPen(QPen(palette.light(), 1));
+
               painter->drawLine(QPoint(scrollBarSlider.left  () + gripMargin,
                                        scrollBarSlider.center().y() + 1 + i),
                                 QPoint(scrollBarSlider.right () - gripMargin,
@@ -438,61 +629,76 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         // The SubLine (up/left) buttons
         if (scrollBar->subControls & SC_ScrollBarSubLine) {
           //int scrollBarExtent = proxy()->pixelMetric(PM_ScrollBarExtent, option, widget);
+
           QRect pixmapRect = scrollBarSubLine;
+
           if (isEnabled ) {
             QRect fillRect = pixmapRect.adjusted(1, 1, -1, -1);
+
             // Gradients
             if ((scrollBar->activeSubControls & SC_ScrollBarSubLine) && sunken) {
-              qt_cleanlooks_draw_gradient(painter,
-                                          QRect(fillRect),
-                                          gradientStopColor.darker(120),
-                                          gradientStopColor.darker(120),
-                                          horizontal ? TopDown : FromLeft,
-                                          palette.button());
-            } else {
-              qt_cleanlooks_draw_gradient(painter,
-                                          QRect(fillRect),
-                                          gradientStartColor.lighter(105),
-                                          gradientStopColor,
-                                          horizontal ? TopDown : FromLeft,
-                                          palette.button());
+              drawGradient(painter,
+                           QRect(fillRect),
+                           gradientStopColor.darker(120),
+                           gradientStopColor.darker(120),
+                           horizontal ? TopDown : FromLeft,
+                           palette.button());
+            }
+            else {
+              drawGradient(painter,
+                           QRect(fillRect),
+                           gradientStartColor.lighter(105),
+                           gradientStopColor,
+                           horizontal ? TopDown : FromLeft,
+                           palette.button());
             }
           }
 
           // Details
 #if 0
           QImage subButton;
+
           if (horizontal) {
             subButton = QImage(reverse ? qt_scrollbar_button_right : qt_scrollbar_button_left);
-          } else {
+          }
+          else {
             subButton = QImage(qt_scrollbar_button_up);
           }
+
           subButton.setColor(1, alphaCornerColor.rgba());
           subButton.setColor(2, darkOutline.rgba());
+
           if ((scrollBar->activeSubControls & SC_ScrollBarSubLine) && sunken) {
             subButton.setColor(3, gradientStopColor.darker(140).rgba());
             subButton.setColor(4, gradientStopColor.darker(120).rgba());
-          } else {
+          }
+          else {
             subButton.setColor(3, gradientStartColor.lighter(105).rgba());
             subButton.setColor(4, gradientStopColor.rgba());
           }
+
           subButton.setColor(5, scrollBar->palette.text().color().rgba());
+
           painter->drawImage(pixmapRect, subButton);
 #else
           painter->setPen(darkOutline);
+
           painter->drawRoundedRect(pixmapRect, 3, 3);
 #endif
 
           // Arrow
           PrimitiveElement arrow;
+
           if (option->state & State_Horizontal)
-            arrow = option->direction == Qt::LeftToRight ?
-              PE_IndicatorArrowLeft : PE_IndicatorArrowRight;
+            arrow = (option->direction == Qt::LeftToRight ?
+                       PE_IndicatorArrowLeft : PE_IndicatorArrowRight);
           else
             arrow = PE_IndicatorArrowUp;
 
           QStyleOption arrowOpt = *option;
+
           arrowOpt.rect = scrollBarSubLine.adjusted(3, 3, -2, -2);
+
           proxy()->drawPrimitive(arrow, &arrowOpt, painter, widget);
         }
 
@@ -500,65 +706,82 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         if (scrollBar->subControls & SC_ScrollBarAddLine) {
           //QString addLinePixmapName =
           //  QStyleHelper::uniqueName(QLatin1String("scrollbar_addline"), option, QSize(16, 16));
+
           QString addLinePixmapName = "scrollbar_addline_123";
+
           QRect pixmapRect = scrollBarAddLine;
+
           if (isEnabled) {
             QRect fillRect = pixmapRect.adjusted(1, 1, -1, -1);
+
             // Gradients
             if ((scrollBar->activeSubControls & SC_ScrollBarAddLine) && sunken) {
-              qt_cleanlooks_draw_gradient(painter,
-                                          fillRect,
-                                          gradientStopColor.darker(120),
-                                          gradientStopColor.darker(120),
-                                          horizontal ? TopDown: FromLeft,
-                                          palette.button());
+              drawGradient(painter,
+                           fillRect,
+                           gradientStopColor.darker(120),
+                           gradientStopColor.darker(120),
+                           horizontal ? TopDown: FromLeft,
+                           palette.button());
             } else {
-              qt_cleanlooks_draw_gradient(painter,
-                                          fillRect,
-                                          gradientStartColor.lighter(105),
-                                          gradientStopColor,
-                                          horizontal ? TopDown : FromLeft,
-                                          palette.button());
+              drawGradient(painter,
+                           fillRect,
+                           gradientStartColor.lighter(105),
+                           gradientStopColor,
+                           horizontal ? TopDown : FromLeft,
+                           palette.button());
             }
           }
           // Details
 #if 0
           QImage addButton;
+
           if (horizontal) {
             addButton = QImage(reverse ? qt_scrollbar_button_left : qt_scrollbar_button_right);
-          } else {
+          }
+          else {
             addButton = QImage(qt_scrollbar_button_down);
           }
+
           addButton.setColor(1, alphaCornerColor.rgba());
           addButton.setColor(2, darkOutline.rgba());
+
           if ((scrollBar->activeSubControls & SC_ScrollBarAddLine) && sunken) {
             addButton.setColor(3, gradientStopColor.darker(140).rgba());
             addButton.setColor(4, gradientStopColor.darker(120).rgba());
-          } else {
+          }
+          else {
             addButton.setColor(3, gradientStartColor.lighter(105).rgba());
             addButton.setColor(4, gradientStopColor.rgba());
           }
+
           addButton.setColor(5, scrollBar->palette.text().color().rgba());
+
           painter->drawImage(pixmapRect, addButton);
 #else
           painter->setPen(darkOutline);
+
           painter->drawRoundedRect(pixmapRect, 3, 3);
 #endif
 
           // Arrow
           PrimitiveElement arrow;
+
           if (option->state & State_Horizontal)
-            arrow = option->direction == Qt::LeftToRight ?
-              PE_IndicatorArrowRight : PE_IndicatorArrowLeft;
+            arrow = (option->direction == Qt::LeftToRight ?
+              PE_IndicatorArrowRight : PE_IndicatorArrowLeft);
           else
             arrow = PE_IndicatorArrowDown;
 
           QStyleOption arrowOpt = *option;
+
           arrowOpt.rect = scrollBarAddLine.adjusted(3, 3, -2, -2);
+
           proxy()->drawPrimitive(arrow, &arrowOpt, painter, widget);
         }
       }
+
       painter->restore();
+
       break;
       //return QProxyStyle::drawComplexControl(control, option, painter, widget);
     }
@@ -609,11 +832,14 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
   switch (element) {
     case PE_FrameGroupBox: {
-      if (const QStyleOptionFrameV2 *frame = qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
+      if (const QStyleOptionFrameV2 *frame =
+            qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
         if (frame->features & QStyleOptionFrameV2::Flat) {
           QRect fr = frame->rect;
+
           QPoint p1(fr.x(), fr.y() + 1);
           QPoint p2(fr.x() + fr.width(), p1.y());
+
           qDrawShadeLine(painter, p1, p2, frame->palette, true,
                          frame->lineWidth, frame->midLineWidth);
         }
@@ -623,24 +849,37 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
                          frame->lineWidth, frame->midLineWidth);
         }
       }
+
       break;
     }
     case PE_IndicatorRadioButton: {
       double b = rect.width()*0.1;
       double w = rect.width()/3.0;
+
       //---
+
       QRectF oRect = rect.adjusted(b, b, -b, -b);
+
       QPainterPath opath;
+
       opath.addEllipse(oRect);
+
       //---
+
       QPointF c = rect.center();
       QPointF d = QPointF(w/2, w/2);
+
       QRectF iRect = QRectF(c - d, c + d);
+
       QPainterPath ipath;
+
       ipath.addEllipse(iRect);
+
       //---
+
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing, true);
+
       if      (state & State_On) {
         painter->fillPath  (opath, QBrush(highlight    ));
         painter->strokePath(opath, QPen  (buttonShadow ));
@@ -657,21 +896,30 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
         painter->fillPath  (opath, QBrush(base        ));
         painter->strokePath(opath, QPen  (buttonShadow));
       }
+
       painter->restore();
+
       break;
     }
     case PE_IndicatorCheckBox: {
       double ob = rect.width()*0.1;
       double ib = rect.width()*0.25;
+
       //---
+
       QRectF oRect = rect.adjusted(ob, ob, -ob, -ob);
       QPainterPath opath;
       opath.addRect(oRect);
+
       //---
+
       QRectF iRect = rect.adjusted(ib, ib, -ib, -ib);
+
       //---
+
       painter->save();
       painter->setRenderHint(QPainter::Antialiasing, true);
+
       if      (state & State_On) {
         painter->fillPath  (opath, QBrush(highlight    ));
         painter->strokePath(opath, QPen  (buttonShadow ));
@@ -686,7 +934,9 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
         painter->fillPath  (opath, QBrush(base        ));
         painter->strokePath(opath, QPen  (buttonShadow));
       }
+
       painter->restore();
+
       break;
     }
     case PE_IndicatorArrowUp:
@@ -779,16 +1029,21 @@ hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
       if (const QStyleOptionGroupBox *groupBox =
             qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
         QRect r;
+
         uint ctrl = SC_GroupBoxCheckBox;
+
         while (ctrl <= SC_GroupBoxFrame) {
           r = proxy()->subControlRect(control, groupBox, QStyle::SubControl(ctrl), widget);
+
           if (r.isValid() && r.contains(pos)) {
             sc = QStyle::SubControl(ctrl);
             break;
           }
+
           ctrl <<= 1;
         }
       }
+
       break;
     }
     default: {
@@ -935,13 +1190,15 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
           case SC_GroupBoxFrame:
             // FALL THROUGH
           case SC_GroupBoxContents: {
-            int topMargin = 0;
-            int topHeight = 0;
+            int topMargin         = 0;
+            int topHeight         = 0;
             int verticalAlignment =
               proxy()->styleHint(SH_GroupBox_TextLabelVerticalAlignment, groupBox, widget);
+
             if (groupBox->text.size() || (groupBox->subControls & QStyle::SC_GroupBoxCheckBox)) {
               topHeight = groupBox->fontMetrics.height();
-              if (verticalAlignment & Qt::AlignVCenter)
+
+              if      (verticalAlignment & Qt::AlignVCenter)
                 topMargin = topHeight / 2;
               else if (verticalAlignment & Qt::AlignTop)
                 topMargin = topHeight;
@@ -956,27 +1213,32 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
             }
 
             int frameWidth = 0;
+
             if ((groupBox->features & QStyleOptionFrameV2::Flat) == 0)
               frameWidth = proxy()->pixelMetric(PM_DefaultFrameWidth, groupBox, widget);
+
             ret = frameRect.adjusted(frameWidth, frameWidth + topHeight - topMargin,
                                      -frameWidth, -frameWidth);
+
             break;
           }
           case SC_GroupBoxCheckBox:
             // FALL THROUGH
           case SC_GroupBoxLabel: {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
-            int h = fontMetrics.height();
-            int tw = fontMetrics.size(Qt::TextShowMnemonic,
-                       groupBox->text + QLatin1Char(' ')).width();
-            int marg = (groupBox->features & QStyleOptionFrameV2::Flat) ? 0 : 8;
+            int h    = fontMetrics.height();
+            int tw   = fontMetrics.size(Qt::TextShowMnemonic,
+                                        groupBox->text + QLatin1Char(' ')).width();
+            int marg = (groupBox->features & QStyleOptionFrameV2::Flat ? 0 : 8);
+
             ret = groupBox->rect.adjusted(marg, 0, -marg, 0);
             ret.setHeight(h);
 
             int indicatorWidth = proxy()->pixelMetric(PM_IndicatorWidth, option, widget);
             int indicatorSpace = proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget) - 1;
-            bool hasCheckBox = groupBox->subControls & QStyle::SC_GroupBoxCheckBox;
-            int checkBoxSize = hasCheckBox ? (indicatorWidth + indicatorSpace) : 0;
+
+            bool hasCheckBox  = groupBox->subControls & QStyle::SC_GroupBoxCheckBox;
+            int  checkBoxSize = hasCheckBox ? (indicatorWidth + indicatorSpace) : 0;
 
             // Adjusted rect for label + indicatorWidth + indicatorSpace
             QRect totalRect = alignedRect(groupBox->direction, groupBox->textAlignment,
@@ -984,23 +1246,30 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
 
             // Adjust totalRect if checkbox is set
             if (hasCheckBox) {
-              bool ltr = groupBox->direction == Qt::LeftToRight;
-              int left = 0;
+              bool ltr  = (groupBox->direction == Qt::LeftToRight);
+              int  left = 0;
+
               // Adjust for check box
               if (sc == SC_GroupBoxCheckBox) {
                 int indicatorHeight = proxy()->pixelMetric(PM_IndicatorHeight, option, widget);
+
                 left = ltr ? totalRect.left() : (totalRect.right() - indicatorWidth);
+
                 int top = totalRect.top() + qMax(0, fontMetrics.height() - indicatorHeight) / 2;
+
                 totalRect.setRect(left, top, indicatorWidth, indicatorHeight);
                 // Adjust for label
               }
               else {
                 left = ltr ? (totalRect.left() + checkBoxSize - 2) : totalRect.left();
+
                 totalRect.setRect(left, totalRect.top(),
                                   totalRect.width() - checkBoxSize, totalRect.height());
               }
             }
+
             ret = totalRect;
+
             break;
           }
           default:
@@ -1018,7 +1287,7 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
   return ret;
 }
 
-#if o
+#if 0
 QRect
 CQStyle::
 subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
@@ -1067,4 +1336,11 @@ drawCheck(QPainter *painter, const QRectF &r, const QBrush &b) const
   path.closeSubpath();
 
   painter->fillPath(path, b);
+}
+
+QPalette
+CQStyle::
+standardPalette() const
+{
+  return palette_;
 }
