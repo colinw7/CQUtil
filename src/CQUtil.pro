@@ -44,6 +44,14 @@ CQRadioButtons.cpp \
 CQAngleSpinBox.cpp \
 CQToolTip.cpp \
 \
+CQTreeView.cpp \
+CQTableView.cpp \
+CQHeaderView.cpp \
+\
+CQAlignEdit.cpp \
+CQIconCombo.cpp \
+CQWidgetMenu.cpp \
+\
 CQWinWidget.cpp \
 
 HEADERS += \
@@ -81,6 +89,14 @@ CQFontListView.h \
 ../include/CQRadioButtons.h \
 ../include/CQAngleSpinBox.h \
 ../include/CQToolTip.h \
+\
+../include/CQTreeView.h \
+../include/CQTableView.h \
+../include/CQHeaderView.h \
+\
+../include/CQAlignEdit.h \
+../include/CQIconCombo.h \
+../include/CQWidgetMenu.h \
 \
 ../include/CQWinWidget.h \
 

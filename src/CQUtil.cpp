@@ -1,13 +1,21 @@
 #include <CQUtil.h>
-#include <CQApp.h>
 #include <CQImage.h>
 #include <CQFont.h>
 #include <CEvent.h>
 #include <CRegExp.h>
+
+#ifdef CQUTIL_LINE_DASH
 #include <CLineDash.h>
+#endif
+
+#ifdef CQUTIL_ANGLE
 #include <CAngle.h>
+#endif
+
+#ifdef CQUTIL_GRADIENT
 #include <CLinearGradient.h>
 #include <CRadialGradient.h>
+#endif
 
 #include <Qt>
 #include <QApplication>
@@ -23,28 +31,15 @@
 #include <QAbstractButton>
 #include <QAbstractTextDocumentLayout>
 #include <QPainter>
+#include <QBuffer>
 
-#define DCL_META_STREAM(TYPE, GETTER, SETTER) \
-QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
-  QString str = t.GETTER().c_str(); \
-\
-  out << str; \
-\
-  return out; \
-} \
-\
-QDataStream &operator>>(QDataStream &in, TYPE &t) {\
-  QString str; \
-\
-  in >> str; \
-\
-  t.fromString(str.toStdString()); \
-\
-  return in; \
-}
+#ifdef CQUTIL_LINE_DASH
+CQUTIL_DEF_META_TYPE_STD(CLineDash, toString, fromString)
+#endif
 
-DCL_META_STREAM(CLineDash, toString, fromString)
-DCL_META_STREAM(CAngle   , toString, fromString)
+#ifdef CQUTIL_ANGLE
+CQUTIL_DEF_META_TYPE_STD(CAngle, toString, fromString)
+#endif
 
 //------
 
@@ -66,11 +61,13 @@ void
 CQUtil::
 initProperties()
 {
-  qRegisterMetaType<CLineDash>("CLineDash");
-  qRegisterMetaTypeStreamOperators<CLineDash>("CLineDash");
+#ifdef CQUTIL_LINE_DASH
+  CQUTIL_REGISTER_META(CLineDash);
+#endif
 
-  qRegisterMetaType<CAngle>("CAngle");
-  qRegisterMetaTypeStreamOperators<CAngle>("CAngle");
+#ifdef CQUTIL_ANGLE
+  CQUTIL_REGISTER_META(CAngle);
+#endif
 }
 
 CMouseEvent *
@@ -468,6 +465,7 @@ colorToRGBA(const QColor &color)
   return CRGBA(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
+#ifdef CQUTIL_BRUSH
 QBrush
 CQUtil::
 toQBrush(const CBrush &brush)
@@ -481,6 +479,7 @@ toQBrush(const CBrush &brush)
     //qbrush = QBrush(CQUtil::toQPattern(brush.getPattern()));
     std::cerr << "Invalid pattern brush" << std::endl;
   }
+#ifdef CQUTIL_GRADIENT
   else if (brush.getStyle() == CBRUSH_STYLE_GRADIENT) {
     CLinearGradient *lgradient = dynamic_cast<CLinearGradient *>(brush.getGradient().get());
     CRadialGradient *rgradient = dynamic_cast<CRadialGradient *>(brush.getGradient().get());
@@ -492,16 +491,21 @@ toQBrush(const CBrush &brush)
     else
       std::cerr << "Invalid gradient type" << std::endl;
   }
+#endif
+#ifdef CQUTIL_IMAGE
   else if (brush.getStyle() == CBRUSH_STYLE_TEXTURE) {
     qbrush = QBrush(CQUtil::toQImage(brush.getTexture()));
   }
+#endif
   else {
     std::cerr << "Invalid brush" << std::endl;
   }
 
   return qbrush;
 }
+#endif
 
+#ifdef CQUTIL_PEN
 QPen
 CQUtil::
 toQPen(const CPen &pen)
@@ -517,6 +521,7 @@ toQPen(const CPen &pen)
 
   return qpen;
 }
+#endif
 
 Qt::PenCapStyle
 CQUtil::
@@ -760,6 +765,18 @@ getPropertyType(const QObject *object, int ind, bool inherited)
   return metaProperty.type();
 }
 
+QString
+CQUtil::
+getPropertyTypeName(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return "";
+
+  return metaProperty.typeName();
+}
+
 QVariant
 CQUtil::
 getPropertyValue(const QObject *object, int ind, bool inherited)
@@ -965,6 +982,8 @@ setProperty(const QObject *object, const QString &propName, const QString &str)
 
   QVariant v;
 
+  (void) getProperty(object, propName, v);
+
   if (! stringToVariant(str, mP.type(), mP.typeName(), v))
     return false;
 
@@ -996,8 +1015,42 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
 
   QString typeName = v1.typeName();
 
-  if (typeName == "QString" && ! stringToVariant(v.toString(), mP.type(), mP.typeName(), v1))
-    return false;
+  if (typeName == "QString" && mP.isEnumType()) {
+    QMetaEnum me = mP.enumerator();
+
+    int num_enums = me.keyCount();
+
+    for (int i = 0; i < num_enums; ++i) {
+      if (v1.toString() == me.valueToKey(i)) {
+        v1 = QVariant(i);
+        break;
+      }
+    }
+
+    typeName = v1.typeName();
+  }
+
+  if (typeName == "QString") {
+    QVariant v2;
+
+    (void) getProperty(object, propName, v2);
+
+    if (! stringToVariant(v1.toString(), mP.type(), mP.typeName(), v1, v2))
+      return false;
+  }
+
+  if (mP.type() == QVariant::UserType) {
+    if (typeName != mP.typeName()) {
+      QString str = v.toString();
+
+      QVariant v2;
+
+      (void) getProperty(object, propName, v2);
+
+      if (userVariantFromString(v2, str))
+        v1 = v2;
+    }
+  }
 
   return obj->setProperty(propName.toLatin1().data(), v1);
 }
@@ -1368,9 +1421,11 @@ variantToString(const QVariant &var, QString &valueStr)
   QVariant::Type type = var.type();
 
   if      (type == QVariant::Palette) {
+#ifdef CQUTIL_PALETTE
     QPalette palette = var.value<QPalette>();
 
     valueStr = CQUtil::paletteToString(palette);
+#endif
   }
   else if (type == QVariant::Point) {
     QPoint point = var.value<QPoint>();
@@ -1434,16 +1489,23 @@ variantToString(const QVariant &var, QString &valueStr)
                                       arg(sp.verticalStretch  ());
   }
   else if (type == QVariant::UserType) {
-    if      (strcmp(var.typeName(), "CLineDash") == 0) {
+    if (! var.typeName()) {
+      return false;
+    }
+#ifdef CQUTIL_LINE_DASH
+    else if (strcmp(var.typeName(), "CLineDash") == 0) {
       CLineDash lineDash = var.value<CLineDash>();
 
       valueStr = lineDash.toString().c_str();
     }
+#endif
+#ifdef CQUTIL_ANGLE
     else if (strcmp(var.typeName(), "CAngle") == 0) {
       CAngle angle = var.value<CAngle>();
 
       valueStr = angle.toString().c_str();
     }
+#endif
     else
       return false;
   }
@@ -1459,7 +1521,8 @@ variantToString(const QVariant &var, QString &valueStr)
 
 bool
 CQUtil::
-stringToVariant(const QString &str, QVariant::Type type, const char *typeName, QVariant &var)
+stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
+                QVariant &var, const QVariant &oldVar)
 {
   // Qt supports QString ->
   //   QVariant::StringList, QVariant::ByteArray, QVariant::Int      , QVariant::UInt,
@@ -1476,6 +1539,8 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
       var = QVariant(true);
     else
       return false;
+
+    return true;
   }
   else if (type == QVariant::Point) {
     QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
@@ -1494,6 +1559,8 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     QPoint p(x, y);
 
     var = QVariant(p);
+
+    return true;
   }
   else if (type == QVariant::PointF) {
     QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
@@ -1512,19 +1579,36 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     QPointF p(x, y);
 
     var = QVariant(p);
+
+    return true;
   }
   else if (type == QVariant::Rect) {
+    int  x1, y1, x2, y2;
+    bool b1, b2, b3, b4;
+
     QRegExp rx("\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}\\s*\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}");
 
     int pos = rx.indexIn(str);
 
-    if (pos == -1)
-      return false;
+    if (pos == -1) {
+      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
 
-    bool b1; int x1 = rx.cap(1).toInt(&b1);
-    bool b2; int y1 = rx.cap(2).toInt(&b2);
-    bool b3; int x2 = rx.cap(3).toInt(&b3);
-    bool b4; int y2 = rx.cap(4).toInt(&b4);
+      int pos1 = rx1.indexIn(str);
+
+      if (pos1 == -1)
+        return false;
+
+      x1 = rx1.cap(1).toInt(&b1);
+      y1 = rx1.cap(2).toInt(&b2);
+      x2 = rx1.cap(3).toInt(&b3);
+      y2 = rx1.cap(4).toInt(&b4);
+    }
+    else {
+      x1 = rx.cap(1).toInt(&b1);
+      y1 = rx.cap(2).toInt(&b2);
+      x2 = rx.cap(3).toInt(&b3);
+      y2 = rx.cap(4).toInt(&b4);
+    }
 
     if (! b1 && ! b2 && ! b3 && ! b4)
       return false;
@@ -1534,19 +1618,36 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     r.setCoords(x1, y1, x2, y2);
 
     var = QVariant(r);
+
+    return true;
   }
   else if (type == QVariant::RectF) {
+    double x1, y1, x2, y2;
+    bool   b1, b2, b3, b4;
+
     QRegExp rx("\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}\\s*\\{\\s*(\\S+)\\s+(\\S+)\\s*\\}");
 
     int pos = rx.indexIn(str);
 
-    if (pos == -1)
-      return false;
+    if (pos == -1) {
+      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
 
-    bool b1; double x1 = rx.cap(1).toDouble(&b1);
-    bool b2; double y1 = rx.cap(2).toDouble(&b2);
-    bool b3; double x2 = rx.cap(3).toDouble(&b3);
-    bool b4; double y2 = rx.cap(4).toDouble(&b4);
+      int pos1 = rx1.indexIn(str);
+
+      if (pos1 == -1)
+        return false;
+
+      x1 = rx1.cap(1).toDouble(&b1);
+      y1 = rx1.cap(2).toDouble(&b2);
+      x2 = rx1.cap(3).toDouble(&b3);
+      y2 = rx1.cap(4).toDouble(&b4);
+    }
+    else {
+      x1 = rx.cap(1).toDouble(&b1);
+      y1 = rx.cap(2).toDouble(&b2);
+      x2 = rx.cap(3).toDouble(&b3);
+      y2 = rx.cap(4).toDouble(&b4);
+    }
 
     if (! b1 && ! b2 && ! b3 && ! b4)
       return false;
@@ -1556,6 +1657,8 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     r.setCoords(x1, y1, x2, y2);
 
     var = QVariant(r);
+
+    return true;
   }
   else if (type == QVariant::Size) {
     QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
@@ -1574,6 +1677,8 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     QSize s(w, h);
 
     var = QVariant(s);
+
+    return true;
   }
   else if (type == QVariant::SizeF) {
     QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
@@ -1592,36 +1697,83 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName, Q
     QSizeF s(w, h);
 
     var = QVariant(s);
+
+    return true;
+  }
+  else if (type == QVariant::Font) {
+    if (str.length() && (str[0] == '+' || str[0] == '-')) {
+      QString str1 = str.mid(1);
+
+      if (oldVar.type() == QVariant::Font) {
+        QFont oldFont = oldVar.value<QFont>();
+
+        QFontInfo oldFontInfo(oldFont);
+
+        bool ok;
+
+        int delta = str1.toInt(&ok);
+
+        if (ok) {
+          QFont newFont = oldFont;
+
+          double oldSize = oldFontInfo.pixelSize();
+
+          if (str[0] == '+')
+            newFont.setPixelSize(oldSize + delta);
+          else
+            newFont.setPixelSize(oldSize - delta);
+
+          var = newFont;
+
+          return true;
+        }
+      }
+    }
   }
   else if (type == QVariant::UserType) {
-    if      (strcmp(typeName, "CLineDash") == 0) {
+    if (! typeName) {
+      return false;
+    }
+#ifdef CQUTIL_LINE_DASH
+    else if (strcmp(typeName, "CLineDash") == 0) {
       CLineDash lineDash(str.toStdString());
 
       var = QVariant::fromValue(lineDash);
+
+      return true;
     }
+#endif
+#ifdef CQUTIL_ANGLE
     else if (strcmp(typeName, "CAngle") == 0) {
       CAngle angle;
 
       angle.fromString(str.toStdString());
 
       var = QVariant::fromValue(angle);
+
+      return true;
     }
-    else
-      return false;
+#endif
+    else {
+      if (userVariantFromString(var, str))
+        return true;
+    }
   }
-  else {
-    var = QVariant(str);
 
-    if (! var.canConvert(type))
-      return false;
+  //---
 
-    if (! var.convert(type))
-      return false;
-  }
+  var = QVariant(str);
+
+  if (! var.canConvert(type))
+    return false;
+
+  if (! var.convert(type))
+    return false;
 
   return true;
 }
 
+#ifdef CQUTIL_PALETTE
 bool
 CQUtil::
 paletteFromString(QPalette &palette, const QString &paletteDef)
@@ -1649,7 +1801,9 @@ paletteToString(const QPalette &palette)
 
   return QString("fg=\"%1\" bg=\"%2\"").arg(fg.name()).arg(bg.name());
 }
+#endif
 
+#ifdef CQUTIL_FONT
 QFont
 CQUtil::
 toQFont(CFontPtr font)
@@ -1668,6 +1822,7 @@ fromQFont(QFont font)
 {
   return CQFontMgrInst->lookupFont(font);
 }
+#endif
 
 //------------
 
@@ -1787,8 +1942,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   bool found = false;
 
-  for (const QMetaObject *pM = receiver->metaObject();
-         pM && ! found; pM = pM->superClass()) {
+  for (const QMetaObject *pM = receiver->metaObject(); pM && ! found; pM = pM->superClass()) {
     for (int i = 0; i < pM->methodCount(); ++i) {
       QMetaMethod metaMethod = pM->method(i);
 
@@ -1809,13 +1963,11 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  QStringList argTypeList =
-    args.split(",", QString::SkipEmptyParts);
+  QStringList argTypeList = args.split(",", QString::SkipEmptyParts);
 
   QStringList::size_type nArgs = argTypeList.count();
 
-  QStringList valueList =
-    QString(valuesStr).split(",", QString::SkipEmptyParts);
+  QStringList valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
 
   QStringList::size_type nValues = valueList.count();
 
@@ -1867,15 +2019,13 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
         break;
 
       default:
-        qDebug("slot argument of type '%s' not supported",
-               typeString.toLatin1().data());
+        qDebug("slot argument of type '%s' not supported", typeString.toLatin1().data());
         break;
     }
   }
 
   bool bReturn =
-    QMetaObject::invokeMethod(receiver, plainSlotName.toLatin1().data(),
-                              Qt::AutoConnection,
+    QMetaObject::invokeMethod(receiver, plainSlotName.toLatin1().data(), Qt::AutoConnection,
                               qArgs[0], qArgs[1], qArgs[2], qArgs[3], qArgs[4],
                               qArgs[5], qArgs[6], qArgs[7], qArgs[8], qArgs[9]);
 
@@ -1913,8 +2063,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
   bool found = false;
 
-  for (const QMetaObject *pM = sender->metaObject();
-         pM && ! found; pM = pM->superClass()) {
+  for (const QMetaObject *pM = sender->metaObject(); pM && ! found; pM = pM->superClass()) {
     for (int i = 0; i < pM->methodCount(); ++i) {
       QMetaMethod metaMethod = pM->method(i);
 
@@ -1935,13 +2084,11 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  QStringList argTypeList =
-    args.split(",", QString::SkipEmptyParts);
+  QStringList argTypeList = args.split(",", QString::SkipEmptyParts);
 
   QStringList::size_type nArgs = argTypeList.count();
 
-  QStringList valueList =
-    QString(valuesStr).split(",", QString::SkipEmptyParts);
+  QStringList valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
 
   QStringList::size_type nValues = valueList.count();
 
@@ -2013,6 +2160,97 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
   return true;
 }
 
+//----------
+
+QDataStream::Version dataStreamVersion() {
+#if QT_VERSION >= 0x050000
+  return QDataStream::Qt_5_0;
+#else
+  return QDataStream::Qt_4_0;
+#endif
+}
+
+bool
+CQUtil::
+userVariantToString(const QVariant &var, QString &str)
+{
+  QByteArray ba;
+
+  // write user type data to data stream using registered DataStream methods
+  QBuffer obuffer(&ba);
+  obuffer.open(QIODevice::WriteOnly);
+
+  QDataStream out(&obuffer);
+  out.setVersion(dataStreamVersion());
+
+  if (! QMetaType::save(out, var.userType(), var.constData()))
+    return false;
+
+  //---
+
+  // read back from data stream as string (assumes registered DataStream method
+  // serializes as string
+  QBuffer ibuffer(&ba);
+  ibuffer.open(QIODevice::ReadOnly);
+
+  QDataStream in(&ibuffer);
+  in.setVersion(dataStreamVersion());
+
+  in >> str;
+
+  return true;
+}
+
+bool
+CQUtil::
+userVariantFromString(QVariant &var, const QString &str)
+{
+  QByteArray ba;
+
+  // write current string to buffer
+  QBuffer obuffer(&ba);
+  obuffer.open(QIODevice::WriteOnly);
+
+  QDataStream out(&obuffer);
+  out.setVersion(dataStreamVersion());
+
+  out << str;
+
+  // create user type data from data stream using registered DataStream methods
+  QBuffer ibuffer(&ba);
+  ibuffer.open(QIODevice::ReadOnly);
+
+  QDataStream in(&ibuffer);
+  in.setVersion(dataStreamVersion());
+
+#if 0
+  QVariant var1(var.userType(), 0);
+
+  // const cast is safe since we operate on a newly constructed variant
+  if (! QMetaType::load(in, var.userType(), const_cast<void *>(var1.constData())))
+    return false;
+
+  if (! var1.isValid())
+    return false;
+
+  var = var1;
+#else
+  QVariant var1(var.userType(), 0);
+
+  // const cast is safe since we operate on a newly constructed variant
+  if (! QMetaType::load(in, var.userType(), const_cast<void *>(var.constData())))
+    return false;
+
+  if (! var.isValid())
+    return false;
+#endif
+
+  return true;
+}
+
+//----------
+
+#ifdef CQUTIL_IMAGE
 QIcon
 CQUtil::
 imageToIcon(CImagePtr image)
@@ -2028,7 +2266,9 @@ toQImage(CImagePtr image)
 {
   return image.cast<CQImage>()->getQImage();
 }
+#endif
 
+#ifdef CQUTIL_GRADIENT
 QLinearGradient
 CQUtil::
 toQGradient(const CLinearGradient *lgradient, QGradient::CoordinateMode mode)
@@ -2089,6 +2329,7 @@ toQGradient(const CRadialGradient *rgradient, QGradient::CoordinateMode mode)
 
   return qgradient;
 }
+#endif
 
 void
 CQUtil::
@@ -2169,7 +2410,7 @@ QSizeF
 CQUtil::
 toQSize(const CSize2D &size)
 {
-  return QSizeF(size.width, size.height);
+  return QSizeF(size.getWidth(), size.getHeight());
 }
 
 CSize2D
@@ -2262,6 +2503,7 @@ setDockVisible(QDockWidget *dock, bool visible)
     action->trigger();
 }
 
+#ifdef CQUTIL_LINE_DASH
 void
 CQUtil::
 penSetLineDash(QPen &pen, const CLineDash &dash)
@@ -2290,6 +2532,7 @@ penSetLineDash(QPen &pen, const CLineDash &dash)
   else
     pen.setStyle(Qt::SolidLine);
 }
+#endif
 
 Qt::Alignment
 CQUtil::

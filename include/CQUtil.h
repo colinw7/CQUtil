@@ -1,6 +1,14 @@
 #ifndef CQUTIL_H
 #define CQUTIL_H
 
+#define CQUTIL_FONT 1
+#define CQUTIL_IMAGE 1
+#define CQUTIL_BRUSH 1
+#define CQUTIL_PEN 1
+#define CQUTIL_LINE_DASH 1
+#define CQUTIL_ANGLE 1
+#define CQUTIL_GRADIENT 1
+
 #include <Qt>
 #include <QColor>
 #include <QEvent>
@@ -10,19 +18,53 @@
 
 #include <CEvent.h>
 #include <CRGBA.h>
+
+#ifdef CQUTIL_LINE_DASH
 #include <CLineDash.h>
+#endif
+
+#ifdef CQUTIL_ANGLE
 #include <CAngle.h>
+#endif
+
 #include <CFontStyle.h>
+#include <CLineCapType.h>
+#include <CLineJoinType.h>
+#include <CIBBox2D.h>
+
+#ifdef CQUTIL_FONT
 #include <CFont.h>
+#endif
+
+#ifdef CQUTIL_IMAGE
 #include <CImageLib.h>
+#endif
+
 #include <CPoint2D.h>
 #include <CBBox2D.h>
 #include <CMatrix2D.h>
-#include <CBrush.h>
-#include <CPen.h>
 
-Q_DECLARE_METATYPE(CLineDash)
-Q_DECLARE_METATYPE(CAngle)
+#ifdef CQUTIL_BRUSH
+#include <CBrush.h>
+#endif
+
+#ifdef CQUTIL_PEN
+#include <CPen.h>
+#endif
+
+//---
+
+#include <CQUtilMeta.h>
+
+#ifdef CQUTIL_LINE_DASH
+CQUTIL_DCL_META_TYPE(CLineDash)
+#endif
+
+#ifdef CQUTIL_ANGLE
+CQUTIL_DCL_META_TYPE(CAngle)
+#endif
+
+//---
 
 class QMouseEvent;
 class QKeyEvent;
@@ -31,8 +73,10 @@ class QAbstractButton;
 class QDockWidget;
 class QLabel;
 
+#ifdef CQUTIL_GRADIENT
 class CLinearGradient;
 class CRadialGradient;
+#endif
 
 namespace CQUtil {
   class PropInfo {
@@ -83,9 +127,13 @@ namespace CQUtil {
   CRGB  colorToRGB(const QColor &color);
   CRGBA colorToRGBA(const QColor &color);
 
+#ifdef CQUTIL_BRUSH
   QBrush toQBrush(const CBrush &brush);
+#endif
 
+#ifdef CQUTIL_PEN
   QPen toQPen(const CPen &pen);
+#endif
 
   Qt::PenCapStyle toPenCapStyle(const CLineCapType &lineCap);
   Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
@@ -117,6 +165,8 @@ namespace CQUtil {
   QString getPropertyName(const QObject *object, int ind, bool inherited=true);
 
   QVariant::Type getPropertyType(const QObject *object, int ind, bool inherited=true);
+
+  QString getPropertyTypeName(const QObject *object, int ind, bool inherited=true);
 
   QVariant getPropertyValue(const QObject *object, int ind, bool inherited=true);
 
@@ -206,14 +256,16 @@ namespace CQUtil {
   QTransform toQTransform  (const CMatrix2D &m);
   CMatrix2D  fromQTransform(const QTransform &t);
 
+#ifdef CQUTIL_FONT
   QFont    toQFont  (CFontPtr font);
   CFontPtr fromQFont(QFont font);
+#endif
 
   QString variantToString(const QVariant &var);
   bool variantToString(const QVariant &var, QString &str);
 
-  bool stringToVariant(const QString &str, QVariant::Type type,
-                       const char *typeName, QVariant &var);
+  bool stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
+                       QVariant &var, const QVariant &oldVar=QVariant());
 
   bool paletteFromString(QPalette &palette, const QString &paletteDef);
   QString paletteToString(const QPalette &palette);
@@ -221,20 +273,33 @@ namespace CQUtil {
   bool activateSlot(QObject *receiver, const char *slotName, const char *valuesStr);
   bool activateSignal(QObject* sender, const char *signalName, const char *valuesStr);
 
+  //---
+
+  bool userVariantToString(const QVariant &var, QString &str);
+  bool userVariantFromString(QVariant &ivar, const QString &str);
+
+  //---
+
   /*! template function to get table cell widget of type */
   template<typename T>
   T tableCellWidget(QTableWidget *table, int row, int col) {
     return qobject_cast<T>(table->cellWidget(row, col));
   }
 
+  //---
+
+#ifdef CQUTIL_IMAGE
   QIcon imageToIcon(CImagePtr image);
 
   QImage toQImage(CImagePtr image);
+#endif
 
+#ifdef CQUTIL_GRADIENT
   QLinearGradient toQGradient(const CLinearGradient *lgradient,
                               QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
   QRadialGradient toQGradient(const CRadialGradient *rgradient,
                               QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
+#endif
 
   void getScreenSize(uint *w, uint *h);
 
