@@ -1,5 +1,6 @@
 #include <CQAlignEdit.h>
 #include <CQWidgetMenu.h>
+#include <CQStrParse.h>
 #include <QStylePainter>
 #include <QStyleOptionComboBox>
 #include <QMouseEvent>
@@ -107,6 +108,12 @@ paintEvent(QPaintEvent *)
 
   //---
 
+  QRect r = style()->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
+
+  painter.setClipRect(r);
+
+  //---
+
   QString str = toString();
 
   QFontMetrics fm(font());
@@ -141,6 +148,50 @@ toString(Qt::Alignment align)
   else if (align & Qt::AlignVCenter) str += "VCenter";
 
   return str;
+}
+
+Qt::Alignment
+CQAlignEdit::
+fromString(const QString &str)
+{
+  auto stringAddAlign = [](const QString &str, Qt::Alignment &align) {
+    if      (str == "left"   ) align |= Qt::AlignLeft;
+    else if (str == "right"  ) align |= Qt::AlignRight;
+    else if (str == "hcenter") align |= Qt::AlignHCenter;
+
+    else if (str == "top"    ) align |= Qt::AlignTop;
+    else if (str == "bottom" ) align |= Qt::AlignBottom;
+    else if (str == "vcenter") align |= Qt::AlignVCenter;
+
+    else if (str == "center" ) align |= Qt::AlignCenter;
+  };
+
+  Qt::Alignment align = 0;
+
+  CQStrParse parse(str);
+
+  parse.skipSpace();
+
+  QString word;
+
+  while (! parse.eof()) {
+    if (parse.isSpace() || parse.isChar('|')) {
+      word = word.toLower();
+
+      if (word != "") {
+        stringAddAlign(word, align);
+
+        word = "";
+      }
+    }
+
+    word += parse.getChar();
+  }
+
+  if (word != "")
+    stringAddAlign(word, align);
+
+  return align;
 }
 
 QSize

@@ -20,6 +20,7 @@ class CQAlignEdit : public QFrame {
   QSize sizeHint() const;
 
   static QString toString(Qt::Alignment align);
+  static Qt::Alignment fromString(const QString &str);
 
  signals:
   void valueChanged(Qt::Alignment);

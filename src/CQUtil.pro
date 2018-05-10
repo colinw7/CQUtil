@@ -53,6 +53,8 @@ CQIconCombo.cpp \
 CQWidgetMenu.cpp \
 \
 CQWinWidget.cpp \
+\
+CQStrParse.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -99,6 +101,8 @@ CQFontListView.h \
 ../include/CQWidgetMenu.h \
 \
 ../include/CQWinWidget.h \
+\
+../include/CQStrParse.h \
 
 OBJECTS_DIR = ../obj
 
