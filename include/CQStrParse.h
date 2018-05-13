@@ -41,6 +41,8 @@ class CQStrParse {
   virtual void skipSpace();
   virtual void skipNonSpace();
 
+  virtual void backSkipSpace();
+
   virtual QChar getChar();
 
   virtual bool skipChar();
@@ -50,7 +52,10 @@ class CQStrParse {
   virtual bool skipString();
   virtual void skipToEnd();
 
+  virtual bool backSkipChar();
+
   virtual void autoSkipSpace() const;
+  virtual void autoBackSkipSpace() const;
 
   virtual bool readNonSpace(QString &text);
 
@@ -108,6 +113,8 @@ class CQStrParse {
 
   virtual bool neof(int n) const;
 
+  virtual bool sof() const;
+
   virtual QString stateStr() const {
     return getBefore() + getCharAt() + "\b_" + getAfter();
   }
@@ -115,6 +122,8 @@ class CQStrParse {
  private:
   bool skipSpaceI(const QString &str, int *pos);
   bool skipNonSpaceI(const QString &str, int *pos);
+
+  bool backSkipSpaceI(const QString &str, int *pos);
 
   bool skipDoubleQuotedStringI(const QString &str, int *pos);
   bool skipSingleQuotedStringI(const QString &str, int *pos);

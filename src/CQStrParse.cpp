@@ -203,6 +203,33 @@ skipNonSpaceI(const QString &str, int *pos)
   return true;
 }
 
+void
+CQStrParse::
+backSkipSpace()
+{
+  if (sof())
+    return;
+
+  int pos1 = pos_;
+
+  backSkipSpaceI(str_, &pos1);
+
+  setPos(pos1);
+}
+
+bool
+CQStrParse::
+backSkipSpaceI(const QString &str, int *pos)
+{
+  if (*pos < 0 || ! str[*pos].isSpace())
+    return false;
+
+  while (*pos >= 0 && str[*pos].isSpace())
+    --(*pos);
+
+  return true;
+}
+
 bool
 CQStrParse::
 skipBracedString()
@@ -304,6 +331,19 @@ autoSkipSpace() const
   }
 }
 
+void
+CQStrParse::
+autoBackSkipSpace() const
+{
+  if (sof()) return;
+
+  if (isAutoSkipSpace()) {
+    CQStrParse *th = const_cast<CQStrParse *>(this);
+
+    th->backSkipSpace();
+  }
+}
+
 QChar
 CQStrParse::
 getChar()
@@ -364,6 +404,20 @@ skipChars(int n)
   }
 
   setPos(pos_ + n);
+
+  return true;
+}
+
+bool
+CQStrParse::
+backSkipChar()
+{
+  autoBackSkipSpace();
+
+  if (sof())
+    return false;
+
+  setPos(pos_ - 1);
 
   return true;
 }
@@ -1323,4 +1377,11 @@ CQStrParse::
 neof(int n) const
 {
   return (pos_ + n >= len_);
+}
+
+bool
+CQStrParse::
+sof() const
+{
+  return (pos_ < 0);
 }
