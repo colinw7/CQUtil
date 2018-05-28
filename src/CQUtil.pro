@@ -14,6 +14,8 @@ MOC_DIR = .moc
 
 SOURCES += \
 CQUtil.cpp \
+CQMsgHandler.cpp \
+\
 CQApp.cpp \
 CQMainWindow.cpp \
 CQWorkspace.cpp \
@@ -34,7 +36,9 @@ CQFontListView.cpp \
 \
 CQIntegerEdit.cpp \
 CQRealEdit.cpp \
+CQIntegerSpin.cpp \
 CQRealSpin.cpp \
+\
 CQPoint2DEdit.cpp \
 CQBBox2DEdit.cpp \
 CQImageButton.cpp \
@@ -58,6 +62,8 @@ CQStrParse.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
+../include/CQMsgHandler.h \
+\
 ../include/CQApp.h \
 ../include/CQMainWindow.h \
 ../include/CQToolBar.h \
@@ -82,7 +88,10 @@ CQFontListView.h \
 \
 ../include/CQIntegerEdit.h \
 ../include/CQRealEdit.h \
+\
+../include/CQIntegerSpin.h \
 ../include/CQRealSpin.h \
+\
 ../include/CQPoint2DEdit.h \
 ../include/CQBBox2DEdit.h \
 ../include/CQImageButton.h \
