@@ -1590,24 +1590,37 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
 
     int pos = rx.indexIn(str);
 
-    if (pos == -1) {
-      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
-
-      int pos1 = rx1.indexIn(str);
-
-      if (pos1 == -1)
-        return false;
-
-      x1 = rx1.cap(1).toInt(&b1);
-      y1 = rx1.cap(2).toInt(&b2);
-      x2 = rx1.cap(3).toInt(&b3);
-      y2 = rx1.cap(4).toInt(&b4);
-    }
-    else {
+    if (pos != -1) {
       x1 = rx.cap(1).toInt(&b1);
       y1 = rx.cap(2).toInt(&b2);
       x2 = rx.cap(3).toInt(&b3);
       y2 = rx.cap(4).toInt(&b4);
+    }
+    else {
+      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
+
+      int pos1 = rx1.indexIn(str);
+
+      if (pos1 != -1) {
+        x1 = rx1.cap(1).toInt(&b1);
+        y1 = rx1.cap(2).toInt(&b2);
+        x2 = rx1.cap(3).toInt(&b3);
+        y2 = rx1.cap(4).toInt(&b4);
+      }
+      else {
+        QRegExp rx2("\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*");
+
+        int pos2 = rx2.indexIn(str);
+
+        if (pos2 != -1) {
+          x1 = rx2.cap(1).toInt(&b1);
+          y1 = rx2.cap(2).toInt(&b2);
+          x2 = rx2.cap(3).toInt(&b3);
+          y2 = rx2.cap(4).toInt(&b4);
+        }
+        else
+          return false;
+      }
     }
 
     if (! b1 && ! b2 && ! b3 && ! b4)
@@ -1629,24 +1642,37 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
 
     int pos = rx.indexIn(str);
 
-    if (pos == -1) {
-      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
-
-      int pos1 = rx1.indexIn(str);
-
-      if (pos1 == -1)
-        return false;
-
-      x1 = rx1.cap(1).toDouble(&b1);
-      y1 = rx1.cap(2).toDouble(&b2);
-      x2 = rx1.cap(3).toDouble(&b3);
-      y2 = rx1.cap(4).toDouble(&b4);
-    }
-    else {
+    if (pos != -1) {
       x1 = rx.cap(1).toDouble(&b1);
       y1 = rx.cap(2).toDouble(&b2);
       x2 = rx.cap(3).toDouble(&b3);
       y2 = rx.cap(4).toDouble(&b4);
+    }
+    else {
+      QRegExp rx1("\\{\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*\\}");
+
+      int pos1 = rx1.indexIn(str);
+
+      if (pos1 != -1) {
+        x1 = rx1.cap(1).toDouble(&b1);
+        y1 = rx1.cap(2).toDouble(&b2);
+        x2 = rx1.cap(3).toDouble(&b3);
+        y2 = rx1.cap(4).toDouble(&b4);
+      }
+      else {
+        QRegExp rx2("\\s*(\\S+)\\s+(\\S+)\\s*(\\S+)\\s+(\\S+)\\s*");
+
+        int pos2 = rx2.indexIn(str);
+
+        if (pos2 != -1) {
+          x1 = rx2.cap(1).toDouble(&b1);
+          y1 = rx2.cap(2).toDouble(&b2);
+          x2 = rx2.cap(3).toDouble(&b3);
+          y2 = rx2.cap(4).toDouble(&b4);
+        }
+        else
+          return false;
+      }
     }
 
     if (! b1 && ! b2 && ! b3 && ! b4)
