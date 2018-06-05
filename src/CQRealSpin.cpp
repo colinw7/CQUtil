@@ -1,7 +1,5 @@
 #include <CQRealSpin.h>
 #include <QLineEdit>
-//#include <iostream>
-//#include <cassert>
 #include <cmath>
 
 CQRealSpin::
@@ -27,6 +25,8 @@ init(double value)
   setRange(-1E6, 1E6);
 
   setValue(value);
+
+  connect(this, SIGNAL(valueChanged(double)), this, SLOT(updateStep()));
 
   connect(lineEdit(), SIGNAL(cursorPositionChanged(int,int)), this, SLOT(updateStep()));
 

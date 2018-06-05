@@ -19,20 +19,38 @@ void
 CQIntegerSpin::
 init(int value)
 {
+  setObjectName("integerSpin");
+
   setRange(-INT_MAX, INT_MAX);
 
   setValue(value);
+
+  connect(this, SIGNAL(valueChanged(int)), this, SLOT(updateStep()));
 
   connect(lineEdit(), SIGNAL(cursorPositionChanged(int,int)), this, SLOT(updateStep()));
 
   updateStep();
 }
 
+int
+CQIntegerSpin::
+cursorPosition() const
+{
+  return lineEdit()->cursorPosition();
+}
+
+void
+CQIntegerSpin::
+setCursorPosition(int pos)
+{
+  lineEdit()->setCursorPosition(pos);
+}
+
 void
 CQIntegerSpin::
 updateStep()
 {
-  int pos = lineEdit()->cursorPosition();
+  int pos = cursorPosition();
 
   int s = posToStep(pos);
 
@@ -71,7 +89,7 @@ stepBy(int n)
   int s = step();
 
   int l   = text().length();
-  int pos = lineEdit()->cursorPosition();
+  int pos = cursorPosition();
 
   bool negative = isNegative();
 
@@ -91,7 +109,7 @@ stepBy(int n)
   int pos1 = l1 - l + pos;
 
   if (pos1 != pos)
-    lineEdit()->setCursorPosition(pos1);
+    setCursorPosition(pos1);
 
   updateStep();
 }
