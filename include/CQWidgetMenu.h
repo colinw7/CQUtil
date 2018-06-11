@@ -54,6 +54,8 @@ class CQWidgetMenu : public QMenu {
   //! reset menu size
   void resetSize();
 
+  void updateAreaSize();
+
  signals:
   //! signal emitted before menu is shown
   void menuShown();

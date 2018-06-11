@@ -1,6 +1,7 @@
 #include <CQWidgetMenu.h>
 
 #include <QApplication>
+#include <QLayout>
 
 #include <cassert>
 
@@ -67,6 +68,25 @@ CQWidgetMenu::
 resetSize()
 {
   getAction()->getArea()->resetSize();
+}
+
+void
+CQWidgetMenu::
+updateAreaSize()
+{
+  //QRect ar = actionGeometry(getAction());
+
+  //int dx = ar.x();
+  //int dy = ar.y();
+
+  CQWidgetMenuArea *area = getAction()->getArea();
+
+  QSize s = area->size();
+
+  area->getWidget()->resize(s);
+
+  if (area->getWidget()->layout())
+    area->getWidget()->layout()->invalidate();
 }
 
 //---------
