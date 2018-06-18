@@ -45,6 +45,10 @@ class CQPixmapIcon : public QIconEngine {
 
     if (size != state_.size || mode != state_.mode || state != state_.state) {
       pixmap_ = icon_.pixmap(size, mode, state);
+
+      state_.size  = size;
+      state_.mode  = mode;
+      state_.state = state;
     }
 
     return pixmap_;
