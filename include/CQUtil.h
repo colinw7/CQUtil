@@ -183,6 +183,8 @@ namespace CQUtil {
   bool getMetaProperty(const QObject *object, int ind, bool inherited,
                        QMetaProperty &metaProperty);
 
+  bool hasProperty(const QObject *object, const QString &name);
+
   bool getProperty(const QObject *object, const QString &name, QVariant &value);
 
   bool setPropertyValue(QObject *object, int ind, const QVariant &value, bool inherited=true);
@@ -351,6 +353,8 @@ namespace CQUtil {
   QColor blendColors(const QColor &c1, const QColor &c2, double f);
 }
 
+//---
+
 namespace CQUtil {
   template<class T>
   T *makeWidget(const QString &name) {
@@ -382,47 +386,12 @@ namespace CQUtil {
   }
 }
 
-class CQWidgetPtr : public QObject {
-  Q_OBJECT
+//---
 
- public:
-  CQWidgetPtr(QWidget *w=nullptr) :
-   w_(w) {
-    watch();
-  }
+namespace CQUtil {
+  double area(const QPolygonF &poly);
 
-  bool isValid() const {
-    return (w_ != nullptr);
-  }
-
-  void set(QWidget *w) {
-    w_ = w;
-
-    watch();
-  }
-
-  QWidget *get() const {
-    return w_;
-  }
-
-  template<typename T>
-  T *get() const {
-    return dynamic_cast<T *>(w_);
-  }
-
- private:
-  void watch() {
-    if (w_)
-      connect(w_, SIGNAL(destroyed(QObject *)), this, SLOT(resetSlot()));
-  }
-
- private slots:
-  void resetSlot() {
-    w_ = nullptr;
-  }
-
- private:
-  QWidget *w_;
-};
+  double polygonArea2(const QPolygonF &poly);
+}
 
 #endif

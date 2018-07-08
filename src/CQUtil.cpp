@@ -914,6 +914,27 @@ getMetaProperty(const QObject *object, int ind, bool inherited, QMetaProperty &m
 
 bool
 CQUtil::
+hasProperty(const QObject *object, const QString &propName)
+{
+  if (! object)
+    return false;
+
+  if (propName.isEmpty())
+    return false;
+
+  QObject *obj = const_cast<QObject *>(object);
+
+  const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
+
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
+
+  return true;
+}
+
+bool
+CQUtil::
 getProperty(const QObject *object, const QString &propName, QVariant &v)
 {
   if (! object)
@@ -925,20 +946,16 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   QObject *obj = const_cast<QObject *>(object);
 
   const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
 
-  if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
 
-    if (propIndex >= 0) {
-      //QMetaProperty mP = meta->property(propIndex);
+//QMetaProperty mP = meta->property(propIndex);
 
-      v = obj->property(propName.toLatin1().data());
+  v = obj->property(propName.toLatin1().data());
 
-      return true;
-    }
-  }
-
-  return false;
+  return true;
 }
 
 bool
@@ -1016,14 +1033,38 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   QString typeName = v1.typeName();
 
   if (typeName == "QString" && mP.isEnumType()) {
+    QString v1Str = v1.toString().toLower();
+
     QMetaEnum me = mP.enumerator();
 
     int num_enums = me.keyCount();
 
-    for (int i = 0; i < num_enums; ++i) {
-      if (v1.toString() == me.valueToKey(i)) {
-        v1 = QVariant(i);
-        break;
+    if (mP.isFlagType()) {
+      //bool isAlign = (strcmp(me.scope(), "Qt") == 0 && strcmp(me.name(), "Alignment") == 0);
+
+      for (int i = 0; i < num_enums; ++i) {
+        int value = me.value(i);
+
+        QString vk1 = QString(me.valueToKey (value)).toLower();
+        QString vk2 = QString(me.valueToKeys(value)).toLower();
+
+        if (v1Str == vk1 || v1Str == vk2) {
+          v1 = QVariant(value);
+          break;
+        }
+
+      }
+    }
+    else {
+      for (int i = 0; i < num_enums; ++i) {
+        int value = me.value(i);
+
+        QString vk = QString(me.valueToKey(value)).toLower();
+
+        if (v1Str == vk) {
+          v1 = QVariant(value);
+          break;
+        }
       }
     }
 
@@ -1031,11 +1072,13 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   }
 
   if (typeName == "QString") {
+    QString v1Str = v1.toString();
+
     QVariant v2;
 
     (void) getProperty(object, propName, v2);
 
-    if (! stringToVariant(v1.toString(), mP.type(), mP.typeName(), v1, v2))
+    if (! stringToVariant(v1Str, mP.type(), mP.typeName(), v1, v2))
       return false;
   }
 
@@ -1092,20 +1135,16 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   QObject *obj = const_cast<QObject *>(object);
 
   const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
 
-  if (meta) {
-    int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
 
-    if (propIndex >= 0) {
-      QMetaProperty mP = meta->property(propIndex);
+  QMetaProperty mP = meta->property(propIndex);
 
-      propInfo->init(mP);
+  propInfo->init(mP);
 
-      return true;
-    }
-  }
-
-  return false;
+  return true;
 }
 
 QString
@@ -2881,4 +2920,30 @@ init(const QMetaProperty &mp)
 
   for (int i = 0; i < num_enums; ++i)
     enumNames_.push_back(me.valueToKey(i));
+}
+
+//------------
+
+double
+CQUtil::
+area(const QPolygonF &poly)
+{
+  return fabs(0.5*polygonArea2(poly));
+}
+
+double
+CQUtil::
+polygonArea2(const QPolygonF &poly)
+{
+  int n = poly.length();
+
+  double area = 0.0;
+
+  int i1 = n - 1;
+  int i2 = 0;
+
+  for ( ; i2 < n; i1 = i2++)
+    area += poly[i1].x()*poly[i2].y() - poly[i1].y()*poly[i2].x();
+
+  return area;
 }
