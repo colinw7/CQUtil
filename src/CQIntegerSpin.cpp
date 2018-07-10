@@ -1,5 +1,6 @@
 #include <CQIntegerSpin.h>
 #include <QLineEdit>
+#include <cmath>
 
 CQIntegerSpin::
 CQIntegerSpin(QWidget *parent, int value) :
