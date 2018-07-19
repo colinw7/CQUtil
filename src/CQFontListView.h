@@ -41,7 +41,7 @@ class CQFontListView : public QListView {
     return model()->stringList().at(i);
   }
 
-signals:
+ signals:
   void highlighted(int);
 };
 

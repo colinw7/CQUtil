@@ -68,10 +68,11 @@ CQUTIL_DCL_META_TYPE(CAngle)
 
 class QMouseEvent;
 class QKeyEvent;
-class QMetaObject;
 class QAbstractButton;
 class QDockWidget;
 class QLabel;
+
+struct QMetaObject;
 
 #ifdef CQUTIL_GRADIENT
 class CLinearGradient;

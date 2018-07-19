@@ -1,5 +1,5 @@
-#ifndef CQAPP_H
-#define CQAPP_H
+#ifndef CQApp_H
+#define CQApp_H
 
 //#define USE_OBJEDIT 1
 
