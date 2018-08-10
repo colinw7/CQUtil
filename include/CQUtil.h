@@ -390,7 +390,7 @@ namespace CQUtil {
 //---
 
 namespace CQUtil {
-  double area(const QPolygonF &poly);
+  double polygonArea(const QPolygonF &poly);
 
   double polygonArea2(const QPolygonF &poly);
 }

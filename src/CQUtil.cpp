@@ -2926,7 +2926,7 @@ init(const QMetaProperty &mp)
 
 double
 CQUtil::
-area(const QPolygonF &poly)
+polygonArea(const QPolygonF &poly)
 {
   return fabs(0.5*polygonArea2(poly));
 }
