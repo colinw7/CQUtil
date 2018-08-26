@@ -55,14 +55,37 @@ drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
 }
 
 static QColor
-mergedColors(const QColor &colorA, const QColor &colorB, int factor = 50)
+mergedColors(const QColor &colorA, const QColor &colorB, double factor = 50.0)
 {
-  const int maxFactor = 100;
+  const double maxFactor = 100.0;
+
   QColor tmp = colorA;
+
   tmp.setRed  ((tmp.red  ()*factor)/maxFactor + (colorB.red  ()*(maxFactor - factor))/maxFactor);
   tmp.setGreen((tmp.green()*factor)/maxFactor + (colorB.green()*(maxFactor - factor))/maxFactor);
   tmp.setBlue ((tmp.blue ()*factor)/maxFactor + (colorB.blue ()*(maxFactor - factor))/maxFactor);
+
   return tmp;
+}
+
+static QColor
+grayColor(const QColor &c)
+{
+  int g = qGray(c.red(), c.green(), c.blue());
+
+  return QColor(g, g, g);
+}
+
+static QColor
+disabledColor(const QColor &c, const QColor &bg)
+{
+  return mergedColors(grayColor(c), bg, 40);
+}
+
+static QColor
+inactiveColor(const QColor &c, const QColor &)
+{
+  return c;
 }
 
 #if 0
@@ -201,113 +224,88 @@ setTheme(const Theme &t)
   QColor windowColor        = QColor("#efebe7");
   QColor altBaseColor       = baseColor.darker(110);
   QColor highlightColor     = Qt::darkBlue;
-  QColor highlightTextColor = Qt::darkBlue;
+  QColor highlightTextColor = Qt::white;
   QColor linkColor          = Qt::blue;
   QColor linkVisitedColor   = Qt::magenta;
+  QColor brightTextColor    = Qt::yellow;
 
   if      (theme_ == Theme::LIGHT) {
     windowTextColor    = QColor("#000000");
     buttonColor        = QColor("#efebe7");
     textColor          = QColor("#000000");
     buttonTextColor    = QColor("#000000");
-    baseColor          = QColor("#ffffff");
+    baseColor          = QColor("#f3f3f4");
     windowColor        = QColor("#efebe7");
     altBaseColor       = baseColor.darker(110);
-    highlightColor     = Qt::darkBlue;
-    highlightTextColor = Qt::black;
-    linkColor          = Qt::blue;
-    linkVisitedColor   = Qt::magenta;
-  }
-  else if (theme_ == Theme::DARK) {
-    windowTextColor    = QColor("#efefef");
-    buttonColor        = QColor("#323232");
-    textColor          = QColor("#efefef");
-    buttonTextColor    = QColor("#efefef");
-    baseColor          = QColor("#282828");
-    windowColor        = QColor("#282828");
-    altBaseColor       = baseColor.lighter(120);
-    highlightColor     = QColor("#408020");
+    highlightColor     = QColor("#9ab87c");
     highlightTextColor = Qt::white;
     linkColor          = Qt::blue;
     linkVisitedColor   = Qt::magenta;
+    brightTextColor    = Qt::yellow;
+  }
+  else if (theme_ == Theme::DARK) {
+    windowTextColor    = QColor("#eaeaea");
+    buttonColor        = QColor("#35353a");
+    textColor          = QColor("#eaeaea");
+    buttonTextColor    = QColor("#eaeaea");
+    baseColor          = QColor("#373737");
+    windowColor        = QColor("#373737");
+    altBaseColor       = QColor("#424242");
+    highlightColor     = QColor("#9ab87c");
+    highlightTextColor = QColor("#d4d4d4");
+    linkColor          = QColor("#3d81c6");
+    linkVisitedColor   = QColor("#6b00b9");
+    brightTextColor    = QColor("#c63333");
   }
 
-  palette_.setColor(QPalette::Normal  , QPalette::WindowText, windowTextColor);
-  palette_.setColor(QPalette::Active  , QPalette::WindowText, windowTextColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::WindowText, windowTextColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Button, buttonColor);
-  palette_.setColor(QPalette::Active  , QPalette::Button, buttonColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Button, buttonColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Text, textColor);
-  palette_.setColor(QPalette::Active  , QPalette::Text, textColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Text, textColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::ButtonText, buttonTextColor);
-  palette_.setColor(QPalette::Active  , QPalette::ButtonText, buttonTextColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::ButtonText, buttonTextColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Window, windowColor);
-  palette_.setColor(QPalette::Active  , QPalette::Window, windowColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Window, windowColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Base, baseColor);
-  palette_.setColor(QPalette::Active  , QPalette::Base, baseColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Base, baseColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::AlternateBase, altBaseColor);
-  palette_.setColor(QPalette::Active  , QPalette::AlternateBase, altBaseColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::AlternateBase, altBaseColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Highlight, highlightColor);
-  palette_.setColor(QPalette::Active  , QPalette::Highlight, highlightColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Highlight, highlightColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::HighlightedText, highlightTextColor);
-  palette_.setColor(QPalette::Active  , QPalette::HighlightedText, highlightTextColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::HighlightedText, highlightTextColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::Link, linkColor);
-  palette_.setColor(QPalette::Active  , QPalette::Link, linkColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Link, linkColor);
-
-  palette_.setColor(QPalette::Normal  , QPalette::LinkVisited, linkVisitedColor);
-  palette_.setColor(QPalette::Active  , QPalette::LinkVisited, linkVisitedColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::LinkVisited, linkVisitedColor);
+  palette_.setColor(QPalette::Active, QPalette::WindowText     , windowTextColor   );
+  palette_.setColor(QPalette::Active, QPalette::Button         , buttonColor       );
+  palette_.setColor(QPalette::Active, QPalette::Text           , textColor         );
+  palette_.setColor(QPalette::Active, QPalette::ButtonText     , buttonTextColor   );
+  palette_.setColor(QPalette::Active, QPalette::Window         , windowColor       );
+  palette_.setColor(QPalette::Active, QPalette::Base           , baseColor         );
+  palette_.setColor(QPalette::Active, QPalette::AlternateBase  , altBaseColor      );
+  palette_.setColor(QPalette::Active, QPalette::Highlight      , highlightColor    );
+  palette_.setColor(QPalette::Active, QPalette::HighlightedText, highlightTextColor);
+  palette_.setColor(QPalette::Active, QPalette::Link           , linkColor         );
+  palette_.setColor(QPalette::Active, QPalette::LinkVisited    , linkVisitedColor  );
 
   //---
 
-  QColor lightColor      = buttonColor.lighter(110);
-  QColor midlightColor   = buttonColor.lighter(105);
-  QColor darkColor       = buttonColor.lighter(110);
-  QColor midColor        = buttonColor.lighter(105);
-  QColor shadowColor     = buttonColor.darker (120);
-  QColor brightTextColor = textColor  .lighter(120);
+  QColor lightColor    = mergedColors(buttonColor, Qt::white  );
+  QColor shadowColor   = mergedColors(buttonColor, Qt::black  );
+  QColor midlightColor = mergedColors(buttonColor, lightColor );
+  QColor darkColor     = mergedColors(buttonColor, shadowColor);
+  QColor midColor      = mergedColors(buttonColor, darkColor  );
 
-  palette_.setColor(QPalette::Normal  , QPalette::Light, lightColor);
-  palette_.setColor(QPalette::Active  , QPalette::Light, lightColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Light, lightColor);
+  palette_.setColor(QPalette::Active, QPalette::Light     , lightColor     );
+  palette_.setColor(QPalette::Active, QPalette::Midlight  , midlightColor  );
+  palette_.setColor(QPalette::Active, QPalette::Dark      , darkColor      );
+  palette_.setColor(QPalette::Active, QPalette::Mid       , midColor       );
+  palette_.setColor(QPalette::Active, QPalette::Shadow    , shadowColor    );
+  palette_.setColor(QPalette::Active, QPalette::BrightText, brightTextColor);
 
-  palette_.setColor(QPalette::Normal  , QPalette::Midlight, midlightColor);
-  palette_.setColor(QPalette::Active  , QPalette::Midlight, midlightColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Midlight, midlightColor);
+  //---
 
-  palette_.setColor(QPalette::Normal  , QPalette::Dark, darkColor);
-  palette_.setColor(QPalette::Active  , QPalette::Dark, darkColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Dark, darkColor);
+  QPalette::ColorRole roles[] = {
+   QPalette::Window, QPalette::WindowText, QPalette::Base, QPalette::AlternateBase,
+   QPalette::ToolTipBase, QPalette::ToolTipText, QPalette::Text, QPalette::Button,
+   QPalette::ButtonText, QPalette::BrightText, QPalette::Light, QPalette::Midlight,
+   QPalette::Dark, QPalette::Mid, QPalette::Shadow, QPalette::Highlight,
+   QPalette::HighlightedText, QPalette::Link, QPalette::LinkVisited
+  };
 
-  palette_.setColor(QPalette::Normal  , QPalette::Mid, midColor);
-  palette_.setColor(QPalette::Active  , QPalette::Mid, midColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Mid, midColor);
+  int num_roles = sizeof(roles)/sizeof(roles[0]);
 
-  palette_.setColor(QPalette::Normal  , QPalette::Shadow, shadowColor);
-  palette_.setColor(QPalette::Active  , QPalette::Shadow, shadowColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::Shadow, shadowColor);
+  for (int r = 0; r < num_roles; ++r) {
+    if (roles[r] == QPalette::Window && roles[r] == QPalette::Base && roles[r] == QPalette::Button)
+      continue;
 
-  palette_.setColor(QPalette::Normal  , QPalette::BrightText, brightTextColor);
-  palette_.setColor(QPalette::Active  , QPalette::BrightText, brightTextColor.lighter(110));
-  palette_.setColor(QPalette::Inactive, QPalette::BrightText, brightTextColor);
+    QColor c = palette_.color(QPalette::Active, roles[r]);
+
+    palette_.setColor(QPalette::Inactive, roles[r], inactiveColor(c, windowColor));
+    palette_.setColor(QPalette::Disabled, roles[r], disabledColor(c, windowColor));
+  }
 
   //---
 
@@ -330,7 +328,11 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
 
         if (groupBox->subControls & QStyle::SC_GroupBoxFrame) {
+#if QT_VERSION >= 0x050000
+          QStyleOptionFrame frame;
+#else
           QStyleOptionFrameV2 frame;
+#endif
 
           frame.QStyleOption::operator=(*groupBox);
 
@@ -826,12 +828,32 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
   QColor base          = option->palette.base().color();
   QColor button        = option->palette.button().color();
-  QColor buttonShadow  = button.darker(120);
+  QColor text          = option->palette.text().color();
+  QColor buttonShadow  = (theme_ == Theme::DARK ? mergedColors(base, text) : button.darker(120));
   QColor highlight     = option->palette.highlight().color();
   QColor darkHighlight = highlight.darker(110);
 
   switch (element) {
     case PE_FrameGroupBox: {
+#if QT_VERSION >= 0x050000
+      if (const QStyleOptionFrame *frame =
+            qstyleoption_cast<const QStyleOptionFrame *>(option)) {
+        if (frame->features & QStyleOptionFrame::Flat) {
+          QRect fr = frame->rect;
+
+          QPoint p1(fr.x(), fr.y() + 1);
+          QPoint p2(fr.x() + fr.width(), p1.y());
+
+          qDrawShadeLine(painter, p1, p2, frame->palette, true,
+                         frame->lineWidth, frame->midLineWidth);
+        }
+        else {
+          qDrawShadeRect(painter, frame->rect.x(), frame->rect.y(), frame->rect.width(),
+                         frame->rect.height(), frame->palette, true,
+                         frame->lineWidth, frame->midLineWidth);
+        }
+      }
+#else
       if (const QStyleOptionFrameV2 *frame =
             qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
         if (frame->features & QStyleOptionFrameV2::Flat) {
@@ -849,6 +871,7 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
                          frame->lineWidth, frame->midLineWidth);
         }
       }
+#endif
 
       break;
     }
@@ -923,11 +946,13 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
       if      (state & State_On) {
         painter->fillPath  (opath, QBrush(highlight    ));
         painter->strokePath(opath, QPen  (buttonShadow ));
+
         drawCheck(painter, iRect, QBrush(base));
       }
       else if (state & State_Sunken) {
         painter->fillPath  (opath, QBrush(button       ));
         painter->strokePath(opath, QPen  (buttonShadow ));
+
         drawCheck(painter, iRect, QBrush(base));
       }
       else {

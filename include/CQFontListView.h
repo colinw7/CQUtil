@@ -10,6 +10,8 @@ class CQFontListView : public QListView {
  public:
   CQFontListView(QWidget *parent=0);
 
+ ~CQFontListView();
+
   QStringListModel *model() const {
     return static_cast<QStringListModel *>(QListView::model());
   }
@@ -33,6 +35,7 @@ class CQFontListView : public QListView {
 
   void currentChanged(const QModelIndex &current, const QModelIndex &previous) Q_DECL_OVERRIDE {
     QListView::currentChanged(current, previous);
+
     if (current.isValid())
       emit highlighted(current.row());
   }
@@ -43,6 +46,9 @@ class CQFontListView : public QListView {
 
  signals:
   void highlighted(int);
+
+ private:
+  QStringListModel *model_ { nullptr };
 };
 
 #endif

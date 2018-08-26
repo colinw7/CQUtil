@@ -4,7 +4,15 @@ CQFontListView::
 CQFontListView(QWidget *parent) :
 QListView(parent)
 {
-  setModel(new QStringListModel(parent));
+  model_ = new QStringListModel(parent);
+
+  setModel(model_);
 
   setEditTriggers(NoEditTriggers);
+}
+
+CQFontListView::
+~CQFontListView()
+{
+  delete model_;
 }

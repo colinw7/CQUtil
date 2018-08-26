@@ -5,6 +5,7 @@
 
 #include <QApplication>
 
+class CQStyle;
 class CConfig;
 class CQAppObjEditFilter;
 
@@ -13,12 +14,19 @@ class CQAppObjEditFilter;
 class CQApp : public QApplication {
   Q_OBJECT
 
+  Q_PROPERTY(bool darkTheme READ isDarkTheme WRITE setDarkTheme)
+
  public:
   static CQApp *getApp() { return app_; }
 
   CQApp(int &argc, char **argv);
 
  ~CQApp();
+
+  CQStyle *style() const { return style_; }
+
+  bool isDarkTheme() const;
+  void setDarkTheme(bool b);
 
 #ifdef USE_OBJEDIT
   void addObjEditFilter(QObject *o);
@@ -27,9 +35,12 @@ class CQApp : public QApplication {
  private:
   static CQApp *app_;
 
+  CQStyle*            style_         { nullptr };
   CConfig*            config_        { nullptr };
   CQAppObjEditFilter* objEditFilter_ { nullptr };
 };
+
+//---
 
 #ifdef USE_OBJEDIT
 class CQAppObjEditFilter : public QObject {

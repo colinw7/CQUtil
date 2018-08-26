@@ -6,16 +6,25 @@
 #include <QFontMetricsF>
 #include <QPainter>
 
+static CQFontMgr *s_instance;
+
 CQFontMgr *
 CQFontMgr::
-getInstance()
+instance()
 {
-  static CQFontMgr *instance;
+  if (! s_instance)
+    s_instance = new CQFontMgr;
 
-  if (! instance)
-    instance = new CQFontMgr;
+  return s_instance;
+}
 
-  return instance;
+void
+CQFontMgr::
+release()
+{
+  delete s_instance;
+
+  s_instance = nullptr;
 }
 
 CQFontMgr::
@@ -27,7 +36,16 @@ CQFontMgr()
 CQFontMgr::
 ~CQFontMgr()
 {
+  clear();
+}
+
+void
+CQFontMgr::
+clear()
+{
   delete config_;
+
+  config_ = nullptr;
 }
 
 void
@@ -37,6 +55,13 @@ setPrototype()
   CFontPtr font(new CQFont("courier", CFONT_STYLE_NORMAL, 12));
 
   CFontMgrInst->setPrototype(font);
+}
+
+void
+CQFontMgr::
+resetPrototype()
+{
+  CFontMgrInst->setPrototype(CFontPtr());
 }
 
 CFontPtr
@@ -136,6 +161,8 @@ CQFont(const std::string &family, CFontStyle style, double size, double angle, d
   // if CFONT_STYLE_FULL_SIZE is set then size is full char height (ascent + descent)
   // if CFONT_STYLE_FULL_SIZE is NOT set then size is char ascent.
   for (int n = 0; n < 8; ++n) {
+    delete qfont_;
+
     qfont_ = new QFont(qfamily.c_str(), isize1, weight, italic);
 
     QFontMetricsF fm(*qfont_);
@@ -156,6 +183,8 @@ CQFont(const std::string &family, CFontStyle style, double size, double angle, d
   }
 
   //---
+
+  assert(qfont_);
 
   if (style & CFONT_STYLE_UNDERLINE)
     qfont_->setUnderline(true);

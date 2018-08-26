@@ -71,6 +71,13 @@ setFactory()
   CWindowMgrInst->setFactory(new CQWindowFactory);
 }
 
+void
+CQWindow::
+resetFactory()
+{
+  CWindowMgrInst->setFactory(0);
+}
+
 CQWindow::
 CQWindow(CQWindow *parent) :
  QWidget(parent), CWindow(parent), pressed_(false)

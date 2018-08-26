@@ -566,6 +566,7 @@ decodeFont(const QFont &qfont, QString &family, CFontStyle &style, int &pixelSiz
 
   if (pixelSize == -1) {
     //int dpi = QX11Info::appDpiY();
+    //int dpi = QApplication::desktop()->logicalDpiY(); (Same ?)
 
     int pointSize = qfont.pointSize();
 

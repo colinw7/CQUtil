@@ -84,7 +84,7 @@ HEADERS += \
 \
 ../include/CQFontChooser.h \
 ../include/CQFontDialog.h \
-CQFontListView.h \
+../include/CQFontListView.h \
 \
 ../include/CQIntegerEdit.h \
 ../include/CQRealEdit.h \

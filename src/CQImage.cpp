@@ -13,6 +13,13 @@ setPrototype()
   CImageMgrInst->setPrototype(image);
 }
 
+void
+CQImage::
+resetPrototype()
+{
+  CImageMgrInst->setPrototype(CImagePtr());
+}
+
 CQImage::
 CQImage()
 {

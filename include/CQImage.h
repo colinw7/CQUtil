@@ -21,7 +21,9 @@ class CQImage : public CImage {
 
  public:
   static void setPrototype();
+  static void resetPrototype();
 
+ public:
   CQImage(const CQImage &qimage);
  ~CQImage();
 

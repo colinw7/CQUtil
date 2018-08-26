@@ -19,6 +19,7 @@ class CQWindow : public QWidget, public CWindow {
 
  public:
   static void setFactory();
+  static void resetFactory();
 
  public:
   CQWindow(CQWindow *parent=nullptr);

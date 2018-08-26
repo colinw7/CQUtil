@@ -7,13 +7,18 @@
 
 class CConfig;
 
-#define CQFontMgrInst CQFontMgr::getInstance()
+#define CQFontMgrInst CQFontMgr::instance()
 
 class CQFontMgr {
  public:
-  static CQFontMgr *getInstance();
+  static CQFontMgr *instance();
+
+  static void release();
 
   void setPrototype();
+  void resetPrototype();
+
+  void clear();
 
   CFontPtr lookupFont(const QFont &qfont);
 
@@ -31,7 +36,7 @@ class CQFontMgr {
  ~CQFontMgr();
 
  private:
-  CConfig *config_ { 0 };
+  CConfig *config_ { nullptr };
 };
 
 //------
