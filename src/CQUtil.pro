@@ -50,6 +50,7 @@ CQToolTip.cpp \
 \
 CQTreeView.cpp \
 CQTableView.cpp \
+CQTableWidget.cpp \
 CQHeaderView.cpp \
 \
 CQAlignEdit.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
 \
 ../include/CQTreeView.h \
 ../include/CQTableView.h \
+../include/CQTableWidget.h \
 ../include/CQHeaderView.h \
 \
 ../include/CQAlignEdit.h \
