@@ -56,6 +56,7 @@ CQHeaderView.cpp \
 CQAlignEdit.cpp \
 CQIconCombo.cpp \
 CQWidgetMenu.cpp \
+CQSwitch.cpp \
 \
 CQWinWidget.cpp \
 \
@@ -110,6 +111,7 @@ HEADERS += \
 ../include/CQAlignEdit.h \
 ../include/CQIconCombo.h \
 ../include/CQWidgetMenu.h \
+../include/CQSwitch.h \
 \
 ../include/CQWinWidget.h \
 \
