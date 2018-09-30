@@ -186,7 +186,7 @@ setItem(int row, int column, const QString &str)
 {
   QTableWidgetItem *item = new QTableWidgetItem(str);
 
-  item->setFlags(item->flags() & !Qt::ItemIsEditable);
+  item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
   QTableWidget::setItem(row, column, item);
 }

@@ -1,8 +1,9 @@
 #ifndef CQUTIL_H
 #define CQUTIL_H
 
-#define CQUTIL_FONT 1
-#define CQUTIL_IMAGE 1
+//#define CQUTIL_FONT 1
+//#define CQUTIL_IMAGE 1
+
 #define CQUTIL_BRUSH 1
 #define CQUTIL_PEN 1
 #define CQUTIL_LINE_DASH 1

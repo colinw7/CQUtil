@@ -58,6 +58,8 @@ CQIconCombo.cpp \
 CQWidgetMenu.cpp \
 CQSwitch.cpp \
 \
+CQLineDash.cpp \
+\
 CQWinWidget.cpp \
 \
 CQStrParse.cpp \
@@ -112,6 +114,8 @@ HEADERS += \
 ../include/CQIconCombo.h \
 ../include/CQWidgetMenu.h \
 ../include/CQSwitch.h \
+\
+../include/CQLineDash.h \
 \
 ../include/CQWinWidget.h \
 \

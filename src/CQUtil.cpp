@@ -1,6 +1,10 @@
 #include <CQUtil.h>
 #include <CQImage.h>
+
+#ifdef CQUTIL_FONT
 #include <CQFont.h>
+#endif
+
 #include <CEvent.h>
 #include <CRegExp.h>
 
