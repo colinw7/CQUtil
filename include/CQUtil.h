@@ -396,4 +396,18 @@ namespace CQUtil {
   double polygonArea2(const QPolygonF &poly);
 }
 
+//---
+
+class QGridLayout;
+class QLayoutItem;
+
+namespace CQUtil {
+  void deleteLayoutChildWidgets(QLayoutItem *item);
+
+  void removeGridItem(QGridLayout *layout, int row, int column, bool deleteWidgets);
+
+  void removeGridRow   (QGridLayout *layout, int row, bool deleteWidgets);
+  void removeGridColumn(QGridLayout *layout, int column, bool deleteWidgets);
+}
+
 #endif
