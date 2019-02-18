@@ -16,6 +16,8 @@ QDebug operator<<(QDebug dbg, const TYPE &t);
 
 //---
 
+// convert meta type to/from data stream using GETTER and SETTER member functions that
+// return and take QString
 #define CQUTIL_DEF_META_TYPE_DATA_STREAM(TYPE, GETTER, SETTER) \
 QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
   QString str = t.GETTER(); \
@@ -26,10 +28,12 @@ QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
 QDataStream &operator>>(QDataStream &in, TYPE &t) { \
   QString str; \
   in >> str; \
-  t.fromString(str); \
+  t.SETTER(str); \
   return in; \
 }
 
+// convert meta type to/from data stream using GETTER and SETTER member functions that
+// return and take std::string
 #define CQUTIL_DEF_META_TYPE_STD_DATA_STREAM(TYPE, GETTER, SETTER) \
 QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
   QString str = t.GETTER().c_str(); \
@@ -40,10 +44,12 @@ QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
 QDataStream &operator>>(QDataStream &in, TYPE &t) { \
   QString str; \
   in >> str; \
-  t.fromString(str.toStdString()); \
+  t.SETTER(str.toStdString()); \
   return in; \
 } \
 
+// convert meta type to/from debug using GETTER and SETTER member functions that
+// return and take QString
 #define CQUTIL_DEF_META_TYPE_DEBUG(TYPE, GETTER) \
 QDebug operator<<(QDebug dbg, const TYPE &t) \
 { \
@@ -51,6 +57,8 @@ QDebug operator<<(QDebug dbg, const TYPE &t) \
   return dbg.maybeSpace(); \
 } \
 
+// convert meta type to/from debug using GETTER and SETTER member functions that
+// return and take std::string
 #define CQUTIL_DEF_META_TYPE_STD_DEBUG(TYPE, GETTER) \
 QDebug operator<<(QDebug dbg, const TYPE &t) \
 { \
@@ -58,6 +66,7 @@ QDebug operator<<(QDebug dbg, const TYPE &t) \
   return dbg.maybeSpace(); \
 }
 
+// define routine to register meta type to Qt
 #define CQUTIL_DEF_META_TYPE_REGISTER(TYPE) \
 namespace CQUtilMeta_##TYPE {\
 int registerMetaType() { \
@@ -72,6 +81,8 @@ int registerMetaType() { \
 } \
 }
 
+// define meta type using GETTER and SETTER member functions that
+// return and take QString
 #define CQUTIL_DEF_META_TYPE(TYPE, GETTER, SETTER) \
 CQUTIL_DEF_META_TYPE_DATA_STREAM(TYPE, GETTER, SETTER) \
 \
@@ -81,6 +92,8 @@ CQUTIL_DEF_META_TYPE_REGISTER(TYPE)
 
 //---
 
+// define meta type using GETTER and SETTER member functions that
+// return and take std::string
 #define CQUTIL_DEF_META_TYPE_STD(TYPE, GETTER, SETTER) \
 CQUTIL_DEF_META_TYPE_STD_DATA_STREAM(TYPE, GETTER, SETTER) \
 \
@@ -90,6 +103,7 @@ CQUTIL_DEF_META_TYPE_REGISTER(TYPE)
 
 //---
 
+// call routine to register meta type
 #define CQUTIL_REGISTER_META(TYPE) CQUtilMeta_##TYPE :: registerMetaType()
 
 #endif

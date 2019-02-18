@@ -150,7 +150,11 @@ paintEvent(QPaintEvent *)
   painter.drawText(tx, tym + ta, text);
 
   // draw toggle
-  painter.setPen(tc);
+  QColor toggleStrokeColor = tc;
+
+  toggleStrokeColor.setAlphaF(0.5);
+
+  painter.setPen(toggleStrokeColor);
   painter.setBrush(bc);
 
   int ex = (isChecked() ? cw - ta - m : m);

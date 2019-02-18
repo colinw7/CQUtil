@@ -232,11 +232,7 @@ void
 CQColorChooser::
 imageButtonClicked()
 {
-  QColor color = QColorDialog::getColor(color_, this);
-
-  setColor(color, alpha_);
-
-  changeColor();
+  colorButtonClicked();
 }
 
 void

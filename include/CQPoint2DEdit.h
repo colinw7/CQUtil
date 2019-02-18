@@ -14,7 +14,7 @@ class CQPoint2DEdit : public QFrame {
 
  public:
   CQPoint2DEdit(QWidget *parent, const CPoint2D &value=CPoint2D(0,0), bool spin=false);
-  CQPoint2DEdit(const CPoint2D &value=CPoint2D(0,0), bool spin=false);
+  CQPoint2DEdit(const CPoint2D &value=CPoint2D(0, 0), bool spin=false);
 
   CQPoint2DEdit(QWidget *parent, const QPointF &value, bool spin=false);
   CQPoint2DEdit(const QPointF &value, bool spin=false);
@@ -53,19 +53,19 @@ class CQPoint2DEdit : public QFrame {
   void widgetToPoint();
 
  private:
-  CPoint2D          point_ { CPoint2D(0, 0) };
-  bool              spin_ { false };
-  CPoint2D          min_ { CPoint2D(-1E50, -1E50) };
-  CPoint2D          max_ { CPoint2D(1E50, 1E50) };
-  CPoint2D          step_ { CPoint2D(1, 1) };
-  int               decimals_ { 3 };
-  QDoubleValidator *x_validator_ { 0 };
-  QDoubleValidator *y_validator_ { 0 };
-  QLineEdit        *x_edit_ { 0 };
-  QLineEdit        *y_edit_ { 0 };
-  QDoubleSpinBox   *x_spin_ { 0 };
-  QDoubleSpinBox   *y_spin_ { 0 };
-  QHBoxLayout      *layout_ { 0 };
+  CPoint2D          point_          { 0, 0 };
+  bool              spin_           { false };
+  CPoint2D          min_            { -1E50, -1E50 };
+  CPoint2D          max_            { 1E50, 1E50 };
+  CPoint2D          step_           { 1, 1 };
+  int               decimals_       { 3 };
+  QDoubleValidator *x_validator_    { nullptr };
+  QDoubleValidator *y_validator_    { nullptr };
+  QLineEdit        *x_edit_         { nullptr };
+  QLineEdit        *y_edit_         { nullptr };
+  QDoubleSpinBox   *x_spin_         { nullptr };
+  QDoubleSpinBox   *y_spin_         { nullptr };
+  QHBoxLayout      *layout_         { nullptr };
   mutable bool      disableSignals_ { false };
 };
 

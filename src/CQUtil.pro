@@ -29,6 +29,7 @@ CQStyle.cpp \
 \
 CQColorChooser.cpp \
 CQAlphaButton.cpp \
+CQColorEdit.cpp \
 \
 CQFontChooser.cpp \
 CQFontDialog.cpp \
@@ -86,6 +87,7 @@ HEADERS += \
 \
 ../include/CQColorChooser.h \
 ../include/CQAlphaButton.h \
+../include/CQColorEdit.h \
 \
 ../include/CQFontChooser.h \
 ../include/CQFontDialog.h \

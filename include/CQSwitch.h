@@ -37,7 +37,7 @@ class CQSwitch : public QAbstractButton {
  signals:
   void released();
 
-  void toggled(bool b);
+  //void toggled(bool b);
 
  private:
   void init();
