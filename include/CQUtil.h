@@ -313,6 +313,9 @@ namespace CQUtil {
 
   void penSetLineDash(QPen &pen, const CLineDash &dash);
 
+  QString alignToString(Qt::Alignment align);
+  bool stringToAlign(const QString &str, Qt::Alignment &align);
+
   Qt::Alignment toQAlign(CHAlignType halign);
   Qt::Alignment toQAlign(CVAlignType valign);
 

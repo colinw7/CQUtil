@@ -2605,6 +2605,67 @@ penSetLineDash(QPen &pen, const CLineDash &dash)
 }
 #endif
 
+//------
+
+QString
+CQUtil::
+alignToString(Qt::Alignment align)
+{
+  QString str;
+
+  if      (align & Qt::AlignLeft   ) str += "AlignLeft";
+  else if (align & Qt::AlignRight  ) str += "AlignRight";
+  else if (align & Qt::AlignHCenter) str += "AlignHCenter";
+  else if (align & Qt::AlignJustify) str += "AlignJustify";
+
+  str += "|";
+
+  if      (align & Qt::AlignTop    ) str += "AlignTop";
+  else if (align & Qt::AlignBottom ) str += "AlignBottom";
+  else if (align & Qt::AlignVCenter) str += "AlignVCenter";
+
+  return str;
+}
+
+bool
+CQUtil::
+stringToAlign(const QString &str, Qt::Alignment &align)
+{
+  auto stringAddAlign = [](const QString &str, Qt::Alignment &align) {
+    if      (str == "alignleft"   ) align |= Qt::AlignLeft;
+    else if (str == "alignright"  ) align |= Qt::AlignRight;
+    else if (str == "alignhcenter") align |= Qt::AlignHCenter;
+    else if (str == "alignjustify") align |= Qt::AlignJustify;
+
+    else if (str == "aligntop"    ) align |= Qt::AlignTop;
+    else if (str == "alignbottom" ) align |= Qt::AlignBottom;
+    else if (str == "alignvcenter") align |= Qt::AlignVCenter;
+
+    else if (str == "aligncenter" ) align |= Qt::AlignCenter;
+
+    else                            return false;
+
+    return true;
+  };
+
+  //---
+
+  bool rc = true;
+
+  align = 0;
+
+  QStringList strs = str.split("|");
+
+  for (int i = 0; i < strs.length(); ++i) {
+    QString str = strs[i].toLower();
+
+    if (! stringAddAlign(str, align))
+      rc = false;
+  }
+
+  return rc;
+}
+
 Qt::Alignment
 CQUtil::
 toQAlign(CHAlignType halign)

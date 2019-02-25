@@ -1,5 +1,5 @@
-#ifndef CQRADIO_BUTTONS_H
-#define CQRADIO_BUTTONS_H
+#ifndef CQRadioButtons_H
+#define CQRadioButtons_H
 
 #include <vector>
 #include <QWidget>
@@ -17,8 +17,10 @@ class CQRadioButtons : public QWidget {
 
   void addButton(const QString &name);
 
-  int     getCurrentValue() const;
+  int getCurrentValue() const;
+
   QString getCurrentName () const;
+  void setCurrentName(const QString &name);
 
  protected:
   void addButtons(const std::vector<QString> &names);

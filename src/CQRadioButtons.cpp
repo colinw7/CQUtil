@@ -263,12 +263,19 @@ QString
 CQRadioButtons::
 getCurrentName() const
 {
-  std::vector<QRadioButton *>::const_iterator p1 = buttons_.begin();
-  std::vector<QRadioButton *>::const_iterator p2 = buttons_.end  ();
-
-  for (int i = 0; p1 != p2; ++p1, ++i)
-    if ((*p1)->isChecked())
-      return (*p1)->text();
+  for (const auto &button : buttons_)
+    if (button->isChecked())
+      return button->text();
 
   return "";
+}
+
+void
+CQRadioButtons::
+setCurrentName(const QString &name)
+{
+  for (auto &button : buttons_) {
+    if (button->text() == name)
+      return button->setChecked(true);
+  }
 }

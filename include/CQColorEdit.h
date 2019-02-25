@@ -31,6 +31,8 @@ class CQColorEdit : public QFrame {
   bool isEditable() const { return editable_; }
   void setEditable(bool editable=true);
 
+  void setNoFocus();
+
   //---
 
   QLineEdit *lineEdit() const { return edit_; }
@@ -44,6 +46,8 @@ class CQColorEdit : public QFrame {
 
   void updateEdit();
 
+  void setNoFocusHier(QWidget *w);
+
   void emitColorChanged();
 
   void initStyle(QStyleOptionComboBox &opt);
@@ -51,9 +55,10 @@ class CQColorEdit : public QFrame {
  private slots:
   void textChangedSlot();
 
-  void showMenuSlot();
+  void buttonSlot();
 
-  void updateMenuSlot();
+  void showMenuSlot();
+  void hideMenuSlot();
 
   void colorSlot(const QColor &color);
 
@@ -62,6 +67,8 @@ class CQColorEdit : public QFrame {
  signals:
   void colorChanged(const QColor &color);
   void colorChanged(const QString &colorName);
+
+  void menuHidden();
 
  private:
   bool          editable_   { true };
@@ -82,6 +89,8 @@ class CQColorEditEdit : public QLineEdit {
 
  public:
   CQColorEditEdit(CQColorEdit *edit);
+
+  void paintEvent(QPaintEvent *) override;
 
  private:
   CQColorEdit *edit_ { nullptr };

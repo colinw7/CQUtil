@@ -22,7 +22,6 @@ CQWorkspace.cpp \
 CQToolBar.cpp \
 CQWindow.cpp \
 CQImage.cpp \
-CQFont.cpp \
 \
 CQPixmapCache.cpp \
 CQStyle.cpp \
@@ -31,8 +30,10 @@ CQColorChooser.cpp \
 CQAlphaButton.cpp \
 CQColorEdit.cpp \
 \
+CQFont.cpp \
 CQFontChooser.cpp \
 CQFontDialog.cpp \
+CQFontEdit.cpp \
 CQFontListView.cpp \
 \
 CQIntegerEdit.cpp \
@@ -59,6 +60,7 @@ CQAlignEdit.cpp \
 CQIconCombo.cpp \
 CQWidgetMenu.cpp \
 CQSwitch.cpp \
+CQGroupBox.cpp \
 \
 CQLineDash.cpp \
 \
@@ -77,7 +79,6 @@ HEADERS += \
 ../include/CQMdiArea.h \
 ../include/CQWindow.h \
 ../include/CQImage.h \
-../include/CQFont.h \
 \
 ../include/CQPixmapCache.h \
 ../include/CQStyle.h \
@@ -89,8 +90,10 @@ HEADERS += \
 ../include/CQAlphaButton.h \
 ../include/CQColorEdit.h \
 \
+../include/CQFont.h \
 ../include/CQFontChooser.h \
 ../include/CQFontDialog.h \
+../include/CQFontEdit.h \
 ../include/CQFontListView.h \
 \
 ../include/CQIntegerEdit.h \
@@ -118,6 +121,7 @@ HEADERS += \
 ../include/CQIconCombo.h \
 ../include/CQWidgetMenu.h \
 ../include/CQSwitch.h \
+../include/CQGroupBox.h \
 \
 ../include/CQLineDash.h \
 \

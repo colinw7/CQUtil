@@ -1,16 +1,16 @@
-#include <CQColorEdit.h>
+#include <CQFontEdit.h>
 #include <CQWidgetMenu.h>
 
 #include <QHBoxLayout>
-#include <QColorDialog>
+#include <QFontDialog>
 #include <QStylePainter>
 #include <QStyleOptionComboBox>
 
-CQColorEdit::
-CQColorEdit(QWidget *parent) :
+CQFontEdit::
+CQFontEdit(QWidget *parent) :
  QFrame(parent)
 {
-  setObjectName("colorEdit");
+  setObjectName("fontEdit");
 
   setFrameShape(QFrame::StyledPanel);
   setFrameShadow(QFrame::Sunken);
@@ -24,7 +24,7 @@ CQColorEdit(QWidget *parent) :
 
   //---
 
-  edit_ = new CQColorEditEdit(this);
+  edit_ = new CQFontEditEdit(this);
 
   connect(edit_, SIGNAL(editingFinished()), this, SLOT(textChangedSlot()));
 
@@ -32,7 +32,7 @@ CQColorEdit(QWidget *parent) :
 
   //---
 
-  button_ = new CQColorEditMenuButton(this);
+  button_ = new CQFontEditMenuButton(this);
 
   connect(button_, SIGNAL(clicked()), this, SLOT(buttonSlot()));
 
@@ -47,12 +47,12 @@ CQColorEdit(QWidget *parent) :
 
   //---
 
-  colorDlg_ = new QColorDialog;
+  fontDlg_ = new QFontDialog;
 
-  menu_->setWidget(colorDlg_);
+  menu_->setWidget(fontDlg_);
 
-  connect(colorDlg_, SIGNAL(colorSelected(const QColor &)), this, SLOT(colorSlot(const QColor &)));
-  connect(colorDlg_, SIGNAL(finished(int)), this, SLOT(closeMenuSlot()));
+  connect(fontDlg_, SIGNAL(fontSelected(const QFont &)), this, SLOT(fontSlot(const QFont &)));
+  connect(fontDlg_, SIGNAL(finished(int)), this, SLOT(closeMenuSlot()));
 
   //---
 
@@ -60,13 +60,17 @@ CQColorEdit(QWidget *parent) :
 
   //---
 
-  updateEdit();
+  fontName_ = font_.toString();
 
-  setColor(color_);
+  edit_->setText(fontName_);
+
+  //---
+
+  updateEdit();
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 setEditable(bool editable)
 {
   editable_ = editable;
@@ -77,14 +81,14 @@ setEditable(bool editable)
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 setNoFocus()
 {
   setNoFocusHier(this);
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 setNoFocusHier(QWidget *w)
 {
   w->setFocusPolicy(Qt::NoFocus);
@@ -100,72 +104,62 @@ setNoFocusHier(QWidget *w)
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 updateEdit()
 {
   edit_->setReadOnly(! editable_);
 }
 
 void
-CQColorEdit::
-setColor(const QColor &color)
+CQFontEdit::
+setFont(const QFont &font)
 {
-  if (! color.isValid()) {
-    if (! color_.isValid())
-      return;
-
-    color_     = color;
-    colorName_ = "";
-  }
-  else {
-    if (color_ == color)
-      return;
-
-    color_     = color;
-    colorName_ = color_.name();
-  }
-
-  edit_->setText(colorName());
-}
-
-void
-CQColorEdit::
-setColorName(const QString &colorName)
-{
-  QColor color;
-
-  if (colorName.length()) {
-    color = QColor(colorName);
-
-    if (! color.isValid())
-      return;
-  }
-
-  if (color_ == color)
+  if (font_ == font)
     return;
 
-  color_     = color;
-  colorName_ = colorName;
+  font_     = font;
+  fontName_ = font_.toString();
 
-  edit_->setText(colorName_);
+  edit_->setText(fontName());
 }
 
 void
-CQColorEdit::
+CQFontEdit::
+setFontName(const QString &fontName)
+{
+  QFont font;
+
+  if (fontName.length())
+    font = QFont(fontName);
+
+  if (font_ == font)
+    return;
+
+  font_     = font;
+  fontName_ = fontName;
+
+  edit_->setText(fontName_);
+}
+
+void
+CQFontEdit::
 textChangedSlot()
 {
-  setColorName(edit_->text());
+  if (edit_->text() == fontName_)
+    return;
 
-  emitColorChanged();
+  setFontName(edit_->text());
+
+  emitFontChanged();
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 buttonSlot()
 {
-  colorDlg_->setCurrentColor(color());
+  fontDlg_->setCurrentFont(font());
 
-  colorDlg_->show();
+  fontDlg_->show();
 
   //---
 
@@ -178,7 +172,7 @@ buttonSlot()
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 showMenuSlot()
 {
   int w = std::max(menu_->sizeHint().width(), this->width());
@@ -189,38 +183,38 @@ showMenuSlot()
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 hideMenuSlot()
 {
   emit menuHidden();
 }
 
 void
-CQColorEdit::
-colorSlot(const QColor &color)
+CQFontEdit::
+fontSlot(const QFont &font)
 {
-  setColor(color);
+  setFont(font);
 
-  emitColorChanged();
+  emitFontChanged();
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 closeMenuSlot()
 {
   menu_->hide();
 }
 
 void
-CQColorEdit::
-emitColorChanged()
+CQFontEdit::
+emitFontChanged()
 {
-  emit colorChanged(color_);
-  emit colorChanged(colorName_);
+  emit fontChanged(font_);
+  emit fontChanged(fontName_);
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 paintEvent(QPaintEvent *)
 {
   QStylePainter painter(this);
@@ -239,14 +233,14 @@ paintEvent(QPaintEvent *)
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 resizeEvent(QResizeEvent *)
 {
   button_->setFixedHeight(edit_->height() + 2);
 }
 
 void
-CQColorEdit::
+CQFontEdit::
 initStyle(QStyleOptionComboBox &opt)
 {
   opt.initFrom(this);
@@ -272,8 +266,8 @@ initStyle(QStyleOptionComboBox &opt)
 
 //------
 
-CQColorEditEdit::
-CQColorEditEdit(CQColorEdit *edit) :
+CQFontEditEdit::
+CQFontEditEdit(CQFontEdit *edit) :
  QLineEdit(edit), edit_(edit)
 {
   setObjectName("edit");
@@ -284,29 +278,23 @@ CQColorEditEdit(CQColorEdit *edit) :
 }
 
 void
-CQColorEditEdit::
+CQFontEditEdit::
 paintEvent(QPaintEvent *e)
 {
-  auto bwColor = [](const QColor &c) {
-    int g = qGray(c.red(), c.green(), c.blue());
-
-    return (g > 128 ? QColor(0,0,0) : QColor(255, 255, 255));
-  };
-
   if (edit_->isEditable())
     QLineEdit::paintEvent(e);
   else {
     QPainter painter(this);
 
-    painter.fillRect(rect(), QBrush(edit_->color()));
+    QColor c = palette().color(QPalette::Window);
 
-    QString text = edit_->color().name();
+    painter.fillRect(rect(), QBrush(c));
 
-    QFontMetrics fm(font());
+    QString text = "ABC abc";
 
-    QColor tc = bwColor(edit_->color());
+    painter.setFont(edit_->font());
 
-    painter.setPen(tc);
+    QFontMetrics fm(painter.font());
 
     painter.drawText(rect().left() + 2, rect().center().y() + (fm.ascent() - fm.descent())/2, text);
   }
@@ -314,8 +302,8 @@ paintEvent(QPaintEvent *e)
 
 //------
 
-CQColorEditMenuButton::
-CQColorEditMenuButton(CQColorEdit *edit) :
+CQFontEditMenuButton::
+CQFontEditMenuButton(CQFontEdit *edit) :
  QPushButton(edit), edit_(edit)
 {
   setObjectName("button");
@@ -337,8 +325,8 @@ CQColorEditMenuButton(CQColorEdit *edit) :
 }
 
 void
-CQColorEditMenuButton::
+CQFontEditMenuButton::
 paintEvent(QPaintEvent *)
 {
-  // drawn by CQColorEdit
+  // drawn by CQFontEdit
 }
