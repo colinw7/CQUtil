@@ -408,10 +408,10 @@ namespace CQUtil {
   }
 
   template<class T>
-  T *makeLayout(int border=2, int spacing=2) {
+  T *makeLayout(int margin=2, int spacing=2) {
     T *t = new T;
 
-    t->setBorder (border );
+    t->setMargin (margin );
     t->setSpacing(spacing);
 
     return t;
