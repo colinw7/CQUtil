@@ -807,23 +807,30 @@ getPropertyValueIsEnum(const QObject *object, int ind, bool inherited)
   return metaProperty.isEnumType();
 }
 
+bool
+CQUtil::
+getPropertyValueIsFlag(const QObject *object, int ind, bool inherited)
+{
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  return metaProperty.isFlagType();
+}
+
 QString
 CQUtil::
 getPropertyEnumName(const QObject *object, int ind, bool inherited)
 {
   QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
 
-  if (! getMetaProperty(object, ind, inherited, metaProperty))
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
     return QString();
 
-  if (! metaProperty.isEnumType())
-    return QString();
-
-  QVariant value = object->property(metaProperty.name());
-
-  QMetaEnum me = metaProperty.enumerator();
-
-  return me.name();
+  return metaEnum.name();
 }
 
 QString
@@ -831,25 +838,41 @@ CQUtil::
 getPropertyEnumValue(const QObject *object, int ind, bool inherited)
 {
   QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
 
-  if (! getMetaProperty(object, ind, inherited, metaProperty))
-    return QString();
-
-  if (! metaProperty.isEnumType())
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
     return QString();
 
   QVariant value = object->property(metaProperty.name());
 
   int eind = value.toInt();
 
-  QMetaEnum me = metaProperty.enumerator();
+  if (isFlag)
+    return metaEnum.valueToKeys(eind);
+  else
+    return metaEnum.valueToKey(eind);
+}
 
-  int numEnums = me.keyCount();
+bool
+CQUtil::
+enumPropertyValueToString(const QObject *object, int ind, bool inherited, int value, QString &str)
+{
+  str = "";
 
-  if (eind < 0 || eind >= numEnums)
-    return QString();
+  QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
 
-  return me.valueToKey(eind);
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
+    return false;
+
+  if (isFlag)
+    str = metaEnum.valueToKeys(value);
+  else
+    str = metaEnum.valueToKey(value);
+
+  return true;
 }
 
 QStringList
@@ -857,19 +880,16 @@ CQUtil::
 getMetaPropertyEnumNames(const QObject *object, int ind, bool inherited)
 {
   QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
 
-  if (! getMetaProperty(object, ind, inherited, metaProperty))
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
     return QStringList();
-
-  if (! metaProperty.isEnumType())
-    return QStringList();
-
-  QMetaEnum me = metaProperty.enumerator();
 
   QStringList names;
 
-  for (int i = 0; i < me.keyCount(); ++i)
-    names.push_back(me.key(i));
+  for (int i = 0; i < metaEnum.keyCount(); ++i)
+    names.push_back(metaEnum.key(i));
 
   return names;
 }
@@ -879,21 +899,55 @@ CQUtil::
 getMetaPropertyEnumValues(const QObject *object, int ind, bool inherited)
 {
   QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
 
-  if (! getMetaProperty(object, ind, inherited, metaProperty))
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
     return QList<int>();
-
-  if (! metaProperty.isEnumType())
-    return QList<int>();
-
-  QMetaEnum me = metaProperty.enumerator();
 
   QList<int> values;
 
-  for (int i = 0; i < me.keyCount(); ++i)
-    values.push_back(me.value(i));
+  for (int i = 0; i < metaEnum.keyCount(); ++i)
+    values.push_back(metaEnum.value(i));
 
   return values;
+}
+
+bool
+CQUtil::
+getMetaPropertyEnumNameValues(const QObject *object, int ind, bool inherited,
+                              QStringList &names, QList<int> &values)
+{
+  QMetaProperty metaProperty;
+  QMetaEnum     metaEnum;
+  bool          isFlag;
+
+  if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
+    return false;
+
+  for (int i = 0; i < metaEnum.keyCount(); ++i) {
+    names .push_back(metaEnum.key  (i));
+    values.push_back(metaEnum.value(i));
+  }
+
+  return true;
+}
+
+bool
+CQUtil::
+getMetaPropertyEnum(const QObject *object, int ind, bool inherited,
+                    QMetaProperty &metaProperty, QMetaEnum &metaEnum, bool &isFlag)
+{
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  if (! metaProperty.isEnumType())
+    return false;
+
+  metaEnum = metaProperty.enumerator();
+  isFlag   = metaProperty.isFlagType();
+
+  return true;
 }
 
 bool
@@ -957,7 +1011,7 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-//QMetaProperty mP = meta->property(propIndex);
+//QMetaProperty metaProperty = meta->property(propIndex);
 
   v = obj->property(propName.toLatin1().data());
 
@@ -1000,14 +1054,14 @@ setProperty(const QObject *object, const QString &propName, const QString &str)
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty mP = meta->property(propIndex);
-  if (! mP.isWritable()) return false;
+  QMetaProperty metaProperty = meta->property(propIndex);
+  if (! metaProperty.isWritable()) return false;
 
   QVariant v;
 
   (void) getProperty(object, propName, v);
 
-  if (! stringToVariant(str, mP.type(), mP.typeName(), v))
+  if (! stringToVariant(str, metaProperty.type(), metaProperty.typeName(), v))
     return false;
 
   return obj->setProperty(propName.toLatin1().data(), v);
@@ -1031,48 +1085,22 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty mP = meta->property(propIndex);
-  if (! mP.isWritable()) return false;
+  QMetaProperty metaProperty = meta->property(propIndex);
+  if (! metaProperty.isWritable()) return false;
 
   QVariant v1 = v;
 
   QString typeName = v1.typeName();
 
-  if (typeName == "QString" && mP.isEnumType()) {
+  if (typeName == "QString" && metaProperty.isEnumType()) {
     QString v1Str = v1.toString().toLower();
 
-    QMetaEnum me = mP.enumerator();
+    int value = 0;
 
-    int num_enums = me.keyCount();
+    if (! stringToEnumValue(v1Str, metaProperty, value))
+      return false;
 
-    if (mP.isFlagType()) {
-      //bool isAlign = (strcmp(me.scope(), "Qt") == 0 && strcmp(me.name(), "Alignment") == 0);
-
-      for (int i = 0; i < num_enums; ++i) {
-        int value = me.value(i);
-
-        QString vk1 = QString(me.valueToKey (value)).toLower();
-        QString vk2 = QString(me.valueToKeys(value)).toLower();
-
-        if (v1Str == vk1 || v1Str == vk2) {
-          v1 = QVariant(value);
-          break;
-        }
-
-      }
-    }
-    else {
-      for (int i = 0; i < num_enums; ++i) {
-        int value = me.value(i);
-
-        QString vk = QString(me.valueToKey(value)).toLower();
-
-        if (v1Str == vk) {
-          v1 = QVariant(value);
-          break;
-        }
-      }
-    }
+    v1 = QVariant(value);
 
     typeName = v1.typeName();
   }
@@ -1084,12 +1112,12 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
 
     (void) getProperty(object, propName, v2);
 
-    if (! stringToVariant(v1Str, mP.type(), mP.typeName(), v1, v2))
+    if (! stringToVariant(v1Str, metaProperty.type(), metaProperty.typeName(), v1, v2))
       return false;
   }
 
-  if (mP.type() == QVariant::UserType) {
-    if (typeName != mP.typeName()) {
+  if (metaProperty.type() == QVariant::UserType) {
+    if (typeName != metaProperty.typeName()) {
       QString str = v.toString();
 
       QVariant v2;
@@ -1102,6 +1130,82 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   }
 
   return obj->setProperty(propName.toLatin1().data(), v1);
+}
+
+bool
+CQUtil::
+enumPropertyStringToValue(const QObject *object, int ind, bool inherited,
+                          const QString &str, int &value)
+{
+  value = 0;
+
+  if (! object)
+    return false;
+
+  QMetaProperty metaProperty;
+
+  if (! getMetaProperty(object, ind, inherited, metaProperty))
+    return false;
+
+  if (! metaProperty.isEnumType())
+    return false;
+
+  return stringToEnumValue(str, metaProperty, value);
+}
+
+bool
+CQUtil::
+stringToEnumValue(const QString &str, const QMetaProperty &metaProperty, int &value)
+{
+  QMetaEnum metaEnum = metaProperty.enumerator();
+
+  if (metaProperty.isFlagType()) {
+    bool found = false;
+
+    QStringList strs = str.split("|", QString::SkipEmptyParts);
+
+    for (int i = 0; i < strs.length(); ++i) {
+      int value1;
+
+      if (stringToEnumSubValue(strs[i], metaEnum, value1)) {
+        value |= value1;
+        found = true;
+      }
+    }
+
+    if (! found)
+      return false;
+  }
+  else {
+    if (! stringToEnumSubValue(str, metaEnum, value))
+      return false;
+  }
+
+  return true;
+}
+
+bool
+CQUtil::
+stringToEnumSubValue(const QString &str, const QMetaEnum &metaEnum, int &value)
+{
+  value = -1;
+
+  QString lstr = str.toLower();
+
+  int num_enums = metaEnum.keyCount();
+
+  for (int i = 0; i < num_enums; ++i) {
+    int value1 = metaEnum.value(i);
+
+    QString lstr1 = QString(metaEnum.valueToKey(value1)).toLower();
+
+    if (lstr == lstr1) {
+      value = value1;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool
@@ -1146,9 +1250,9 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty mP = meta->property(propIndex);
+  QMetaProperty metaProperty = meta->property(propIndex);
 
-  propInfo->init(mP);
+  propInfo->init(metaProperty);
 
   return true;
 }
@@ -2973,20 +3077,23 @@ void
 CQUtil::PropInfo::
 init(const QMetaProperty &mp)
 {
-  name_         = mp.name();
-  type_         = mp.type();
-  typeName_     = mp.typeName();
-  is_writable_  = mp.isWritable();
-  is_enum_type_ = mp.isEnumType();
-
-  QMetaEnum me = mp.enumerator();
-
-  int num_enums = me.keyCount();
+  name_       = mp.name();
+  type_       = mp.type();
+  typeName_   = mp.typeName();
+  isWritable_ = mp.isWritable();
+  isEnumType_ = mp.isEnumType();
+  isFlagType_ = mp.isFlagType();
 
   enumNames_.clear();
 
-  for (int i = 0; i < num_enums; ++i)
-    enumNames_.push_back(me.valueToKey(i));
+  if (isEnumType_) {
+    QMetaEnum metaEnum = mp.enumerator();
+
+    int num_enums = metaEnum.keyCount();
+
+    for (int i = 0; i < num_enums; ++i)
+      enumNames_.push_back(metaEnum.valueToKey(i));
+  }
 }
 
 //------------

@@ -38,7 +38,7 @@
 #endif
 
 #ifdef CQUTIL_IMAGE
-#include <CImageLib.h>
+#include <CImagePtr.h>
 #endif
 
 #include <CPoint2D.h>
@@ -84,9 +84,10 @@ namespace CQUtil {
   class PropInfo {
    public:
     PropInfo() {
-     type_         = QVariant::Invalid;
-     is_writable_  = false;
-     is_enum_type_ = false;
+     type_       = QVariant::Invalid;
+     isWritable_ = false;
+     isEnumType_ = false;
+     isFlagType_ = false;
     }
 
     void init(const QMetaProperty &mp);
@@ -95,8 +96,9 @@ namespace CQUtil {
     QVariant::Type type    () const { return type_; }
     QString        typeName() const { return typeName_; }
 
-    bool isWritable() const { return is_writable_ ; }
-    bool isEnumType() const { return is_enum_type_; }
+    bool isWritable() const { return isWritable_ ; }
+    bool isEnumType() const { return isEnumType_; }
+    bool isFlagType() const { return isFlagType_; }
 
     const QStringList &enumNames() const { return enumNames_; }
 
@@ -104,8 +106,9 @@ namespace CQUtil {
     QString        name_;
     QVariant::Type type_;
     QString        typeName_;
-    bool           is_writable_;
-    bool           is_enum_type_;
+    bool           isWritable_;
+    bool           isEnumType_;
+    bool           isFlagType_;
     QStringList    enumNames_;
   };
 
@@ -173,14 +176,29 @@ namespace CQUtil {
   QVariant getPropertyValue(const QObject *object, int ind, bool inherited=true);
 
   bool getPropertyValueIsEnum(const QObject *object, int ind, bool inherited=true);
+  bool getPropertyValueIsFlag(const QObject *object, int ind, bool inherited=true);
 
   QString getPropertyEnumName(const QObject *object, int ind, bool inherited=true);
 
   QString getPropertyEnumValue(const QObject *object, int ind, bool inherited=true);
 
   QStringList getMetaPropertyEnumNames(const QObject *object, int ind, bool inherited=true);
-
   QList<int> getMetaPropertyEnumValues(const QObject *object, int ind, bool inherited=true);
+
+  bool getMetaPropertyEnumNameValues(const QObject *object, int ind, bool inherited,
+                                     QStringList &names, QList<int> &values);
+
+  bool enumPropertyValueToString(const QObject *object, int ind, bool inherited,
+                                 int value, QString &str);
+  bool enumPropertyStringToValue(const QObject *object, int ind, bool inherited,
+                                 const QString &str, int &value);
+
+  bool stringToEnumValue(const QString &str, const QMetaProperty &metaProperty, int &value);
+
+  bool stringToEnumSubValue(const QString &str, const QMetaEnum &metaEnum, int &value);
+
+  bool getMetaPropertyEnum(const QObject *object, int ind, bool inherited,
+                           QMetaProperty &metaProperty, QMetaEnum &metaEnum, bool &isFlag);
 
   bool getMetaProperty(const QObject *object, int ind, bool inherited,
                        QMetaProperty &metaProperty);
@@ -362,10 +380,19 @@ namespace CQUtil {
 
 namespace CQUtil {
   template<class T>
-  T *makeWidget(const QString &name) {
+  T *makeWidget(const QString &objName) {
     T *t = new T;
 
-    t->setObjectName(name);
+    t->setObjectName(objName);
+
+    return t;
+  }
+
+  template<class T>
+  T *makeLabelWidget(const QString &name, const QString &objName) {
+    T *t = new T(name);
+
+    t->setObjectName(objName);
 
     return t;
   }
