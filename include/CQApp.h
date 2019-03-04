@@ -32,6 +32,9 @@ class CQApp : public QApplication {
   void addObjEditFilter(QObject *o);
 #endif
 
+  static void showMetaEdit(QObject *obj=nullptr);
+  static void showPerfDialog();
+
  private:
   static CQApp *app_;
 

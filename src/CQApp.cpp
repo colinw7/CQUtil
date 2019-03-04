@@ -5,7 +5,9 @@
 #include <CQWindow.h>
 //#include <CQPixmapCache.h>
 //#include <CQToolTip.h>
+//#include <CQPerfGraph.h>
 #include <CConfig.h>
+#include <CImageMgr.h>
 #include <CFontMgr.h>
 #include <CScreenUnits.h>
 
@@ -13,6 +15,8 @@
 
 #ifdef USE_OBJEDIT
 #include <CQObjEdit.h>
+#else
+//#include <CQMetaEdit.h>
 #endif
 
 #include <QScreen>
@@ -31,13 +35,8 @@ CQAppEventFilter(void *message, long *)
 {
   bool show = CQAppXIsObjEditKey(message);
 
-  if (show) {
-    CQObjEdit *objEdit = CQObjEdit::createInstance();
-
-    objEdit->show();
-
-    objEdit->raise();
-  }
+  if (show)
+    CQApp::showMetaEdit();
 
   return show;
 }
@@ -52,12 +51,16 @@ eventFilter(QObject *obj, QEvent *event)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
     if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Home) {
-      CQObjEdit *objEdit = CQObjEdit::createInstance();
-
-      objEdit->show();
-
+      CQApp::showMetaEdit();
       return true;
     }
+
+#if 0
+    if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_End) {
+      CQApp::showPerfDialog();
+      return true;
+    }
+#endif
   }
 
   // standard event processing
@@ -76,9 +79,11 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  style_ = new CQStyle;
+  if (! getenv("CQAPP_NO_STYLE")) {
+    style_ = new CQStyle;
 
-  setStyle(style_);
+    setStyle(style_);
+  }
 
   if (getenv("CQAPP_DARK_THEME"))
     setDarkTheme(true);
@@ -169,6 +174,42 @@ CQApp::
   CWindowMgr::release();
 
   CScreenUnitsMgr::release();
+}
+
+void
+CQApp::
+showMetaEdit(QObject *obj)
+{
+#ifdef USE_OBJEDIT_OBJEDIT
+  CQObjEdit *objEdit = CQObjEdit::createInstance();
+
+  if (obj)
+    objEdit->setObject(obj);
+
+  objEdit->show();
+
+  objEdit->raise();
+#else
+/*
+  CQMetaEdit *metaEdit = new CQMetaEdit;
+
+  if (obj)
+    metaEdit->setObject(obj);
+
+  metaEdit->show();
+
+  metaEdit->raise();
+*/
+#endif
+}
+
+void
+CQApp::
+showPerfDialog()
+{
+  //CQPerfDialog *dialog = CQPerfDialog::instance();
+
+  //dialog->show();
 }
 
 bool
