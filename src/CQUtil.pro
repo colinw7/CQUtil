@@ -61,6 +61,7 @@ CQIconCombo.cpp \
 CQWidgetMenu.cpp \
 CQSwitch.cpp \
 CQGroupBox.cpp \
+CQLineEdit.cpp \
 \
 CQLineDash.cpp \
 \
@@ -122,6 +123,7 @@ HEADERS += \
 ../include/CQWidgetMenu.h \
 ../include/CQSwitch.h \
 ../include/CQGroupBox.h \
+../include/CQLineEdit.h \
 \
 ../include/CQLineDash.h \
 \

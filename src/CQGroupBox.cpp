@@ -411,6 +411,8 @@ paintEvent(QPaintEvent *)
 
   p.setRenderHints(QPainter::Antialiasing);
 
+  p.fillRect(rect(), QBrush(palette().color(QPalette::Background)));
+
   QFontMetrics fm(titleFont_);
 
   // set check size
@@ -717,6 +719,8 @@ void
 CQGroupBox::
 updateEnabled()
 {
+  bool enabled = isEnabled();
+
   QObjectList childList = children();
 
   for (int i = 0; i < childList.size(); ++i) {
@@ -726,15 +730,20 @@ updateEnabled()
 
     QWidget *w = static_cast<QWidget *>(o);
 
-    if (isChecked()) {
-//    if (! w->isEnabled()) {
-//      if (! w->testAttribute(Qt::WA_ForceDisabled))
-          w->setEnabled(true);
-//    }
+    if (isCheckable()) {
+      if (isChecked()) {
+//      if (! w->isEnabled()) {
+//        if (! w->testAttribute(Qt::WA_ForceDisabled))
+            w->setEnabled(true);
+//      }
+      }
+      else {
+//      if (w->isEnabled())
+          w->setEnabled(false);
+      }
     }
     else {
-//    if (w->isEnabled())
-        w->setEnabled(false);
+      w->setEnabled(enabled);
     }
   }
 }

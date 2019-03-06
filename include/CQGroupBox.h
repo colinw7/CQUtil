@@ -92,6 +92,9 @@ class CQGroupBox : public QWidget {
 
   bool isCollapsed() const { return collapsed_; }
 
+  QSize sizeHint() const;
+  QSize minimumSizeHint() const;
+
  private:
   void init();
 
@@ -115,9 +118,6 @@ class CQGroupBox : public QWidget {
                     double startAngle, int sides) const;
 
   void resizeEvent(QResizeEvent *e);
-
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
 
   int spaceTop() const;
   int spaceBottom() const;
