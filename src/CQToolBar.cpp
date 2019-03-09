@@ -33,8 +33,10 @@ CQToolBar(QMainWindow *main_window, const QString &name, Qt::ToolBarArea area) :
 
   main_window->addToolBar(area, toolbar_);
 
-  if (CQToolBarMgrInst->iconSize().isValid()) {
-    int is = CQToolBarMgrInst->iconSize().getValue();
+  CQToolBarMgr *mgr = CQToolBarMgrInst;
+
+  if (mgr->iconSize().isValid()) {
+    int is = mgr->iconSize().getValue();
 
     setIconSize(QSize(is, is));
   }

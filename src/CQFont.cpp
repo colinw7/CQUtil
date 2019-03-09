@@ -2,6 +2,7 @@
 #include <CConfig.h>
 #include <CFontMgr.h>
 #include <CQImage.h>
+#include <CImageLib.h>
 
 #include <QFontMetricsF>
 #include <QPainter>

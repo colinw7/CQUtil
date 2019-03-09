@@ -124,19 +124,32 @@ const QPixmap &
 CQPixmapCache::
 getPixmap(const QString &id)
 {
+  static QPixmap dummy_pixmap;
+
   auto p = idData_.find(id);
 
-  if (p == idData_.end())
-    std::cout << "Pixmap not found: " << id.toStdString() << std::endl;
+  if (p == idData_.end()) {
+    std::cerr << "Pixmap '" << id.toStdString() << "' not found\n";
 
-  assert(p != idData_.end());
+    if (getenv("CQPIXMAP_CACHE_ASSERT"))
+      assert(false);
+    else
+      return dummy_pixmap;
+  }
 
   if (! (*p).second.pixmap) {
     (*p).second.pixmap = new QPixmap;
 
     bool rc = (*p).second.pixmap->loadFromData((*p).second.data, (*p).second.len);
 
-    assert(rc);
+    if (! rc) {
+      std::cerr << "Pixmap '" << id.toStdString() << "' failed to load\n";
+
+      if (getenv("CQPIXMAP_CACHE_ASSERT"))
+        assert(false);
+      else
+        return dummy_pixmap;
+    }
   }
 
   return *(*p).second.pixmap;

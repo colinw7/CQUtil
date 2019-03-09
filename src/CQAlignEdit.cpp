@@ -1,6 +1,7 @@
 #include <CQAlignEdit.h>
 #include <CQWidgetMenu.h>
-#include <CQStrParse.h>
+#include <CQUtil.h>
+
 #include <QStylePainter>
 #include <QStyleOptionComboBox>
 #include <QMouseEvent>
@@ -118,7 +119,7 @@ paintEvent(QPaintEvent *)
 
   QFontMetrics fm(font());
 
-  painter.drawText(2, fm.ascent() + 2, str);
+  painter.drawText(r.left(), r.center().y() + (fm.ascent() - fm.descent())/2, str);
 }
 
 QString
@@ -134,62 +135,17 @@ QString
 CQAlignEdit::
 toString(Qt::Alignment align)
 {
-  QString str;
-
-  if      (align & Qt::AlignLeft   ) str += "Left";
-  else if (align & Qt::AlignRight  ) str += "Right";
-  else if (align & Qt::AlignHCenter) str += "HCenter";
-  else if (align & Qt::AlignJustify) str += "Justify";
-
-  str += "|";
-
-  if      (align & Qt::AlignTop    ) str += "Top";
-  else if (align & Qt::AlignBottom ) str += "Bottom";
-  else if (align & Qt::AlignVCenter) str += "VCenter";
-
-  return str;
+  return CQUtil::alignToString(align);
 }
 
 Qt::Alignment
 CQAlignEdit::
 fromString(const QString &str)
 {
-  auto stringAddAlign = [](const QString &str, Qt::Alignment &align) {
-    if      (str == "left"   ) align |= Qt::AlignLeft;
-    else if (str == "right"  ) align |= Qt::AlignRight;
-    else if (str == "hcenter") align |= Qt::AlignHCenter;
-
-    else if (str == "top"    ) align |= Qt::AlignTop;
-    else if (str == "bottom" ) align |= Qt::AlignBottom;
-    else if (str == "vcenter") align |= Qt::AlignVCenter;
-
-    else if (str == "center" ) align |= Qt::AlignCenter;
-  };
-
   Qt::Alignment align = 0;
 
-  CQStrParse parse(str);
-
-  parse.skipSpace();
-
-  QString word;
-
-  while (! parse.eof()) {
-    if (parse.isSpace() || parse.isChar('|')) {
-      word = word.toLower();
-
-      if (word != "") {
-        stringAddAlign(word, align);
-
-        word = "";
-      }
-    }
-
-    word += parse.getChar();
-  }
-
-  if (word != "")
-    stringAddAlign(word, align);
+  if (! CQUtil::stringToAlign(str, align))
+    return 0;
 
   return align;
 }

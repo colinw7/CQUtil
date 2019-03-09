@@ -28,6 +28,8 @@ class CQToolBarMgr {
   COptInt iconSize_;
 };
 
+//---
+
 class CQToolBar {
  public:
   CQToolBar(QMainWindow *main_window, const QString &name,
@@ -52,8 +54,8 @@ class CQToolBar {
   void setVisible(bool visible);
 
  private:
-  QMainWindow *main_window_;
-  QToolBar    *toolbar_;
+  QMainWindow *main_window_ { nullptr };
+  QToolBar    *toolbar_ { nullptr };
 };
 
 #endif
