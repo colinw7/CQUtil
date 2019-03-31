@@ -2,13 +2,14 @@
 #define CQAutoHide_H
 
 #include <QWidget>
+#include <QPointer>
 #include <QSet>
 
 class CQAutoHide : public QObject {
   Q_OBJECT
 
  public:
-  CQAutoHide(QWidget *w=0);
+  CQAutoHide(QWidget *w=nullptr);
 
   void setWidget(QWidget *w);
 
@@ -41,14 +42,15 @@ class CQAutoHide : public QObject {
   bool isModalDialogWidget(QWidget *w) const;
 
  private:
-  typedef QSet<QWidget *> Widgets;
-  typedef QList<QRect>    Rects;
+  using WidgetP = QPointer<QWidget>;
+  using Widgets = QSet<QWidget*>;
+  using Rects   = QList<QRect>;
 
-  QWidget *w_ { nullptr };
-  bool     active_ { false };
+  WidgetP  w_;
+  bool     active_        { false };
   bool     hideOnRelease_ { false };
-  bool     menuActive_ { false };
-  QWidget *pressWidget_ { nullptr };
+  bool     menuActive_    { false };
+  QWidget* pressWidget_   { nullptr };
   Widgets  widgets_;
   Rects    rects_;
 };
