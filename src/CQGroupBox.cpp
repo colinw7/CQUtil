@@ -354,6 +354,8 @@ mousePressEvent(QMouseEvent *e)
       checkPress_ = true;
 
       update();
+
+      return;
     }
   }
 
@@ -364,6 +366,8 @@ mousePressEvent(QMouseEvent *e)
       collapsePress_ = true;
 
       update();
+
+      return;
     }
   }
 
