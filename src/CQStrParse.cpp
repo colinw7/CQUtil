@@ -1359,10 +1359,17 @@ isWord(const QString &str) const
     if (str_[pos_ + i] != str[i])
       return false;
 
-  if (pos_ + len <= len_ && str_[pos_ + len].isLetterOrNumber())
+  if (pos_ + len < len_ && str_[pos_ + len].isLetterOrNumber())
     return false;
 
   return true;
+}
+
+void
+CQStrParse::
+skipWord(const QString &str)
+{
+  setPos(pos_ + str.length());
 }
 
 bool

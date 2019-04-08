@@ -107,7 +107,9 @@ class CQStrParse {
 
   virtual bool isString(const QString &str) const;
   virtual bool isOneOf(const QString &str) const;
+
   virtual bool isWord(const QString &str) const;
+  virtual void skipWord(const QString &str);
 
   virtual bool eof() const;
 
