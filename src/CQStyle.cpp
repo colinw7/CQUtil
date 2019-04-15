@@ -1150,7 +1150,7 @@ sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &siz
   switch (type) {
     case CT_GroupBox: {
       if (const QGroupBox *grb = static_cast<const QGroupBox *>(widget))
-        sz += QSize(!grb->isFlat() ? 16 : 0, 0);
+        sz += QSize(grb && !grb->isFlat() ? 16 : 0, 0);
       break;
     }
     default: {
