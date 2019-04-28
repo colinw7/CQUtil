@@ -120,6 +120,15 @@ addData(const QString &id, const uchar *data, int len)
   idData_[id] = Data(data, len);
 }
 
+bool
+CQPixmapCache::
+hasPixmap(const QString &id) const
+{
+  auto p = idData_.find(id);
+
+  return (p != idData_.end());
+}
+
 const QPixmap &
 CQPixmapCache::
 getPixmap(const QString &id)
@@ -137,10 +146,12 @@ getPixmap(const QString &id)
       return dummy_pixmap;
   }
 
-  if (! (*p).second.pixmap) {
-    (*p).second.pixmap = new QPixmap;
+  Data &data = (*p).second;
 
-    bool rc = (*p).second.pixmap->loadFromData((*p).second.data, (*p).second.len);
+  if (! data.pixmap) {
+    data.pixmap = new QPixmap;
+
+    bool rc = data.pixmap->loadFromData(data.data, data.len);
 
     if (! rc) {
       std::cerr << "Pixmap '" << id.toStdString() << "' failed to load\n";
@@ -152,7 +163,7 @@ getPixmap(const QString &id)
     }
   }
 
-  return *(*p).second.pixmap;
+  return *data.pixmap;
 }
 
 QPixmap

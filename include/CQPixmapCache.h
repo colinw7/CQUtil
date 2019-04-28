@@ -24,6 +24,8 @@ class CQPixmapCache {
 
   void addData(const QString &id, const uchar *data, int len);
 
+  bool hasPixmap(const QString &id) const;
+
   const QPixmap &getPixmap(const QString &id);
 
   QIcon getIcon(const QString &lightId, const QString &darkId="");
