@@ -389,8 +389,26 @@ namespace CQUtil {
   }
 
   template<class T>
+  T *makeWidget(QWidget *parent, const QString &objName) {
+    T *t = new T(parent);
+
+    t->setObjectName(objName);
+
+    return t;
+  }
+
+  template<class T>
   T *makeLabelWidget(const QString &name, const QString &objName) {
     T *t = new T(name);
+
+    t->setObjectName(objName);
+
+    return t;
+  }
+
+  template<class T>
+  T *makeLabelWidget(QWidget *parent, const QString &name, const QString &objName) {
+    T *t = new T(name, parent);
 
     t->setObjectName(objName);
 
