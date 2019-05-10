@@ -1020,6 +1020,47 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
 
 bool
 CQUtil::
+getTclProperty(const QObject *object, const QString &propName, QVariant &v)
+{
+  if (! object)
+    return false;
+
+  if (propName.isEmpty())
+    return false;
+
+  QObject *obj = const_cast<QObject *>(object);
+
+  const QMetaObject *meta = obj->metaObject();
+  if (! meta) return false;
+
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
+
+  v = obj->property(propName.toLatin1().data());
+
+  QMetaProperty metaProperty = meta->property(propIndex);
+
+  if (metaProperty.isEnumType()) {
+    QMetaEnum metaEnum = metaProperty.enumerator();
+    bool      isFlag   = metaProperty.isFlagType();
+
+    int eind = v.toInt();
+
+    QString str;
+
+    if (isFlag)
+      str = metaEnum.valueToKeys(eind);
+    else
+      str = metaEnum.valueToKey(eind);
+
+    v = QVariant(str);
+  }
+
+  return true;
+}
+
+bool
+CQUtil::
 setPropertyValue(QObject *object, int ind, const QVariant &value, bool inherited)
 {
   if (! object)

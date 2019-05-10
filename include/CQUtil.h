@@ -207,6 +207,8 @@ namespace CQUtil {
 
   bool getProperty(const QObject *object, const QString &name, QVariant &value);
 
+  bool getTclProperty(const QObject *object, const QString &propName, QVariant &v);
+
   bool setPropertyValue(QObject *object, int ind, const QVariant &value, bool inherited=true);
 
   bool setProperty(const QObject *object, const QString &name, const QString &value);
