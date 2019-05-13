@@ -1,0 +1,30 @@
+/* XPM */
+
+static const char *
+new_data[] = {
+  /* width height num_colors chars_per_pixel x_hot y_hot */
+  "16 16 3 1 0 0",
+
+  /* colors */
+  ". s symbol1 c #dad378 m white",
+  "# s symbol2 c #faee36 m white",
+  "  s mask c none",
+
+  /* pixels */
+  "                ",
+  "       .        ",
+  "       .        ",
+  "  .    .    .   ",
+  "   .       .    ",
+  "      ###       ",
+  "     #####      ",
+  "    #######     ",
+  " .. ####### ... ",
+  "    #######     ",
+  "     #####      ",
+  "      ###       ",
+  "   .       .    ",
+  "  .    .    .   ",
+  "       .        ",
+  "                ",
+};

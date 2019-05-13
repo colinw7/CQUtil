@@ -50,6 +50,7 @@ CQAutoHide.cpp \
 CQRadioButtons.cpp \
 CQAngleSpinBox.cpp \
 CQToolTip.cpp \
+CQTabWidget.cpp \
 \
 CQTreeView.cpp \
 CQTableView.cpp \
@@ -112,6 +113,7 @@ HEADERS += \
 ../include/CQRadioButtons.h \
 ../include/CQAngleSpinBox.h \
 ../include/CQToolTip.h \
+../include/CQTabWidget.h \
 \
 ../include/CQTreeView.h \
 ../include/CQTableView.h \
