@@ -12,7 +12,7 @@ class CQGroupBox : public QWidget {
   Q_OBJECT
 
   // title
-  Q_PROPERTY(QString       title           READ title         WRITE setTitle         )
+  Q_PROPERTY(QString       title          READ title          WRITE setTitle         )
   Q_PROPERTY(bool          titleBold      READ isTitleBold    WRITE setTitleBold     )
   Q_PROPERTY(double        titleScale     READ titleScale     WRITE setTitleScale    )
   Q_PROPERTY(Qt::Alignment titleAlignment READ titleAlignment WRITE setTitleAlignment)
@@ -91,6 +91,8 @@ class CQGroupBox : public QWidget {
   void setCollapsible(bool collapsible);
 
   bool isCollapsed() const { return collapsed_; }
+
+  void setCornerWidget(QWidget *w);
 
   QSize sizeHint() const;
   QSize minimumSizeHint() const;
@@ -171,6 +173,8 @@ class CQGroupBox : public QWidget {
 
   int             dx_ { 2 };
   int             dy_ { 2 };
+
+  QWidget*        cornerWidget_ { nullptr };
 };
 
 //----

@@ -644,6 +644,8 @@ void
 CQGroupBox::
 resizeEvent(QResizeEvent *)
 {
+  if (cornerWidget_)
+    cornerWidget_->move(width() - cornerWidget_->width() - 2, 2);
 }
 
 int
@@ -670,6 +672,25 @@ spaceBottom() const
     return marginBottom_;
 
   return 4;
+}
+
+void
+CQGroupBox::
+setCornerWidget(QWidget *w)
+{
+  delete cornerWidget_;
+
+  cornerWidget_ = w;
+
+  if (cornerWidget_) {
+    cornerWidget_->setParent(this);
+
+    cornerWidget_->resize(cornerWidget_->sizeHint());
+
+    cornerWidget_->show();
+
+    resizeEvent(nullptr);
+  }
 }
 
 QSize
