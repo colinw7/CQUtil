@@ -11,8 +11,13 @@ class QSortFilterProxyModel;
 class CQHeaderView : public QHeaderView {
   Q_OBJECT
 
+  Q_PROPERTY(bool initFit READ isInitFit WRITE setInitFit)
+
  public:
   CQHeaderView(QWidget *parent=nullptr);
+
+  bool isInitFit() const { return initFit_; }
+  void setInitFit(bool b) { initFit_ = b; }
 
   void setWidgetFactory(CQHeaderViewWidgetFactory *factory);
 
@@ -28,12 +33,16 @@ class CQHeaderView : public QHeaderView {
   void update();
 
  private:
-  void contextMenuEvent(QContextMenuEvent *event);
+  void doInitFit();
 
-  void showEvent(QShowEvent *e);
+  void contextMenuEvent(QContextMenuEvent *event) override;
+
+  void showEvent(QShowEvent *e) override;
+
+  void resizeEvent(QResizeEvent *e) override;
 
  private slots:
-  void handleSectionResized(int i);
+  void handleSectionResized(int section, int oldSize, int newSize);
 
   void handleSectionMoved(int logical, int oldVisualIndex, int newVisualIndex);
 
@@ -60,10 +69,13 @@ class CQHeaderView : public QHeaderView {
  private:
   typedef QList<QWidget *> Widgets;
 
-  CQHeaderViewWidgetFactory *factory_ { nullptr };
+  CQHeaderViewWidgetFactory *factory_     { nullptr };
   Widgets                    widgets_;
   int                        menuSection_ { -1 };
-  int                        sortRole_ { -1 };
+  int                        sortRole_    { -1 };
+  bool                       shown_       { false };
+  bool                       resized_     { false };
+  bool                       initFit_     { false };
 };
 
 //---

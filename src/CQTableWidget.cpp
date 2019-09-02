@@ -55,6 +55,8 @@ CQTableWidget(QWidget* parent) :
 
   header_ = new CQHeaderView(this);
 
+  header_->setInitFit(true);
+
   setHorizontalHeader(header_);
 
   //---
@@ -202,7 +204,7 @@ void
 CQTableWidget::
 showEvent(QShowEvent *)
 {
-  resizeColumnsToContents();
+  //resizeColumnsToContents();
 
   //fixTableColumnWidths(this, 16, true);
 }

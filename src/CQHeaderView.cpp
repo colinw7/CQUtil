@@ -4,6 +4,8 @@
 #include <QSortFilterProxyModel>
 #include <QContextMenuEvent>
 #include <QMenu>
+
+#include <iostream>
 #include <cassert>
 
 CQHeaderView::
@@ -13,7 +15,7 @@ CQHeaderView(QWidget *parent) :
   setObjectName("headerView");
 
   connect(this, SIGNAL(sectionResized(int, int, int)), this,
-          SLOT(handleSectionResized(int)));
+          SLOT(handleSectionResized(int, int, int)));
   connect(this, SIGNAL(sectionMoved(int, int, int)), this,
           SLOT(handleSectionMoved(int, int, int)));
   connect(this, SIGNAL(sectionClicked(int)), this,
@@ -64,9 +66,35 @@ void
 CQHeaderView::
 showEvent(QShowEvent *e)
 {
+  shown_ = true;
+
   initWidgets();
 
   QHeaderView::showEvent(e);
+
+  doInitFit();
+}
+
+void
+CQHeaderView::
+resizeEvent(QResizeEvent *e)
+{
+  resized_ = true;
+
+  QHeaderView::resizeEvent(e);
+
+  doInitFit();
+}
+
+void
+CQHeaderView::
+doInitFit()
+{
+  if (shown_ && resized_ && initFit_) {
+    fitAllSlot();
+
+    initFit_ = false;
+  }
 }
 
 void
@@ -337,9 +365,13 @@ initWidgets()
 
 void
 CQHeaderView::
-handleSectionResized(int i)
+handleSectionResized(int section, int oldSize, int newSize)
 {
-  for (int j = visualIndex(i); j < count(); ++j) {
+  Q_UNUSED(oldSize);
+  Q_UNUSED(newSize);
+
+//std::cerr << "handleSectionResized " << section << " " << oldSize << " " << newSize << "\n";
+  for (int j = visualIndex(section); j < count(); ++j) {
     int logical = logicalIndex(j);
 
     if (logical < 0 || logical >= widgets_.size())

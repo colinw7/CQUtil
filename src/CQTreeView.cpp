@@ -46,6 +46,8 @@ customContextMenuSlot(const QPoint &pos)
 
   addMenuActions(menu);
 
+  menuIndex_ = indexAt(pos);
+
   menu->exec(mpos);
 
   delete menu;
@@ -57,12 +59,15 @@ addMenuActions(QMenu *menu)
 {
   QAction *expandAction   = new QAction("Expand All"  , menu);
   QAction *collapseAction = new QAction("Collapse All", menu);
+  QAction *setRootAction  = new QAction("Set Root"    , menu);
 
   connect(expandAction  , SIGNAL(triggered()), this, SLOT(expandAll()));
   connect(collapseAction, SIGNAL(triggered()), this, SLOT(collapseAll()));
+  connect(setRootAction , SIGNAL(triggered()), this, SLOT(setRootSlot()));
 
   menu->addAction(expandAction);
   menu->addAction(collapseAction);
+  menu->addAction(setRootAction);
 }
 
 void
@@ -89,4 +94,11 @@ collapseAll(const QModelIndex &ind)
 
     collapseAll(ind1);
   }
+}
+
+void
+CQTreeView::
+setRootSlot()
+{
+  setRootIndex(menuIndex_);
 }

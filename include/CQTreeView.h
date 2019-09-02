@@ -21,8 +21,11 @@ class CQTreeView : public QTreeView {
   void expandAll  (const QModelIndex &ind=QModelIndex());
   void collapseAll(const QModelIndex &ind=QModelIndex());
 
+  void setRootSlot();
+
  private:
   CQHeaderView *header_ { nullptr };
+  QModelIndex   menuIndex_;
 };
 
 #endif
