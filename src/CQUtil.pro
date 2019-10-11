@@ -21,7 +21,9 @@ CQMainWindow.cpp \
 CQWorkspace.cpp \
 CQToolBar.cpp \
 CQWindow.cpp \
+\
 CQImage.cpp \
+CQImageUtil.cpp \
 \
 CQPixmapCache.cpp \
 CQStyle.cpp \
@@ -35,6 +37,7 @@ CQFontChooser.cpp \
 CQFontDialog.cpp \
 CQFontEdit.cpp \
 CQFontListView.cpp \
+CQFontUtil.cpp \
 \
 CQIntegerEdit.cpp \
 CQRealEdit.cpp \
@@ -80,7 +83,9 @@ HEADERS += \
 ../include/CQWorkspace.h \
 ../include/CQMdiArea.h \
 ../include/CQWindow.h \
+\
 ../include/CQImage.h \
+../include/CQImageUtil.h \
 \
 ../include/CQPixmapCache.h \
 ../include/CQStyle.h \
@@ -97,6 +102,7 @@ HEADERS += \
 ../include/CQFontDialog.h \
 ../include/CQFontEdit.h \
 ../include/CQFontListView.h \
+../include/CQFontUtil.h \
 \
 ../include/CQIntegerEdit.h \
 ../include/CQRealEdit.h \
