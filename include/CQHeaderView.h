@@ -41,6 +41,9 @@ class CQHeaderView : public QHeaderView {
 
   void resizeEvent(QResizeEvent *e) override;
 
+ public slots:
+  void fitAllSlot();
+
  private slots:
   void handleSectionResized(int section, int oldSize, int newSize);
 
@@ -49,7 +52,6 @@ class CQHeaderView : public QHeaderView {
   void handleSectionClicked(int logical);
 
   void fitColumnSlot();
-  void fitAllSlot();
 
   void stretchLastSlot(bool b);
   void sortIndicatorSlot(bool b);

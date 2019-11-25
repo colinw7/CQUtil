@@ -102,6 +102,8 @@ class CQTableWidget : public QTableWidget {
   void setItem(int row, int column, const QString &str);
   void setItem(int row, int column, QWidget *w);
 
+  void fitAll();
+
   void fixTableColumnWidths();
 
   void emitValueChanged(int row, int col);

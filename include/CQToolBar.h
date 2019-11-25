@@ -18,6 +18,8 @@ class CQToolBarMgr {
  public:
   static CQToolBarMgr *instance();
 
+  static void release();
+
   const COptInt &iconSize() const { return iconSize_; }
   void setIconSize(int i) { iconSize_ = i; }
 

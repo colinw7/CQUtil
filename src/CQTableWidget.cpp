@@ -211,6 +211,13 @@ showEvent(QShowEvent *)
 
 void
 CQTableWidget::
+fitAll()
+{
+  header_->fitAllSlot();
+}
+
+void
+CQTableWidget::
 fixTableColumnWidths()
 {
   resizeColumnsToContents();

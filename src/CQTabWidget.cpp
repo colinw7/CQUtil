@@ -6,12 +6,12 @@
 #include <QMouseEvent>
 #include <QHBoxLayout>
 
-#include <xpm/new.xpm>
+#include <svg/new_svg.h>
 #include <svg/left_svg.h>
 #include <svg/right_svg.h>
 
 #ifndef CQTAB_WIDGET_MOVABLE
-#include <xpm/tab.xpm>
+#include <svg/tab_svg.h>
 #endif
 
 CQTabWidget::
@@ -103,7 +103,7 @@ void
 CQTabWidget::
 addCreateButton()
 {
-  CQImageButton *new_button = new CQImageButton(QPixmap(new_data));
+  CQImageButton *new_button = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
 
   connect(new_button, SIGNAL(clicked()), this, SIGNAL(createTab()));
 
@@ -151,7 +151,7 @@ mouseMoveEvent(QMouseEvent *event)
   // initiate Drag
   QDrag *drag = new QDrag(this);
 
-  drag->setPixmap(QPixmap(tab_data));
+  drag->setPixmap((CQPixmapCacheInst->getPixmap("TAB"));
 
   QMimeData *mimeData = new QMimeData;
 

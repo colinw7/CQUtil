@@ -4,16 +4,25 @@
 #include <QToolBar>
 #include <QAbstractButton>
 
+static CQToolBarMgr *s_instance;
+
 CQToolBarMgr *
 CQToolBarMgr::
 instance()
 {
-  static CQToolBarMgr *inst;
+  if (! s_instance)
+    s_instance = new CQToolBarMgr;
 
-  if (! inst)
-    inst = new CQToolBarMgr;
+  return s_instance;
+}
 
-  return inst;
+void
+CQToolBarMgr::
+release()
+{
+  delete s_instance;
+
+  s_instance = nullptr;
 }
 
 CQToolBarMgr::
@@ -33,6 +42,7 @@ CQToolBar(QMainWindow *main_window, const QString &name, Qt::ToolBarArea area) :
 
   main_window->addToolBar(area, toolbar_);
 
+#if 0
   CQToolBarMgr *mgr = CQToolBarMgrInst;
 
   if (mgr->iconSize().isValid()) {
@@ -40,6 +50,7 @@ CQToolBar(QMainWindow *main_window, const QString &name, Qt::ToolBarArea area) :
 
     setIconSize(QSize(is, is));
   }
+#endif
 }
 
 void
