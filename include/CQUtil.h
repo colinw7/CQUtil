@@ -9,6 +9,7 @@
 #define CQUTIL_LINE_DASH 1
 #define CQUTIL_ANGLE 1
 #define CQUTIL_GRADIENT 1
+#define CQUTIL_PALETTE 1
 
 #include <Qt>
 #include <QColor>
