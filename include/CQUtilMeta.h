@@ -67,8 +67,8 @@ QDebug operator<<(QDebug dbg, const TYPE &t) \
 }
 
 // define routine to register meta type to Qt
-#define CQUTIL_DEF_META_TYPE_REGISTER(TYPE) \
-namespace CQUtilMeta_##TYPE {\
+#define CQUTIL_DEF_META_TYPE_REGISTER(TYPE, ID) \
+namespace CQUtilMeta_##ID {\
 int registerMetaType() { \
   static bool registered; \
   static int type = -1; \
@@ -88,7 +88,14 @@ CQUTIL_DEF_META_TYPE_DATA_STREAM(TYPE, GETTER, SETTER) \
 \
 CQUTIL_DEF_META_TYPE_DEBUG(TYPE, GETTER) \
 \
-CQUTIL_DEF_META_TYPE_REGISTER(TYPE)
+CQUTIL_DEF_META_TYPE_REGISTER(TYPE, TYPE)
+
+#define CQUTIL_DEF_META_TYPE_ID(TYPE, ID, GETTER, SETTER) \
+CQUTIL_DEF_META_TYPE_DATA_STREAM(TYPE, GETTER, SETTER) \
+\
+CQUTIL_DEF_META_TYPE_DEBUG(TYPE, GETTER) \
+\
+CQUTIL_DEF_META_TYPE_REGISTER(TYPE, ID)
 
 //---
 
@@ -105,5 +112,7 @@ CQUTIL_DEF_META_TYPE_REGISTER(TYPE)
 
 // call routine to register meta type
 #define CQUTIL_REGISTER_META(TYPE) CQUtilMeta_##TYPE :: registerMetaType()
+
+#define CQUTIL_REGISTER_META_ID(ID) CQUtilMeta_##ID :: registerMetaType()
 
 #endif
