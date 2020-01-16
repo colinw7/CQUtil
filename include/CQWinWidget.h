@@ -15,6 +15,7 @@ class CQWinWidget : public QWidget {
 
   Q_PROPERTY(DecorationType decorationType READ decorationType WRITE setDecorationType)
   Q_PROPERTY(HeaderSide     headerSide     READ headerSide     WRITE setHeaderSide    )
+  Q_PROPERTY(int            border         READ getBorder      WRITE setBorder        )
 
   Q_ENUMS(DecorationType)
   Q_ENUMS(HeaderSide)
@@ -60,7 +61,7 @@ class CQWinWidget : public QWidget {
     DecorationType type;
     HeaderSide     header_side;
     int            header_height { 0 };
-    QRect          header_rect;
+    QRect          headerRect;
     int            border { 0 };
     QColor         border_color;
 
@@ -121,7 +122,7 @@ class CQWinWidget : public QWidget {
   //---
 
  public:
-  CQWinWidget(QWidget *parent=0, const char *name=0);
+  CQWinWidget(QWidget *parent=nullptr, const char *name=nullptr);
 
   virtual ~CQWinWidget() { }
 
@@ -189,6 +190,7 @@ class CQWinWidget : public QWidget {
   virtual bool checkGeometry(const QRect &r) const;
 
   int getBorder() const;
+  void setBorder(int b);
 
   void drawHeaderButtonH(QPainter *painter, HeaderButton &button, int &x1, int y1, int b1);
   void drawHeaderButtonV(QPainter *painter, HeaderButton &button, int x1, int &y1, int b1);

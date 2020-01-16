@@ -182,6 +182,7 @@ bool
 CQWinWidget::
 checkMove(QPoint &p) const
 {
+  // widget is fully visible
   if (constraint_ == VISIBLE_CONSTRAINT) {
     QRect r(p, this->size());
 
@@ -233,15 +234,15 @@ paintEvent(QPaintEvent *)
     QBrush bgBrush = QBrush(pal.color(QPalette::Window));
 
     if      (decoration_.header_side == SideTop)
-      decoration_.header_rect = QRect(b, b, width() - 2*b, hh);
+      decoration_.headerRect = QRect(b, b, width() - 2*b, hh);
     else if (decoration_.header_side == SideBottom)
-      decoration_.header_rect = QRect(b, height() - b - hh, width() - 2*b, hh);
+      decoration_.headerRect = QRect(b, height() - b - hh, width() - 2*b, hh);
     else if (decoration_.header_side == SideLeft)
-      decoration_.header_rect = QRect(b, b, hh, height() - 2*b);
+      decoration_.headerRect = QRect(b, b, hh, height() - 2*b);
     else if (decoration_.header_side == SideRight)
-      decoration_.header_rect = QRect(width() - b - hh, b, hh, height() - 2*b);
+      decoration_.headerRect = QRect(width() - b - hh, b, hh, height() - 2*b);
 
-    painter.fillRect(decoration_.header_rect, bgBrush);
+    painter.fillRect(decoration_.headerRect, bgBrush);
 
     int b1 = hh - 4;
 
@@ -262,8 +263,18 @@ paintEvent(QPaintEvent *)
       if (expandButton_  .displayed) panelWidth -= b1 + 2;
       if (collapseButton_.displayed) panelWidth -= b1 + 2;
 
-      qDrawShadePanel(&painter, b + margin, b + margin                , panelWidth, panelSize, pal);
-      qDrawShadePanel(&painter, b + margin, b + margin + 1 + panelSize, panelWidth, panelSize, pal);
+      int pd = 2*panelSize - 1;
+
+      int n  = (hh - 2*b - 2*margin)/pd;
+      int dy = (hh - (n - 1)*pd)/2;
+
+      int y = dy;
+
+      for (int i = 0; i < n; ++i) {
+        qDrawShadePanel(&painter, b + margin, y, panelWidth, panelSize, pal);
+
+        y += pd;
+      }
     }
     else {
        int y1 = b + 2;
@@ -436,7 +447,7 @@ mousePressEvent(QMouseEvent *event)
 
     if (ops_ & MoveOp) {
       if (decoration_.type & HeaderDecoration) {
-        if (decoration_.header_rect.contains(p)) {
+        if (decoration_.headerRect.contains(p)) {
           if (! closeButton_.active && ! expandButton_.active && ! collapseButton_.active)
             state_.moving = true;
         }
@@ -541,7 +552,7 @@ mouseMoveEvent(QMouseEvent *event)
 
   if (ops_ & MoveOp) {
     if (decoration_.type & HeaderDecoration) {
-      if (decoration_.header_rect.contains(p)) {
+      if (decoration_.headerRect.contains(p)) {
         if (closeButton_.active || expandButton_.active || collapseButton_.active)
           setCursor(select_bits, selectmask_bits, 2, 2);
         else
@@ -658,6 +669,13 @@ getBorder() const
   int b = (decoration_.type & BorderDecoration ? decoration_.border : 0);
 
   return b;
+}
+
+void
+CQWinWidget::
+setBorder(int b)
+{
+  decoration_.border = b;
 }
 
 void
