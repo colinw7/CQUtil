@@ -71,10 +71,16 @@ class CQStrParse {
   virtual bool unreadString(const QString &str);
 
   virtual bool readNumber(double &real, int &integer, bool &is_real);
+  virtual bool readNumber(double &real, long &integer, bool &is_real);
 
   virtual bool readInteger(int *integer);
+  virtual bool readInteger(long *integer);
+
   virtual bool readBaseInteger(int base, int *integer);
+  virtual bool readBaseInteger(int base, long *integer);
+
   virtual bool readReal(double *real);
+
   virtual bool readString(QString &str, bool strip_quotes=false);
 
   virtual bool skipToChar(QChar c);
@@ -134,10 +140,10 @@ class CQStrParse {
   bool toIntegerI(const QString &str, int *integer);
   bool toIntegerI(const QString &str, long *integer);
 
-  bool readIntegerI(const QString &str, int *pos, int *integer);
-  bool readBaseIntegerI(const QString &str, int base, int *pos, int *integer);
+  bool readIntegerI(const QString &str, int *pos, long *integer);
+  bool readBaseIntegerI(const QString &str, int base, int *pos, long *integer);
   bool readRealI(const QString &str, int *pos, double *real);
-  bool readNumberI(const QString &str, int *pos, double &real, int &integer, bool &is_real);
+  bool readNumberI(const QString &str, int *pos, double &real, long &integer, bool &is_real);
 
   bool skipIntegerI(const QString &str, int *pos);
   bool skipBaseIntegerI(const QString &str, int base, int *pos);

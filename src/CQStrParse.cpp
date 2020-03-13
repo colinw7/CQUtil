@@ -624,6 +624,20 @@ bool
 CQStrParse::
 readNumber(double &real, int &integer, bool &is_real)
 {
+  long linteger;
+
+  if (! readNumber(real, linteger, is_real))
+    return false;
+
+  integer = (int) linteger;
+
+  return true;
+}
+
+bool
+CQStrParse::
+readNumber(double &real, long &integer, bool &is_real)
+{
   autoSkipSpace();
 
   int pos1 = pos_;
@@ -637,7 +651,7 @@ readNumber(double &real, int &integer, bool &is_real)
 
 bool
 CQStrParse::
-readNumberI(const QString &str, int *pos, double &real, int &integer, bool &is_real)
+readNumberI(const QString &str, int *pos, double &real, long &integer, bool &is_real)
 {
   is_real = false;
 
@@ -764,20 +778,6 @@ toRealI(const QString &str, double *real)
 
 bool
 CQStrParse::
-toIntegerI(const QString &str, int *integer)
-{
-  long integer1;
-
-  if (! toIntegerI(str, &integer1))
-    return false;
-
-  *integer = (int) integer1;
-
-  return true;
-}
-
-bool
-CQStrParse::
 toIntegerI(const QString &str, long *integer)
 {
   QByteArray ba = str.toLatin1();
@@ -820,6 +820,20 @@ bool
 CQStrParse::
 readInteger(int *integer)
 {
+  long linteger;
+
+  if (! readInteger(&linteger))
+    return false;
+
+  *integer = (int) linteger;
+
+  return true;
+}
+
+bool
+CQStrParse::
+readInteger(long *integer)
+{
   autoSkipSpace();
 
   int pos1 = pos_;
@@ -833,7 +847,7 @@ readInteger(int *integer)
 
 bool
 CQStrParse::
-readIntegerI(const QString &str, int *pos, int *integer)
+readIntegerI(const QString &str, int *pos, long *integer)
 {
   int i = *pos;
 
@@ -858,6 +872,20 @@ bool
 CQStrParse::
 readBaseInteger(int base, int *integer)
 {
+  long linteger;
+
+  if (! readBaseInteger(base, &linteger))
+    return false;
+
+  *integer = (int) linteger;
+
+  return true;
+}
+
+bool
+CQStrParse::
+readBaseInteger(int base, long *integer)
+{
   autoSkipSpace();
 
   int pos1 = pos_;
@@ -871,7 +899,7 @@ readBaseInteger(int base, int *integer)
 
 bool
 CQStrParse::
-readBaseIntegerI(const QString &str, int base, int *pos, int *integer)
+readBaseIntegerI(const QString &str, int base, int *pos, long *integer)
 {
   int i = *pos;
 
@@ -1028,7 +1056,7 @@ CQStrParse::
 readRealI(const QString &str, int *pos, double *real)
 {
   double r       = 0.0;
-  int    i       = 0;
+  long   i       = 0;
   bool   is_real = false;
 
   if (! readNumberI(str, pos, r, i, is_real))
