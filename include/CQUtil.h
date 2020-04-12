@@ -463,6 +463,8 @@ namespace CQUtil {
 
   void removeGridRow   (QGridLayout *layout, int row, bool deleteWidgets);
   void removeGridColumn(QGridLayout *layout, int column, bool deleteWidgets);
+
+  void removeGridItems(QGridLayout *layout, bool deleteWidgets);
 }
 
 #endif

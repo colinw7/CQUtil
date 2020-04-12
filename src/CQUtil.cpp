@@ -3241,3 +3241,18 @@ removeGridColumn(QGridLayout *layout, int column, bool deleteWidgets)
   layout->setColumnMinimumWidth(column, 0);
   layout->setColumnStretch(column, 0);
 }
+
+void
+CQUtil::
+removeGridItems(QGridLayout *layout, bool deleteWidgets)
+{
+  // We avoid usage of QGridLayout::itemAtPosition() here to improve performance.
+  for (int i = layout->count() - 1; i >= 0; i--) {
+    // This layout item is subject to deletion.
+    QLayoutItem *item = layout->takeAt(i);
+    if (deleteWidgets) {
+      deleteLayoutChildWidgets(item);
+    }
+    delete item;
+  }
+}
