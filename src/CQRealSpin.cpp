@@ -129,6 +129,9 @@ stepBy(int n)
   int pos    = cursorPosition();
   int dotPos = this->dotPos();
 
+  if (dotPos < 0)
+    dotPos = lineEdit()->text().length();
+
   bool negative = isNegative();
 
   if (! negative) {
