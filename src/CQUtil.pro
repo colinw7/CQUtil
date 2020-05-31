@@ -55,6 +55,7 @@ CQAngleSpinBox.cpp \
 CQToolTip.cpp \
 CQTabWidget.cpp \
 CQCheckBox.cpp \
+CQTabSplit.cpp \
 \
 CQTreeView.cpp \
 CQTableView.cpp \
@@ -122,6 +123,7 @@ HEADERS += \
 ../include/CQToolTip.h \
 ../include/CQTabWidget.h \
 ../include/CQCheckBox.h \
+../include/CQTabSplit.h \
 \
 ../include/CQTreeView.h \
 ../include/CQTableView.h \
