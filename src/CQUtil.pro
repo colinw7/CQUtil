@@ -76,6 +76,8 @@ CQWinWidget.cpp \
 CQStrParse.cpp \
 \
 CQDragLabel.cpp \
+\
+CQWidgetFactory.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -146,6 +148,8 @@ HEADERS += \
 ../include/CQStrParse.h \
 \
 ../include/CQDragLabel.h \
+\
+../include/CQWidgetFactory.h \
 
 OBJECTS_DIR = ../obj
 

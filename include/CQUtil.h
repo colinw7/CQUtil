@@ -205,6 +205,7 @@ namespace CQUtil {
                        QMetaProperty &metaProperty);
 
   bool hasProperty(const QObject *object, const QString &name);
+  bool hasWritableProperty(const QObject *object, const QString &name);
 
   bool getProperty(const QObject *object, const QString &name, QVariant &value);
 

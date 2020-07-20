@@ -982,13 +982,39 @@ hasProperty(const QObject *object, const QString &propName)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
+
+  return true;
+}
+
+bool
+CQUtil::
+hasWritableProperty(const QObject *object, const QString &propName)
+{
+  if (! object)
+    return false;
+
+  if (propName.isEmpty())
+    return false;
+
+  auto *obj = const_cast<QObject *>(object);
+
+  const auto *meta = obj->metaObject();
+  if (! meta) return false;
+
+  int propIndex = meta->indexOfProperty(propName.toLatin1().data());
+  if (propIndex < 0) return false;
+
+  auto metaProperty = meta->property(propIndex);
+
+  if (! metaProperty.isWritable())
+    return false;
 
   return true;
 }
@@ -1011,7 +1037,7 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-//QMetaProperty metaProperty = meta->property(propIndex);
+//auto metaProperty = meta->property(propIndex);
 
   v = obj->property(propName.toLatin1().data());
 
@@ -1038,7 +1064,7 @@ getTclProperty(const QObject *object, const QString &propName, QVariant &v)
 
   v = obj->property(propName.toLatin1().data());
 
-  QMetaProperty metaProperty = meta->property(propIndex);
+  auto metaProperty = meta->property(propIndex);
 
   if (metaProperty.isEnumType()) {
     QMetaEnum metaEnum = metaProperty.enumerator();
