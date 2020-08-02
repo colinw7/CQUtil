@@ -11,7 +11,7 @@ CQRealSpin(QWidget *parent, double value) :
 
 CQRealSpin::
 CQRealSpin(double value) :
- QDoubleSpinBox(0)
+ QDoubleSpinBox(nullptr)
 {
   init(value);
 }
@@ -31,20 +31,6 @@ init(double value)
   connect(lineEdit(), SIGNAL(cursorPositionChanged(int,int)), this, SLOT(updateStep()));
 
   updateStep();
-}
-
-int
-CQRealSpin::
-cursorPosition() const
-{
-  return lineEdit()->cursorPosition();
-}
-
-void
-CQRealSpin::
-setCursorPosition(int pos)
-{
-  lineEdit()->setCursorPosition(pos);
 }
 
 void
@@ -153,6 +139,20 @@ stepBy(int n)
     setCursorPosition(pos1);
 
   updateStep();
+}
+
+int
+CQRealSpin::
+cursorPosition() const
+{
+  return lineEdit()->cursorPosition();
+}
+
+void
+CQRealSpin::
+setCursorPosition(int pos)
+{
+  lineEdit()->setCursorPosition(pos);
 }
 
 bool

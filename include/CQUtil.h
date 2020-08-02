@@ -16,6 +16,7 @@
 #include <QEvent>
 #include <QVariant>
 #include <QTableWidget>
+#include <QButtonGroup>
 #include <QPen>
 
 #include <CEvent.h>
@@ -441,6 +442,18 @@ namespace CQUtil {
     t->setSpacing(spacing);
 
     return t;
+  }
+
+  inline QButtonGroup *makeButtonGroup(QWidget *parent,
+   const std::initializer_list<QAbstractButton *> &buttons) {
+    auto *buttonGroup = new QButtonGroup(parent);
+
+    int ind = 0;
+
+    for (auto button : buttons)
+      buttonGroup->addButton(button, ind++);
+
+    return buttonGroup;
   }
 }
 

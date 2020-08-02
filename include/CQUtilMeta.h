@@ -5,6 +5,18 @@
 #include <QDataStream>
 #include <QDebug>
 
+namespace CQUtilMetaData {
+  inline bool *resultPtr() {
+    static bool result;
+    return &result;
+  }
+
+  inline bool getResult() { return *resultPtr(); }
+  inline void setResult(bool b) { *resultPtr() = b; }
+}
+
+//---
+
 #define CQUTIL_DCL_META_TYPE(TYPE) \
 Q_DECLARE_METATYPE(TYPE) \
 \
@@ -28,7 +40,7 @@ QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
 QDataStream &operator>>(QDataStream &in, TYPE &t) { \
   QString str; \
   in >> str; \
-  t.SETTER(str); \
+  CQUtilMetaData::setResult(t.SETTER(str)); \
   return in; \
 }
 
@@ -44,7 +56,7 @@ QDataStream &operator<<(QDataStream &out, const TYPE &t) { \
 QDataStream &operator>>(QDataStream &in, TYPE &t) { \
   QString str; \
   in >> str; \
-  t.SETTER(str.toStdString()); \
+  CQUtilMetaData::setResult(t.SETTER(str.toStdString())); \
   return in; \
 } \
 
