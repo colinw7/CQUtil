@@ -47,8 +47,16 @@
 //#include <QWebView>
 #include <QWizard>
 
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QFormLayout>
+
 #define addWidgetFactoryT(N) \
 CQWidgetFactoryMgrInst->addWidgetFactory(#N, new CQWidgetFactoryT<N>())
+
+#define addLayoutFactoryT(N) \
+CQWidgetFactoryMgrInst->addLayoutFactory(#N, new CQLayoutFactoryT<N>())
 
 //---
 
@@ -137,6 +145,14 @@ init()
 //addWidgetFactoryT(QWebView);
   addWidgetFactoryT(QWizard);
   addWidgetFactoryT(QWizardPage);
+
+  //---
+
+  addLayoutFactoryT(QHBoxLayout);
+  addLayoutFactoryT(QVBoxLayout);
+//addLayoutFactoryT(QBoxLayout );
+  addLayoutFactoryT(QGridLayout);
+  addLayoutFactoryT(QFormLayout);
 }
 
 //---
@@ -192,6 +208,57 @@ widgetFactoryNames() const
 
 //---
 
+bool
+CQWidgetFactoryMgr::
+isLayoutFactory(const QString &name) const
+{
+  return (layoutFactories_.find(name) != layoutFactories_.end());
+}
+
+void
+CQWidgetFactoryMgr::
+addLayoutFactory(const QString &name, CQLayoutFactory *factory)
+{
+  if (isLayoutFactory(name))
+    removeLayoutFactory(name);
+
+  layoutFactories_[name] = factory;
+}
+
+void
+CQWidgetFactoryMgr::
+removeLayoutFactory(const QString &name)
+{
+  auto p = layoutFactories_.find(name);
+  assert(p != layoutFactories_.end());
+
+  layoutFactories_.erase(p);
+}
+
+CQLayoutFactory *
+CQWidgetFactoryMgr::
+getLayoutFactory(const QString &name) const
+{
+  auto p = layoutFactories_.find(name);
+  assert(p != layoutFactories_.end());
+
+  return (*p).second;
+}
+
+QStringList
+CQWidgetFactoryMgr::
+layoutFactoryNames() const
+{
+  QStringList names;
+
+  for (const auto &pf : layoutFactories_)
+    names << pf.first;
+
+  return names;
+}
+
+//---
+
 QWidget *
 CQWidgetFactoryMgr::
 createWidget(const QString &type, QWidget *parent, const QStringList &options)
@@ -201,4 +268,15 @@ createWidget(const QString &type, QWidget *parent, const QStringList &options)
   auto *w = factory->createWidget(parent, options);
 
   return w;
+}
+
+QLayout *
+CQWidgetFactoryMgr::
+createLayout(const QString &type, QWidget *parent, const QStringList &options)
+{
+  auto *factory = getLayoutFactory(type);
+
+  auto *l = factory->createLayout(parent, options);
+
+  return l;
 }
