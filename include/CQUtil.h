@@ -85,12 +85,7 @@ class CRadialGradient;
 namespace CQUtil {
   class PropInfo {
    public:
-    PropInfo() {
-     type_       = QVariant::Invalid;
-     isWritable_ = false;
-     isEnumType_ = false;
-     isFlagType_ = false;
-    }
+    PropInfo() { }
 
     void init(const QMetaProperty &mp);
 
@@ -104,14 +99,33 @@ namespace CQUtil {
 
     const QStringList &enumNames() const { return enumNames_; }
 
+    int enumNameValue(const QString &name, int badValue=1) const {
+      auto p = enumNameValue_.find(name);
+      if (p == enumNameValue_.end()) return badValue;
+
+      return (*p).second;
+    }
+
+    QString enumValueName(int value, const QString &badName="") const {
+      auto p = enumValueName_.find(value);
+      if (p == enumValueName_.end()) return badName;
+
+      return (*p).second;
+    }
+
    private:
+    using NameValueMap = std::map<QString,int>;
+    using ValueNameMap = std::map<int,QString>;
+
     QString        name_;
-    QVariant::Type type_;
+    QVariant::Type type_       { QVariant::Invalid };
     QString        typeName_;
-    bool           isWritable_;
-    bool           isEnumType_;
-    bool           isFlagType_;
+    bool           isWritable_ { false };
+    bool           isEnumType_ { false };
+    bool           isFlagType_ { false };
     QStringList    enumNames_;
+    NameValueMap   enumNameValue_;
+    ValueNameMap   enumValueName_;
   };
 
   void initProperties();

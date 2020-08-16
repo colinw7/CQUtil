@@ -89,6 +89,36 @@ updateAreaSize()
     area->getWidget()->layout()->invalidate();
 }
 
+void
+CQWidgetMenu::
+paintEvent(QPaintEvent *e)
+{
+  CQWidgetMenuArea *area = getAction()->getArea();
+
+  QWidget *w = area->getWidget();
+
+  QSize s1 = this->size();
+//QSize s2 = area->size();
+  QSize s3 = w   ->size();
+
+//int dx12 = s1.width () - s2.width ();
+//int dy12 = s1.height() - s2.height();
+
+  int dx13 = s1.width () - s3.width ();
+  int dy13 = s1.height() - s3.height();
+
+  if (dx13 > 2 || dy13 > 2) {
+//  std::cerr << "CQWidgetMenu::paintEvent\n";
+
+//  std::cerr << "  " << dx12 << " " << dy12 << "\n";
+//  std::cerr << "  " << dx13 << " " << dy13 << "\n";
+
+    updateAreaSize();
+  }
+
+  QMenu::paintEvent(e);
+}
+
 //---------
 
 CQWidgetMenuAction::

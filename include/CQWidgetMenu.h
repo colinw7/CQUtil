@@ -56,6 +56,8 @@ class CQWidgetMenu : public QMenu {
 
   void updateAreaSize();
 
+  void paintEvent(QPaintEvent *) override;
+
  signals:
   //! signal emitted before menu is shown
   void menuShown();

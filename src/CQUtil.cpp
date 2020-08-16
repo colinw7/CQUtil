@@ -1972,6 +1972,38 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
       }
     }
   }
+  else if (type == QVariant::SizePolicy) {
+    auto stringToPolicy = [](const QString &str) {
+      QString lstr = str.toLower();
+
+      if (lstr == "fixed"    ) return QSizePolicy::Fixed;
+      if (lstr == "minimum"  ) return QSizePolicy::Minimum;
+      if (lstr == "maximum"  ) return QSizePolicy::Maximum;
+      if (lstr == "preferred") return QSizePolicy::Preferred;
+      if (lstr == "expanding") return QSizePolicy::Expanding;
+
+      return QSizePolicy::Fixed;
+    };
+
+    QStringList strs = str.split(" ", QString::SkipEmptyParts);
+
+    QSizePolicy::Policy hpolicy  { QSizePolicy::Fixed }, vpolicy { QSizePolicy::Fixed };
+    int                 hstretch { 0 }, vstretch { 0 };
+
+    if (strs.size() > 0) hpolicy = stringToPolicy(strs[0]);
+    if (strs.size() > 1) vpolicy = stringToPolicy(strs[1]);
+    if (strs.size() > 2) hstretch = strs[2].toInt();
+    if (strs.size() > 3) vstretch = strs[3].toInt();
+
+    QSizePolicy sizePolicy(hpolicy, vpolicy);
+
+    sizePolicy.setHorizontalStretch(hstretch);
+    sizePolicy.setVerticalStretch  (vstretch);
+
+    var = QVariant::fromValue(sizePolicy);
+
+    return true;
+  }
   else if (type == QVariant::UserType) {
     if (! typeName) {
       return false;
@@ -2480,7 +2512,12 @@ userVariantFromString(QVariant &var, const QString &str)
   QVariant var1(var.userType(), 0);
 
   // const cast is safe since we operate on a newly constructed variant
+  CQUtilMetaData::setResult(true);
+
   if (! QMetaType::load(in, var.userType(), const_cast<void *>(var.constData())))
+    return false;
+
+  if (! CQUtilMetaData::getResult())
     return false;
 
   if (! var.isValid())
@@ -3151,15 +3188,25 @@ init(const QMetaProperty &mp)
   isEnumType_ = mp.isEnumType();
   isFlagType_ = mp.isFlagType();
 
-  enumNames_.clear();
+  enumNames_    .clear();
+  enumNameValue_.clear();
+  enumValueName_.clear();
 
   if (isEnumType_) {
     QMetaEnum metaEnum = mp.enumerator();
 
     int num_enums = metaEnum.keyCount();
 
-    for (int i = 0; i < num_enums; ++i)
-      enumNames_.push_back(metaEnum.valueToKey(i));
+    for (int i = 0; i < num_enums; ++i) {
+      int value = metaEnum.value(i);
+
+      QString name = metaEnum.valueToKey(value);
+
+      enumNames_.push_back(name);
+
+      enumNameValue_[name ] = value;
+      enumValueName_[value] = name;
+    }
   }
 }
 
