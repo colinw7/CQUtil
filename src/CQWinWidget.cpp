@@ -33,7 +33,7 @@ CQWinWidget::
 setChild(QWidget *child)
 {
   if (child_)
-    child_->setParent(0);
+    child_->setParent(nullptr);
 
   child_ = child;
 
@@ -42,7 +42,7 @@ setChild(QWidget *child)
   child_->show();
 
   if (ops_ & ResizeOp)
-    resizeEvent(0);
+    updateSize();
   else
     fitChild();
 }
@@ -72,7 +72,7 @@ setChildSize(const QSize &size)
   if (decoration_.type & HeaderDecoration) {
     int hh = getHeaderHeight();
 
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom)
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
       h += hh;
     else
       w += hh;
@@ -88,7 +88,7 @@ getX() const
   int x = getBorder();
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.header_side == SideLeft)
+    if (decoration_.headerSide == SideLeft)
       x += getHeaderHeight();
   }
 
@@ -102,7 +102,7 @@ getY() const
   int y = getBorder();
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.header_side == SideTop)
+    if (decoration_.headerSide == SideTop)
       y += getHeaderHeight();
   }
 
@@ -118,7 +118,7 @@ getWidth() const
   int h = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.header_side == SideLeft || decoration_.header_side == SideRight)
+    if (decoration_.headerSide == SideLeft || decoration_.headerSide == SideRight)
       h = getHeaderHeight();
   }
 
@@ -134,7 +134,7 @@ getHeight() const
   int h = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom)
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
       h = getHeaderHeight();
   }
 
@@ -147,7 +147,7 @@ getHeaderHeight() const
 {
   QFontMetrics fm(font());
 
-  int h = qMax(decoration_.header_height, fm.height() + 4);
+  int h = qMax(decoration_.headerHeight, fm.height() + 4);
 
   return h;
 }
@@ -168,10 +168,10 @@ setSize(int w, int h)
   int hw = 0, hh = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.header_side == SideLeft || decoration_.header_side == SideRight)
+    if (decoration_.headerSide == SideLeft || decoration_.headerSide == SideRight)
       hw = getHeaderHeight();
 
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom)
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
       hh = getHeaderHeight();
   }
 
@@ -222,7 +222,7 @@ paintEvent(QPaintEvent *)
   // draw border
   int b = getBorder();
 
-  qDrawPlainRect(&painter, 0, 0, width(), height(), decoration_.border_color, b);
+  qDrawPlainRect(&painter, 0, 0, width(), height(), decoration_.borderColor, b);
 
   // draw header
   if (decoration_.type & HeaderDecoration) {
@@ -233,13 +233,13 @@ paintEvent(QPaintEvent *)
     // draw background
     QBrush bgBrush = QBrush(pal.color(QPalette::Window));
 
-    if      (decoration_.header_side == SideTop)
+    if      (decoration_.headerSide == SideTop)
       decoration_.headerRect = QRect(b, b, width() - 2*b, hh);
-    else if (decoration_.header_side == SideBottom)
+    else if (decoration_.headerSide == SideBottom)
       decoration_.headerRect = QRect(b, height() - b - hh, width() - 2*b, hh);
-    else if (decoration_.header_side == SideLeft)
+    else if (decoration_.headerSide == SideLeft)
       decoration_.headerRect = QRect(b, b, hh, height() - 2*b);
-    else if (decoration_.header_side == SideRight)
+    else if (decoration_.headerSide == SideRight)
       decoration_.headerRect = QRect(width() - b - hh, b, hh, height() - 2*b);
 
     painter.fillRect(decoration_.headerRect, bgBrush);
@@ -252,9 +252,9 @@ paintEvent(QPaintEvent *)
 
     // draw title bar handle
     int panelSize = 3;
-    int margin    = (decoration_.header_height - 2*panelSize - 1)/2;
+    int margin    = (decoration_.headerHeight - 2*panelSize - 1)/2;
 
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom) {
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom) {
       int x1 = width() - b + 2;
 
       int panelWidth = qMax(1, x1 - 2*b - 2*margin);
@@ -301,7 +301,7 @@ paintEvent(QPaintEvent *)
 
       painter.save();
 
-      if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom)
+      if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
         painter.fillRect(QRect(b, b, tw + 4, hh), bgBrush);
       else {
         painter.fillRect(QRect(b, height() - tw - b - 4, hh, tw + 4), bgBrush);
@@ -318,9 +318,9 @@ paintEvent(QPaintEvent *)
     }
 
     // draw header buttons
-    painter.setPen(decoration_.border_color);
+    painter.setPen(decoration_.borderColor);
 
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom) {
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom) {
       int x1 = width() - b + 2;
       int y1 = b + 2;
 
@@ -369,7 +369,14 @@ void
 CQWinWidget::
 moveEvent(QMoveEvent *)
 {
-  resizeEvent(0);
+  resizeEvent(nullptr);
+}
+
+void
+CQWinWidget::
+updateSize()
+{
+  resizeEvent(nullptr);
 }
 
 void
@@ -386,12 +393,12 @@ resizeEvent(QResizeEvent *)
   if (decoration_.type & HeaderDecoration) {
     int hh = getHeaderHeight();
 
-    if      (decoration_.header_side == SideTop)
+    if      (decoration_.headerSide == SideTop)
       y += hh;
-    else if (decoration_.header_side == SideLeft)
+    else if (decoration_.headerSide == SideLeft)
       x += hh;
 
-    if (decoration_.header_side == SideTop || decoration_.header_side == SideBottom)
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
       h -= hh;
     else
       w -= hh;
@@ -411,15 +418,15 @@ mousePressEvent(QMouseEvent *event)
 {
   pressed_ = true;
 
-  if (edit_mode_ == EDIT_MODE_CLICK) {
+  if (editMode() == EDIT_MODE_CLICK) {
     if (state_.moving || state_.resizing) {
-      edit_mode_ = EDIT_MODE_DRAG;
+      editMode_ = EDIT_MODE_DRAG;
 
       mouseReleaseEvent(event);
 
       releaseMouse();
 
-      edit_mode_ = EDIT_MODE_CLICK;
+      editMode_ = EDIT_MODE_CLICK;
 
       return;
     }
@@ -427,9 +434,9 @@ mousePressEvent(QMouseEvent *event)
 
   //-----
 
-  state_.init_pos  = pos();
-  state_.init_size = size();
-  state_.press_pos = event->globalPos();
+  state_.initPos  = pos();
+  state_.initSize = size();
+  state_.pressPos = event->globalPos();
 
   if      (event->button() == Qt::LeftButton) {
     state_.moving   = false;
@@ -459,19 +466,19 @@ mousePressEvent(QMouseEvent *event)
     if ((ops_ & ResizeOp) && ! state_.moving) {
       int b = getBorder() + 2;
 
-      state_.resize_l = (event->x() <= b);
-      state_.resize_t = (event->y() <= b);
-      state_.resize_r = (event->x() >= width () - b - 1);
-      state_.resize_b = (event->y() >= height() - b - 1);
+      state_.resizeL = (event->x() <= b);
+      state_.resizeT = (event->y() <= b);
+      state_.resizeR = (event->x() >= width () - b - 1);
+      state_.resizeB = (event->y() >= height() - b - 1);
 
-      if (state_.resize_l || state_.resize_t || state_.resize_r || state_.resize_b)
+      if (state_.resizeL || state_.resizeT || state_.resizeR || state_.resizeB)
         state_.resizing = true;
     }
 
     if (ops_ & RaiseOp)
       raise();
 
-    if (edit_mode_ == EDIT_MODE_CLICK)
+    if (editMode() == EDIT_MODE_CLICK)
       grabMouse();
   }
   else if (event->button() == Qt::MidButton) {
@@ -484,7 +491,7 @@ mousePressEvent(QMouseEvent *event)
     if (ops_ & RaiseOp)
       raise();
 
-    if (edit_mode_ == EDIT_MODE_CLICK)
+    if (editMode() == EDIT_MODE_CLICK)
       grabMouse();
   }
 }
@@ -494,9 +501,9 @@ CQWinWidget::
 mouseMoveEvent(QMouseEvent *event)
 {
   if      (state_.moving) {
-    QPoint d = event->globalPos() - state_.press_pos;
+    QPoint d = event->globalPos() - state_.pressPos;
 
-    QPoint p = state_.init_pos + d;
+    QPoint p = state_.initPos + d;
 
     if (checkMove(p))
       move(p);
@@ -505,26 +512,26 @@ mouseMoveEvent(QMouseEvent *event)
     int dx = 0; int dy = 0;
     int dw = 0; int dh = 0;
 
-    if (state_.resize_l) {
-      dx = event->globalPos().x() - state_.press_pos.x();
+    if (state_.resizeL) {
+      dx = event->globalPos().x() - state_.pressPos.x();
       dw = -dx;
     }
 
-    if (state_.resize_r)
-      dw = event->globalPos().x() - state_.press_pos.x();
+    if (state_.resizeR)
+      dw = event->globalPos().x() - state_.pressPos.x();
 
-    if (state_.resize_t) {
-      dy = event->globalPos().y() - state_.press_pos.y();
+    if (state_.resizeT) {
+      dy = event->globalPos().y() - state_.pressPos.y();
       dh = -dy;
     }
 
-    if (state_.resize_b)
-      dh = event->globalPos().y() - state_.press_pos.y();
+    if (state_.resizeB)
+      dh = event->globalPos().y() - state_.pressPos.y();
 
     move  (pos () + QPoint(dx, dy));
     resize(size() + QSize (dw, dh));
 
-    state_.press_pos = event->globalPos();
+    state_.pressPos = event->globalPos();
   }
 
   //------
@@ -566,19 +573,19 @@ mouseMoveEvent(QMouseEvent *event)
   if (ops_ & ResizeOp) {
     int b = getBorder() + 2;
 
-    bool resize_l = (event->x() <= b);
-    bool resize_t = (event->y() <= b);
-    bool resize_r = (event->x() >= width () - b - 1);
-    bool resize_b = (event->y() >= height() - b - 1);
+    bool resizeL = (event->x() <= b);
+    bool resizeT = (event->y() <= b);
+    bool resizeR = (event->x() >= width () - b - 1);
+    bool resizeB = (event->y() >= height() - b - 1);
 
-    if      (resize_l && resize_t) QWidget::setCursor(Qt::SizeFDiagCursor);
-    else if (resize_l && resize_b) QWidget::setCursor(Qt::SizeBDiagCursor);
-    else if (resize_r && resize_t) QWidget::setCursor(Qt::SizeBDiagCursor);
-    else if (resize_r && resize_b) QWidget::setCursor(Qt::SizeFDiagCursor);
-    else if (resize_l            ) QWidget::setCursor(Qt::SizeHorCursor);
-    else if (resize_r            ) QWidget::setCursor(Qt::SizeHorCursor);
-    else if (resize_t            ) QWidget::setCursor(Qt::SizeVerCursor);
-    else if (resize_b            ) QWidget::setCursor(Qt::SizeVerCursor);
+    if      (resizeL && resizeT) QWidget::setCursor(Qt::SizeFDiagCursor);
+    else if (resizeL && resizeB) QWidget::setCursor(Qt::SizeBDiagCursor);
+    else if (resizeR && resizeT) QWidget::setCursor(Qt::SizeBDiagCursor);
+    else if (resizeR && resizeB) QWidget::setCursor(Qt::SizeFDiagCursor);
+    else if (resizeL           ) QWidget::setCursor(Qt::SizeHorCursor);
+    else if (resizeR           ) QWidget::setCursor(Qt::SizeHorCursor);
+    else if (resizeT           ) QWidget::setCursor(Qt::SizeVerCursor);
+    else if (resizeB           ) QWidget::setCursor(Qt::SizeVerCursor);
   }
 }
 
@@ -588,13 +595,13 @@ mouseReleaseEvent(QMouseEvent *event)
 {
   pressed_ = false;
 
-  if (edit_mode_ == EDIT_MODE_DRAG) {
+  if (editMode() == EDIT_MODE_DRAG) {
     if (state_.moving || state_.resizing) {
       mouseMoveEvent(event);
 
       if (! checkGeometry(geometry())) {
-        move  (state_.init_pos );
-        resize(state_.init_size);
+        move  (state_.initPos );
+        resize(state_.initSize);
       }
       else {
         emit geometryChanged();
@@ -625,12 +632,41 @@ mouseReleaseEvent(QMouseEvent *event)
   }
 }
 
+//---
+
 void
 CQWinWidget::
 contextMenuEvent(QContextMenuEvent *event)
 {
-  emit showContextMenu(event->globalPos());
+  showContextMenu(event->globalPos());
 }
+
+void
+CQWinWidget::
+showContextMenu(const QPoint &gpos)
+{
+  auto *menu = new QMenu(this);
+
+  QAction *headerAction = menu->addAction("Show Header");
+
+  headerAction->setCheckable(true);
+  headerAction->setChecked  (isHeaderVisible());
+
+  connect(headerAction, SIGNAL(triggered(bool)), this, SLOT(setHeaderSlot(bool)));
+
+  menu->exec(gpos);
+
+  delete menu;
+}
+
+void
+CQWinWidget::
+setHeaderSlot(bool b)
+{
+  setHeaderVisible(b);
+}
+
+//---
 
 void
 CQWinWidget::
@@ -669,13 +705,6 @@ getBorder() const
   int b = (decoration_.type & BorderDecoration ? decoration_.border : 0);
 
   return b;
-}
-
-void
-CQWinWidget::
-setBorder(int b)
-{
-  decoration_.border = b;
 }
 
 void
@@ -790,9 +819,9 @@ CQWinWidgetBase::
 
 void
 CQWinWidgetBase::
-setEditMode(CQWinWidget::EditMode edit_mode)
+setEditMode(CQWinWidget::EditMode editMode)
 {
-  widget_->setEditMode(edit_mode);
+  widget_->setEditMode(editMode);
 }
 
 //---------------
@@ -830,7 +859,7 @@ CQWinImage(QWidget *parent, const char *name) :
 
   //------
 
-  menu_ = new QMenu;
+  menu_ = new QMenu(this);
 
   QAction *loadAction = menu_->addAction("Load Image");
 

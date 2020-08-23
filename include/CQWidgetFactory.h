@@ -43,6 +43,20 @@ class CQWidgetFactoryT : public CQWidgetFactory {
 };
 
 template<typename T>
+class CQWidgetFactoryNoArgsT : public CQWidgetFactory {
+ public:
+  CQWidgetFactoryNoArgsT() { }
+
+  QWidget *createWidget(QWidget *, const QStringList &) {
+    auto *w = new T();
+
+    // TODO: set object name
+
+    return w;
+  }
+};
+
+template<typename T>
 class CQLayoutFactoryT : public CQLayoutFactory {
  public:
   CQLayoutFactoryT() { }

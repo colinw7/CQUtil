@@ -15,10 +15,19 @@ class CQWinWidget : public QWidget {
 
   Q_PROPERTY(DecorationType decorationType READ decorationType WRITE setDecorationType)
   Q_PROPERTY(HeaderSide     headerSide     READ headerSide     WRITE setHeaderSide    )
-  Q_PROPERTY(int            border         READ getBorder      WRITE setBorder        )
+  Q_PROPERTY(EditMode       editMode       READ editMode       WRITE setEditMode      )
+
+  Q_PROPERTY(int    borderWidth   READ decorationBorder WRITE setDecorationBorder)
+  Q_PROPERTY(QColor borderColor   READ decorationColor  WRITE setDecorationColor )
+  Q_PROPERTY(bool   movable       READ isMovable        WRITE setMovable         )
+  Q_PROPERTY(bool   resizable     READ isResizable      WRITE setResizable       )
+  Q_PROPERTY(bool   closable      READ isClosable       WRITE setClosable        )
+  Q_PROPERTY(bool   transparent   READ isTransparent    WRITE setTransparent     )
+  Q_PROPERTY(bool   headerVisible READ isHeaderVisible  WRITE setHeaderVisible   )
 
   Q_ENUMS(DecorationType)
   Q_ENUMS(HeaderSide)
+  Q_ENUMS(EditMode)
 
  public:
   enum GeometryOps {
@@ -58,17 +67,19 @@ class CQWinWidget : public QWidget {
 
  private:
   struct Decoration {
-    DecorationType type;
-    HeaderSide     header_side;
-    int            header_height { 0 };
+    DecorationType type         { HeaderBorderDecoration };
+    HeaderSide     headerSide   { SideTop };
+    int            headerHeight { 0 };
     QRect          headerRect;
-    int            border { 0 };
-    QColor         border_color;
+    int            border       { 0 };
+    QColor         borderColor  { Qt::white };
 
-    Decoration(DecorationType type1, HeaderSide header_side1, int header_height1,
-               int border1, const QColor &border_color1) :
-     type(type1), header_side(header_side1), header_height(header_height1),
-     border(border1), border_color(border_color1) {
+    Decoration() = default;
+
+    Decoration(DecorationType type, HeaderSide headerSide, int headerHeight,
+               int border, const QColor &borderColor) :
+     type(type), headerSide(headerSide), headerHeight(headerHeight),
+     border(border), borderColor(borderColor) {
     }
   };
 
@@ -106,15 +117,15 @@ class CQWinWidget : public QWidget {
   //---
 
   struct State {
-    QPoint init_pos;
-    QSize  init_size;
-    QPoint press_pos;
+    QPoint initPos;
+    QSize  initSize;
+    QPoint pressPos;
     bool   moving   { false };
     bool   resizing { false };
-    bool   resize_l { false };
-    bool   resize_t { false };
-    bool   resize_r { false };
-    bool   resize_b { false };
+    bool   resizeL  { false };
+    bool   resizeT  { false };
+    bool   resizeR  { false };
+    bool   resizeB  { false };
 
     State() { }
   };
@@ -130,49 +141,54 @@ class CQWinWidget : public QWidget {
 
   void fitChild();
 
+  //---
+
   DecorationType decorationType() const { return decoration_.type; }
-  void setDecorationType(DecorationType type) { decoration_.type = type; }
+  void setDecorationType(DecorationType type) { decoration_.type = type; updateSize(); }
 
-  HeaderSide headerSide() const { return decoration_.header_side; }
-  void setHeaderSide(HeaderSide side) { decoration_.header_side = side; }
+  HeaderSide headerSide() const { return decoration_.headerSide; }
+  void setHeaderSide(HeaderSide side) { decoration_.headerSide = side; updateSize(); }
 
-  void setDecorationHeaderHeight(int height) {
-    decoration_.header_height = height;
-  }
+  void setDecorationHeaderHeight(int height) { decoration_.headerHeight = height; updateSize(); }
 
-  void setDecorationBorder(int border) {
-    decoration_.border = border;
-  }
+  int decorationBorder() const { return decoration_.border; }
+  void setDecorationBorder(int border) { decoration_.border = border; updateSize(); }
 
-  void setOps(unsigned int ops) {
-    ops_ = ops;
-  }
+  const QColor &decorationColor() const { return decoration_.borderColor; }
+  void setDecorationColor(const QColor &c) { decoration_.borderColor = c; update(); }
 
+  unsigned int ops() const { return ops_; }
+  void setOps(unsigned int ops) { ops_ = ops; updateSize(); }
+
+  bool isMovable() const { return ops_ & MoveOp; }
   void setMovable(bool movable) {
-    ops_ = (movable ? ops_ | MoveOp : ops_ & ~MoveOp);
-  }
+    ops_ = (movable ? ops_ | MoveOp : ops_ & ~MoveOp); updateSize(); }
 
+  bool isResizable() const { return ops_ & ResizeOp; }
   void setResizable(bool resizable) {
-    ops_ = (resizable ? ops_ | ResizeOp : ops_ & ~ResizeOp);
-  }
+    ops_ = (resizable ? ops_ | ResizeOp : ops_ & ~ResizeOp); updateSize(); }
 
+  bool isClosable() const { return ops_ & CloseOp; }
   void setClosable(bool closable) {
-    ops_ = (closable ? ops_ | CloseOp : ops_ & ~CloseOp);
-  }
+    ops_ = (closable ? ops_ | CloseOp : ops_ & ~CloseOp); updateSize(); }
 
-  void setTransparent(bool flag=true) {
-    setAutoFillBackground(! flag);
-  }
+  bool isTransparent() const { return ! autoFillBackground(); }
+  void setTransparent(bool flag=true) { setAutoFillBackground(! flag); update(); }
 
-  void setEditMode(EditMode edit_mode) {
-    edit_mode_ = edit_mode;
-  }
+  EditMode editMode() const { return editMode_; }
+  void setEditMode(EditMode editMode) { editMode_ = editMode; }
 
-  void setConstraint(Constraint constraint) {
-    constraint_ = constraint;
-  }
+  bool isHeaderVisible() const { return (decoration_.type & HeaderDecoration); }
+  void setHeaderVisible(bool visible) {
+    decoration_.type = (DecorationType)
+      (visible ? decoration_.type |  HeaderDecoration : decoration_.type & ~HeaderDecoration);
+    updateSize(); }
+
+  void setConstraint(Constraint constraint) { constraint_ = constraint; }
 
   void setChildSize(const QSize &size);
+
+  //---
 
   int getX() const;
   int getY() const;
@@ -190,12 +206,19 @@ class CQWinWidget : public QWidget {
   virtual bool checkGeometry(const QRect &r) const;
 
   int getBorder() const;
-  void setBorder(int b);
 
   void drawHeaderButtonH(QPainter *painter, HeaderButton &button, int &x1, int y1, int b1);
   void drawHeaderButtonV(QPainter *painter, HeaderButton &button, int x1, int &y1, int b1);
 
+  //---
+
+  void showContextMenu(const QPoint &p);
+
+  void updateSize();
+
  private slots:
+  void setHeaderSlot(bool);
+
   void closeSlot();
   void expandSlot();
   void collapseSlot();
@@ -209,40 +232,38 @@ class CQWinWidget : public QWidget {
   void expand();
   void collapse();
 
-  void showContextMenu(const QPoint &p);
-
  private:
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
 
-  void moveEvent  (QMoveEvent *event);
-  void resizeEvent(QResizeEvent *event);
+  void moveEvent  (QMoveEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
 
-  void mousePressEvent  (QMouseEvent *event);
-  void mouseMoveEvent   (QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
+  void mousePressEvent  (QMouseEvent *event) override;
+  void mouseMoveEvent   (QMouseEvent *event) override;
+  void mouseReleaseEvent(QMouseEvent *event) override;
 
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
-  void enterEvent(QEvent *);
-  void leaveEvent(QEvent *);
+  void enterEvent(QEvent *) override;
+  void leaveEvent(QEvent *) override;
 
-  void showEvent(QShowEvent *);
-  void hideEvent(QHideEvent *);
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
   void setCursor(const uchar *bits, const uchar *mask, int xo, int yo);
 
  private:
-  QWidget *      child_ { 0 };
-  bool           active_ { false };
-  bool           pressed_ { false };
+  QWidget*       child_          { nullptr };
+  bool           active_         { false };
+  bool           pressed_        { false };
   Decoration     decoration_;
-  CloseButton    closeButton_ { "CLOSE" };
-  ExpandButton   expandButton_ { "MAXIMIZE" };
+  CloseButton    closeButton_    { "CLOSE" };
+  ExpandButton   expandButton_   { "MAXIMIZE" };
   CollapseButton collapseButton_ { "MINIMIZE" };
   State          state_;
-  unsigned int   ops_ { MoveOp | ResizeOp | RaiseOp | LowerOp | CloseOp };
-  EditMode       edit_mode_ { EDIT_MODE_DRAG };
-  Constraint     constraint_ { NO_CONSTRAINT };
+  unsigned int   ops_            { MoveOp | ResizeOp | RaiseOp | LowerOp | CloseOp };
+  EditMode       editMode_       { EDIT_MODE_DRAG };
+  Constraint     constraint_     { NO_CONSTRAINT };
 };
 
 //------
@@ -275,7 +296,7 @@ class CQWinWidgetBase {
 
   virtual QString getImageName() const { return ""; }
 
-  void setEditMode(CQWinWidget::EditMode edit_mode);
+  void setEditMode(CQWinWidget::EditMode editMode);
 
  protected:
   CQWinWidget *widget_ { 0 };
@@ -309,29 +330,22 @@ class CQWinTextEdit : public QTextEdit, public CQWinWidgetBase {
 class CQWinImage : public QLabel, public CQWinWidgetBase {
   Q_OBJECT
 
- private:
-  QString  fileName_;
-  QImage   image_;
-  QMenu   *menu_;
-
  public:
   CQWinImage(QWidget *parent, const char *name=0);
 
   virtual ~CQWinImage() { }
 
-  void show() { QLabel::show(); widget_->show(); }
-  void hide() { QLabel::hide(); widget_->hide(); }
+  void show() override { QLabel::show(); widget_->show(); }
+  void hide() override { QLabel::hide(); widget_->hide(); }
 
-  void setImageName(const QString &fileName);
-
-  void setImage(const QImage &image);
-
-  QString getImageName() const { return fileName_; }
+  QString getImageName() const override { return fileName_; }
+  void setImageName(const QString &fileName) override;
 
   const QImage &getImage() const { return image_; }
+  void setImage(const QImage &image);
 
  private:
-  void contextMenuEvent(QContextMenuEvent *event);
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
  signals:
   void valueChanged();
@@ -340,6 +354,11 @@ class CQWinImage : public QLabel, public CQWinWidgetBase {
 
  public slots:
   void loadImage();
+
+ private:
+  QString fileName_;
+  QImage  image_;
+  QMenu*  menu_ { nullptr };
 };
 
 //------

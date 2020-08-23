@@ -4,6 +4,7 @@
 #include <QLayout>
 
 #include <cassert>
+//#include <iostream>
 
 // create menu
 CQWidgetMenu::
