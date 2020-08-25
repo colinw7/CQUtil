@@ -1324,6 +1324,22 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   return true;
 }
 
+bool
+CQUtil::
+getPropInfoEnumNameValue(const CQUtil::PropInfo &propInfo, const QString &name, int &value)
+{
+  return propInfo.enumNameValue(name, value);
+}
+
+bool
+CQUtil::
+getPropInfoEnumValueName(const CQUtil::PropInfo &propInfo, int value, QString &name)
+{
+  return propInfo.enumValueName(value, name);
+}
+
+//---
+
 QString
 CQUtil::
 className(const QObject *object)

@@ -99,18 +99,22 @@ namespace CQUtil {
 
     const QStringList &enumNames() const { return enumNames_; }
 
-    int enumNameValue(const QString &name, int badValue=1) const {
+    bool enumNameValue(const QString &name, int &value) const {
       auto p = enumNameValue_.find(name);
-      if (p == enumNameValue_.end()) return badValue;
+      if (p == enumNameValue_.end()) return false;
 
-      return (*p).second;
+      value = (*p).second;
+
+      return true;
     }
 
-    QString enumValueName(int value, const QString &badName="") const {
+    bool enumValueName(int value, QString &name) const {
       auto p = enumValueName_.find(value);
-      if (p == enumValueName_.end()) return badName;
+      if (p == enumValueName_.end()) return false;
 
-      return (*p).second;
+      name = (*p).second;
+
+      return true;
     }
 
    private:
@@ -234,6 +238,9 @@ namespace CQUtil {
   bool getPropertyInfo(const QObject *object, int ind, PropInfo *info, bool inherited=true);
 
   bool getPropInfo(const QObject *object, const QString &name, PropInfo *info);
+
+  bool getPropInfoEnumNameValue(const CQUtil::PropInfo &propInfo, const QString &name, int &value);
+  bool getPropInfoEnumValueName(const CQUtil::PropInfo &propInfo, int value, QString &name);
 
   //---
 
