@@ -17,11 +17,82 @@
 #include <cursors/select.xbm>
 #include <cursors/selectmask.xbm>
 
+namespace {
+
+QColor mergedColors(const QColor &colorA, const QColor &colorB, double factor = 50.0) {
+  const double maxFactor = 100.0;
+
+  QColor tmp = colorA;
+
+  tmp.setRed  ((tmp.red  ()*factor)/maxFactor + (colorB.red  ()*(maxFactor - factor))/maxFactor);
+  tmp.setGreen((tmp.green()*factor)/maxFactor + (colorB.green()*(maxFactor - factor))/maxFactor);
+  tmp.setBlue ((tmp.blue ()*factor)/maxFactor + (colorB.blue ()*(maxFactor - factor))/maxFactor);
+
+  return tmp;
+}
+
+enum Direction {
+  DiagDown,
+  DiagUp,
+  TopDown,
+  FromLeft,
+  BottomUp,
+  FromRight
+};
+
+void drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
+                  const QColor &gradientStop, Direction direction=TopDown,
+                  QBrush bgBrush=QBrush()) {
+  int x = rect.center().x();
+  int y = rect.center().y();
+
+  QLinearGradient *gradient;
+
+  switch(direction) {
+    case DiagDown:
+      gradient = new QLinearGradient(rect.left(), rect.top(), rect.right(), rect.bottom());
+      break;
+    case DiagUp:
+      gradient = new QLinearGradient(rect.left(), rect.bottom(), rect.right(), rect.top());
+      break;
+    case FromLeft:
+      gradient = new QLinearGradient(rect.left(), y, rect.right(), y);
+      break;
+    case FromRight:
+      gradient = new QLinearGradient(rect.right(), y, rect.left(), y);
+      break;
+    case BottomUp:
+      gradient = new QLinearGradient(x, rect.bottom(), x, rect.top());
+      break;
+    case TopDown:
+    default:
+      gradient = new QLinearGradient(x, rect.top(), x, rect.bottom());
+      break;
+  }
+
+  if (bgBrush.gradient())
+    gradient->setStops(bgBrush.gradient()->stops());
+  else {
+    gradient->setColorAt(0, gradientStart);
+    gradient->setColorAt(1, gradientStop);
+  }
+
+  painter->fillRect(rect, *gradient);
+
+  delete gradient;
+}
+
+}
+
+//---
+
 CQWinWidget::
 CQWinWidget(QWidget *parent, const char *name) :
- QWidget(parent), decoration_(HeaderBorderDecoration, SideTop, 10, 1, QColor(80,80,100))
+ QWidget(parent), decoration_(HeaderBorderDecoration, SideTop, 10, 1,
+                              QColor(80,80,100), QColor(200,200,240))
 {
-  setObjectName(name);
+  if (name)
+    setObjectName(name);
 
   setMouseTracking(true);
 
@@ -40,6 +111,8 @@ setChild(QWidget *child)
   child_->setParent(this);
 
   child_->show();
+
+  child->setCursor(Qt::ArrowCursor);
 
   if (ops_ & ResizeOp)
     updateSize();
@@ -152,17 +225,37 @@ getHeaderHeight() const
   return h;
 }
 
+int
+CQWinWidget::
+getXPos() const
+{
+  return this->x() + getX();
+}
+
+int
+CQWinWidget::
+getYPos() const
+{
+  return this->y() + getX();
+}
+
 void
 CQWinWidget::
 setPos(int x, int y)
 {
+  emit geometryChanging();
+
   move(x - getX(), y - getY());
+
+  emit geometryChanged();
 }
 
 void
 CQWinWidget::
 setSize(int w, int h)
 {
+  emit geometryChanging();
+
   int b = getBorder();
 
   int hw = 0, hh = 0;
@@ -176,6 +269,8 @@ setSize(int w, int h)
   }
 
   resize(w + hw + 2*b, h + hh + 2*b);
+
+  emit geometryChanged();
 }
 
 bool
@@ -242,7 +337,28 @@ paintEvent(QPaintEvent *)
     else if (decoration_.headerSide == SideRight)
       decoration_.headerRect = QRect(width() - b - hh, b, hh, height() - 2*b);
 
+#if 1
+  //QColor barColor = palette().button().color();
+    QColor barColor = this->barColor();
+
+    QColor dark;
+
+    dark.setHsv(barColor.hue(),
+                qMin(255, (int)(barColor.saturation()*1.9)),
+                qMin(255, (int)(barColor.value()*0.7)));
+
+    QColor gradientStartColor = barColor.lighter(108);
+    QColor gradientStopColor  = mergedColors(barColor.darker(108), dark.lighter(150), 70);
+
+    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+      drawGradient(&painter, decoration_.headerRect, gradientStartColor, gradientStopColor,
+                   DiagDown, palette().button());
+    else
+      drawGradient(&painter, decoration_.headerRect, gradientStartColor, gradientStopColor,
+                   DiagDown, palette().button());
+#else
     painter.fillRect(decoration_.headerRect, bgBrush);
+#endif
 
     int b1 = hh - 4;
 
@@ -250,6 +366,7 @@ paintEvent(QPaintEvent *)
     expandButton_  .displayed = (ops_ & ExpandOp);
     collapseButton_.displayed = (ops_ & CollapseOp);
 
+#if 0
     // draw title bar handle
     int panelSize = 3;
     int margin    = (decoration_.headerHeight - 2*panelSize - 1)/2;
@@ -277,7 +394,7 @@ paintEvent(QPaintEvent *)
       }
     }
     else {
-       int y1 = b + 2;
+      int y1 = b + 2;
 
       int panelWidth = qMax(1, height() - y1 - 2*b - 2*margin);
 
@@ -288,6 +405,7 @@ paintEvent(QPaintEvent *)
       qDrawShadePanel(&painter, b + margin                , b + margin, panelSize, panelWidth, pal);
       qDrawShadePanel(&painter, b + margin + 1 + panelSize, b + margin, panelSize, panelWidth, pal);
     }
+#endif
 
     // draw title
     QString text = windowTitle();

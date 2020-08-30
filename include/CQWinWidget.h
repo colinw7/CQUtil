@@ -19,6 +19,7 @@ class CQWinWidget : public QWidget {
 
   Q_PROPERTY(int    borderWidth   READ decorationBorder WRITE setDecorationBorder)
   Q_PROPERTY(QColor borderColor   READ decorationColor  WRITE setDecorationColor )
+  Q_PROPERTY(QColor barColor      READ barColor         WRITE setBarColor        )
   Q_PROPERTY(bool   movable       READ isMovable        WRITE setMovable         )
   Q_PROPERTY(bool   resizable     READ isResizable      WRITE setResizable       )
   Q_PROPERTY(bool   closable      READ isClosable       WRITE setClosable        )
@@ -73,13 +74,14 @@ class CQWinWidget : public QWidget {
     QRect          headerRect;
     int            border       { 0 };
     QColor         borderColor  { Qt::white };
+    QColor         barColor     { 100, 100, 240 };
 
     Decoration() = default;
 
     Decoration(DecorationType type, HeaderSide headerSide, int headerHeight,
-               int border, const QColor &borderColor) :
+               int border, const QColor &borderColor, const QColor &barColor) :
      type(type), headerSide(headerSide), headerHeight(headerHeight),
-     border(border), borderColor(borderColor) {
+     border(border), borderColor(borderColor), barColor(barColor) {
     }
   };
 
@@ -157,6 +159,9 @@ class CQWinWidget : public QWidget {
   const QColor &decorationColor() const { return decoration_.borderColor; }
   void setDecorationColor(const QColor &c) { decoration_.borderColor = c; update(); }
 
+  const QColor &barColor() const { return decoration_.barColor; }
+  void setBarColor(const QColor &c) { decoration_.barColor = c; update(); }
+
   unsigned int ops() const { return ops_; }
   void setOps(unsigned int ops) { ops_ = ops; updateSize(); }
 
@@ -190,6 +195,7 @@ class CQWinWidget : public QWidget {
 
   //---
 
+  // get x/y position inside frame
   int getX() const;
   int getY() const;
 
@@ -198,7 +204,13 @@ class CQWinWidget : public QWidget {
 
   int getHeaderHeight() const;
 
-  void setPos (int x, int y);
+  // get x/y position in parent coords
+  int getXPos() const;
+  int getYPos() const;
+
+  // set postion of widget in parent coords
+  void setPos(int x, int y);
+
   void setSize(int w, int h);
 
   virtual bool checkMove(QPoint &p) const;

@@ -22,6 +22,7 @@ CQHeaderView(QWidget *parent) :
           SLOT(handleSectionClicked(int)));
 
   setSectionsMovable(true);
+  setSectionsClickable(true);
 
   setContextMenuPolicy(Qt::DefaultContextMenu);
 }
@@ -108,15 +109,18 @@ contextMenuEvent(QContextMenuEvent *event)
 
   menu.addSeparator();
 
-  QAction *stretchAction = menu.addAction("Stretch Last", this, SLOT(stretchLastSlot(bool)));
+  auto *stretchAction = menu.addAction("Stretch Last", this, SLOT(stretchLastSlot(bool)));
   stretchAction->setCheckable(true);
   stretchAction->setChecked(stretchLastSection());
 
-  QAction *sortAction = menu.addAction("Sort Indicator", this, SLOT(sortIndicatorSlot(bool)));
+  auto *sortAction = menu.addAction("Sort Indicator", this, SLOT(sortIndicatorSlot(bool)));
   sortAction->setCheckable(true);
   sortAction->setChecked(isSortIndicatorShown());
 
   menu.addAction("Reset Sort", this, SLOT(resetSortSlot()));
+
+  menu.addAction("Sort Increasing", this, SLOT(sortIncreasingSlot()));
+  menu.addAction("Sort Decreasing", this, SLOT(sortDecreasingSlot()));
 
   menuSection_ = logicalIndexAt(event->pos());
 
@@ -324,6 +328,20 @@ resetSortSlot()
 
     //proxyModel->setSortRole(role);
   }
+}
+
+void
+CQHeaderView::
+sortIncreasingSlot()
+{
+  setSortIndicator(menuSection_, Qt::AscendingOrder);
+}
+
+void
+CQHeaderView::
+sortDecreasingSlot()
+{
+  setSortIndicator(menuSection_, Qt::DescendingOrder);
 }
 
 void

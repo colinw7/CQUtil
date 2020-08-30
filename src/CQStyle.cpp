@@ -11,10 +11,10 @@
 //------
 
 enum Direction {
-    TopDown,
-    FromLeft,
-    BottomUp,
-    FromRight
+  TopDown,
+  FromLeft,
+  BottomUp,
+  FromRight
 };
 
 static void

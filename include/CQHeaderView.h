@@ -58,6 +58,9 @@ class CQHeaderView : public QHeaderView {
 
   void resetSortSlot();
 
+  void sortIncreasingSlot();
+  void sortDecreasingSlot();
+
  private:
   typedef std::map<int,int> ColumnWidths;
 
