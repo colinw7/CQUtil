@@ -502,4 +502,12 @@ namespace CQUtil {
   void removeGridItems(QGridLayout *layout, bool deleteWidgets);
 }
 
+//---
+
+namespace CQUtil {
+  bool isFixedPitch(const QFont &font);
+
+  QFont getMonospaceFont();
+}
+
 #endif

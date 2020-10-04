@@ -78,6 +78,8 @@ CQStrParse.cpp \
 CQDragLabel.cpp \
 \
 CQWidgetFactory.cpp \
+\
+CQStrUtil.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -150,6 +152,8 @@ HEADERS += \
 ../include/CQDragLabel.h \
 \
 ../include/CQWidgetFactory.h \
+\
+../include/CQStrUtil.h \
 
 OBJECTS_DIR = ../obj
 

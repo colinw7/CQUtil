@@ -3345,3 +3345,34 @@ removeGridItems(QGridLayout *layout, bool deleteWidgets)
     delete item;
   }
 }
+
+//------
+
+bool
+CQUtil::
+isFixedPitch(const QFont &font)
+{
+  const QFontInfo fi(font);
+  //qDebug() << fi.family() << fi.fixedPitch();
+
+  return fi.fixedPitch();
+}
+
+QFont
+CQUtil::
+getMonospaceFont()
+{
+  QFont font("monospace");
+  if (isFixedPitch(font)) return font;
+
+  font.setStyleHint(QFont::Monospace);
+  if (isFixedPitch(font)) return font;
+
+  font.setStyleHint(QFont::TypeWriter);
+  if (isFixedPitch(font)) return font;
+
+  font.setFamily("courier");
+  if (isFixedPitch(font)) return font;
+
+  return font;
+}
