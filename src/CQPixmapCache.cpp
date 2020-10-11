@@ -117,6 +117,28 @@ void
 CQPixmapCache::
 addData(const QString &id, const uchar *data, int len)
 {
+  auto p = idData_.find(id);
+
+  if (p != idData_.end()) {
+    const Data &oldData = (*p).second;
+
+    bool match = (oldData.len == len);
+
+    if (match) {
+      for (int i = 0; i < len; ++i) {
+        if (oldData.data[i] != data[i]) {
+          match = false;
+          break;
+        }
+      }
+    }
+
+    if (! match) {
+      std::cerr << "Pixmap '" << id.toStdString() << "' multiple definition\n";
+      std::cerr << "  Old Size " << oldData.len << " New Size " << len << "\n";
+    }
+  }
+
   idData_[id] = Data(data, len);
 }
 

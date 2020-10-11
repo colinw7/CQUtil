@@ -8,17 +8,21 @@ class CQIconComboModel;
 class CQIconCombo : public QComboBox {
   Q_OBJECT
 
+  Q_PROPERTY(int iconWidth     READ iconWidth     WRITE setIconWidth)
+  Q_PROPERTY(int menuTextWidth READ menuTextWidth WRITE setMenuTextWidth)
+
  public:
-  CQIconCombo(QWidget *parent=0);
+  CQIconCombo(QWidget *parent=nullptr);
  ~CQIconCombo();
 
   int iconWidth() const { return iconWidth_; }
   void setIconWidth(int i) { iconWidth_ = i; }
 
-  void setMenuTextWidth(int w);
   int menuTextWidth() const { return textWidth_; }
+  void setMenuTextWidth(int w);
 
   void addItem(const QIcon &icon, const QString &str, const QVariant &var=QVariant());
+
   QVariant itemData(int ind) const;
 
   QSize sizeHint() const;
@@ -35,7 +39,7 @@ class CQIconCombo : public QComboBox {
   void calcMenuTextWidth();
 
  private:
-  CQIconComboModel *model_     { 0 };
+  CQIconComboModel *model_     { nullptr };
   int               iconWidth_ { -1 };
   int               textWidth_ { -1 };
 };
