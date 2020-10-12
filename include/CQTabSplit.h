@@ -53,6 +53,8 @@ class CQTabSplit : public QFrame {
 
   bool hasWidget(QWidget *w) const;
 
+  void setWidgetName(QWidget *w, const QString &name);
+
   int count() const;
 
   void setSizes(const Sizes &sizes);

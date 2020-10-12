@@ -174,6 +174,36 @@ widget(int i) const
   return widgets_[i].w;
 }
 
+void
+CQTabSplit::
+setWidgetName(QWidget *w, const QString &name)
+{
+  WidgetData *data = nullptr;
+
+  for (auto &data1 : widgets_) {
+    if (w == data1.w) {
+      data = &data1;
+      break;
+    }
+  }
+
+  if (! data)
+    return;
+
+  data->name = name;
+
+  if (state_ == State::TAB) {
+    int i = tabWidget_->indexOf(data->w);
+
+    if (i >= 0)
+      tabWidget_->setTabText(i, data->name);
+  }
+  else if (state_ == State::HSPLIT || state_ == State::VSPLIT) {
+    if (isGrouped())
+      data->group->setTitle(data->name);
+  }
+}
+
 int
 CQTabSplit::
 count() const
