@@ -10,6 +10,7 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QAbstractItemView>
+#include <QScrollBar>
 
 //----------------------------
 
@@ -51,6 +52,8 @@ CQTableWidget::
 CQTableWidget(QWidget* parent) :
  QTableWidget(parent)
 {
+  setObjectName("table");
+
   verticalHeader()->hide();
 
   header_ = new CQHeaderView(this);
@@ -81,6 +84,9 @@ CQTableWidget(QWidget* parent) :
 
   //setRowMovingEnabled(false);
   //setColumnMovingEnabled(false);
+
+  horizontalScrollBar()->setObjectName("hbar");
+  verticalScrollBar  ()->setObjectName("vbar");
 }
 
 CQTableWidget::

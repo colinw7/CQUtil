@@ -32,19 +32,27 @@ CQTabWidget(QWidget *parent) :
   connect(tabBar_, SIGNAL(tabMoved(int,int)), this, SIGNAL(swapTabs(int,int)));
 #endif
 
-  CQImageButton *left_button  = new CQImageButton(CQPixmapCacheInst->getIcon("LEFT" ));
-  CQImageButton *right_button = new CQImageButton(CQPixmapCacheInst->getIcon("RIGHT"));
+  CQImageButton *leftButton  = new CQImageButton(CQPixmapCacheInst->getIcon("LEFT" ));
+  CQImageButton *rightButton = new CQImageButton(CQPixmapCacheInst->getIcon("RIGHT"));
 
-  connect(left_button , SIGNAL(clicked()), this, SLOT(moveTabLeft ()));
-  connect(right_button, SIGNAL(clicked()), this, SLOT(moveTabRight()));
+  leftButton ->setObjectName("left");
+  rightButton->setObjectName("right");
+
+  leftButton ->setToolTip("Scroll left");
+  rightButton->setToolTip("Scroll right");
+
+  connect(leftButton , SIGNAL(clicked()), this, SLOT(moveTabLeft ()));
+  connect(rightButton, SIGNAL(clicked()), this, SLOT(moveTabRight()));
 
   moveTabWidget_ = new QWidget;
+
+  moveTabWidget_->setObjectName("moveTab");
 
   QHBoxLayout *moveTabLayout = new QHBoxLayout(moveTabWidget_);
   moveTabLayout->setMargin(2); moveTabLayout->setSpacing(2);
 
-  moveTabLayout->addWidget(left_button);
-  moveTabLayout->addWidget(right_button);
+  moveTabLayout->addWidget(leftButton);
+  moveTabLayout->addWidget(rightButton);
 }
 
 void
@@ -103,11 +111,11 @@ void
 CQTabWidget::
 addCreateButton()
 {
-  CQImageButton *new_button = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
+  CQImageButton *newButton = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
 
-  connect(new_button, SIGNAL(clicked()), this, SIGNAL(createTab()));
+  connect(newButton, SIGNAL(clicked()), this, SIGNAL(createTab()));
 
-  setCornerWidget(new_button, Qt::TopLeftCorner);
+  setCornerWidget(newButton, Qt::TopLeftCorner);
 }
 
 //-----------
