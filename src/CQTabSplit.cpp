@@ -60,7 +60,22 @@ void
 CQTabSplit::
 setGrouped(bool b)
 {
-  grouped_ = b;
+  if (b != grouped_) {
+    grouped_ = b;
+
+    // TODO: re-layout with/widthout groups
+  }
+}
+
+void
+CQTabSplit::
+setTabsClosable(bool b)
+{
+  if (b != tabsClosable_) {
+    tabsClosable_ = b;
+
+    tabWidget_->setTabsClosable(b);
+  }
 }
 
 void
@@ -309,6 +324,13 @@ setState(State state)
   }
 }
 
+void
+CQTabSplit::
+tabCloseSlot(int i)
+{
+  emit widgetCloseRequested(i);
+}
+
 QSize
 CQTabSplit::
 sizeHint() const
@@ -551,6 +573,8 @@ CQTabSplitTabWidget(CQTabSplit *split) :
   setObjectName("tab");
 
   setContextMenuPolicy(Qt::DefaultContextMenu);
+
+  connect(this, SIGNAL(tabCloseRequested(int)), split_, SLOT(tabCloseSlot(int)));
 }
 
 void
