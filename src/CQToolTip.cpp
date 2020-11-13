@@ -40,7 +40,7 @@ release()
 // the tooltip widget
 CQToolTip::
 CQToolTip() :
- QWidget(0, Qt::Window | Qt::FramelessWindowHint),
+ QWidget(nullptr, Qt::Window | Qt::FramelessWindowHint),
  margin_ (style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth)),
  opacity_(style()->styleHint  (QStyle::SH_ToolTipLabel_Opacity)/255.0)
 {
@@ -71,7 +71,7 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
   if (! tooltip->canTip(pos))
     return false;
 
-  QDesktopWidget *desktop = QApplication::desktop();
+  auto *desktop = QApplication::desktop();
 
   int snum;
 
@@ -84,7 +84,7 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
 
   setWindowFlags(Qt::ToolTip);
 
-  QWidget *tipWidget = tooltip->showWidget(pos);
+  auto *tipWidget = tooltip->showWidget(pos);
 
   if (! tipWidget)
     return false;
@@ -115,7 +115,7 @@ void
 CQToolTip::
 updateSize()
 {
-  QSize s = sizeHint();
+  auto s = sizeHint();
 
   resize(s);
 
@@ -123,7 +123,7 @@ updateSize()
 
   tooltip_->setParent(this);
 
-  QPalette pal = this->palette();
+  auto pal = this->palette();
   pal.setColor(tooltip_->foregroundRole(), pal.color(QPalette::ToolTipText));
   tooltip_->setPalette(pal);
 
@@ -138,8 +138,8 @@ QSize
 CQToolTip::
 sizeHint() const
 {
-  QSize s      = calcSize();
-  int   margin = calcMargin();
+  auto s      = calcSize();
+  int  margin = calcMargin();
 
   return QSize(s.width() + 2*margin, s.height() + 2*margin);
 }
@@ -162,20 +162,20 @@ void
 CQToolTip::
 showAtPos(const QPoint &pos)
 {
-  QRect drect = desktopRect(pos);
+  auto drect = desktopRect(pos);
 
   //---
 
-  QCursor c = parent_->cursor();
+  auto c = parent_->cursor();
 
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
   //---
 
   // cursor size and hotspot
   QSize size(16, 16);
 
-  const QBitmap *bm = c.bitmap();
+  const auto *bm = c.bitmap();
 
   if (bm)
     size = bm->size();
@@ -183,20 +183,20 @@ showAtPos(const QPoint &pos)
   int cw = size.width ();
   int ch = size.height();
 
-  QPoint hs = c.hotSpot();
+  auto hs = c.hotSpot();
 
   //---
 
   // tip rect size
 
-  QSize ts = sizeHint();
+  auto ts = sizeHint();
 
   int tw = ts.width ();
   int th = ts.height();
 
   //---
 
-  Qt::Alignment align = tooltip->alignment();
+  auto align = tooltip->alignment();
 
   QPoint pos1;
 
@@ -245,7 +245,7 @@ showAtPos(const QPoint &pos)
 
   //---
 
-  QSize s = this->sizeHint();
+  auto s = this->sizeHint();
 
   int w = s.width ();
   int h = s.height();
@@ -293,7 +293,7 @@ void
 CQToolTip::
 paintEvent(QPaintEvent *)
 {
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
   if (tooltip && tooltip->isTransparent())
     return;
@@ -315,12 +315,12 @@ eventFilter(QObject *o, QEvent *e)
     case QEvent::KeyPress:
     case QEvent::KeyRelease: {
       if (isVisible()) {
-        int                   key = static_cast<QKeyEvent *>(e)->key();
-        Qt::KeyboardModifiers mod = static_cast<QKeyEvent *>(e)->modifiers();
+        int  key = static_cast<QKeyEvent *>(e)->key();
+        auto mod = static_cast<QKeyEvent *>(e)->modifiers();
 
-      //QWidget *parent = static_cast<QWidget *>(o);
+      //auto *parent = static_cast<QWidget *>(o);
 
-        CQToolTipIFace *tooltip = getToolTip(parent_);
+        auto *tooltip = getToolTip(parent_);
 
         // ignore modifier key presses
         if (key == Qt::Key_Shift || key == Qt::Key_Control ||
@@ -338,7 +338,7 @@ eventFilter(QObject *o, QEvent *e)
           else {
             if (e->type() == QEvent::KeyRelease) {
               if (tooltip->keyPress(key, mod)) {
-                QPoint gpos = QCursor::pos();
+                auto gpos = QCursor::pos();
 
                 if (! tooltip->trackMouse())
                   gpos = showPos_;
@@ -375,7 +375,7 @@ eventFilter(QObject *o, QEvent *e)
     case QEvent::WindowActivate:
     case QEvent::WindowDeactivate: {
       if (isVisible()) {
-        CQToolTipIFace *tooltip = getToolTip(parent_);
+        auto *tooltip = getToolTip(parent_);
 
         if (tooltip && ! tooltip->grabKey()) {
           hideLater();
@@ -397,10 +397,10 @@ eventFilter(QObject *o, QEvent *e)
     case QEvent::FocusIn:
     case QEvent::FocusOut: {
       if (isVisible()) {
-      //QWidget     *parent     = static_cast<QWidget *>(o);
-      //QFocusEvent *focusEvent = static_cast<QFocusEvent *>(e);
+      //auto *parent     = static_cast<QWidget *>(o);
+      //auto *focusEvent = static_cast<QFocusEvent *>(e);
 
-        CQToolTipIFace *tooltip = getToolTip(parent_);
+        auto *tooltip = getToolTip(parent_);
 
         if (tooltip && ! tooltip->grabKey()) {
           hideLater();
@@ -411,13 +411,13 @@ eventFilter(QObject *o, QEvent *e)
     }
     case QEvent::MouseMove: {
       if (isVisible()) {
-      //QWidget     *parent     = static_cast<QWidget *>(o);
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(e);
+      //auto *parent     = static_cast<QWidget *>(o);
+        auto *mouseEvent = static_cast<QMouseEvent *>(e);
 
-        CQToolTipIFace *tooltip = getToolTip(parent_);
+        auto *tooltip = getToolTip(parent_);
 
         if (tooltip && ! tooltip->grabKey()) {
-          QPoint gpos = mouseEvent->globalPos();
+          auto gpos = mouseEvent->globalPos();
 
           if (! tooltip->trackMouse())
             gpos = showPos_;
@@ -435,8 +435,8 @@ eventFilter(QObject *o, QEvent *e)
       break;
     }
     case QEvent::ToolTip: {
-      QWidget    *parent    = static_cast<QWidget *>(o);
-      QHelpEvent *helpEvent = static_cast<QHelpEvent *>(e);
+      auto *parent    = static_cast<QWidget *>(o);
+      auto *helpEvent = static_cast<QHelpEvent *>(e);
 
       if (showTip(parent, helpEvent->globalPos()))
         return true;
@@ -454,7 +454,7 @@ bool
 CQToolTip::
 showTip(QWidget *parent, const QPoint &gpos)
 {
-  CQToolTipIFace *tooltip = getToolTip(parent);
+  auto *tooltip = getToolTip(parent);
 
   if (tooltip && ! isVisible()) {
     if (! show(gpos, tooltip, parent))
@@ -478,7 +478,7 @@ bool
 CQToolTip::
 updateTip(QWidget *parent, const QPoint &gpos)
 {
-  CQToolTipIFace *tooltip = getToolTip(parent);
+  auto *tooltip = getToolTip(parent);
 
   if (tooltip) {
     if (! tooltip->updateWidget(gpos))
@@ -524,9 +524,9 @@ startHideTimer()
 {
   stopTimer();
 
-  double hideSecs =  hideSecs_;
+  double hideSecs = hideSecs_;
 
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
   if (tooltip && tooltip->hideSecs() > 0)
     hideSecs = tooltip->hideSecs();
@@ -551,7 +551,7 @@ hideSlot()
 {
   this->hide();
 
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
   //if (tooltip && tooltip->trackMouse())
   setMouseTracking(false);
@@ -572,7 +572,7 @@ CQToolTipIFace *
 CQToolTip::
 getToolTip(QWidget *parent)
 {
-  CQToolTip *inst = CQToolTipInst;
+  auto *inst = CQToolTipInst;
 
   if (! inst->tooltips_.contains(parent))
     return 0;
@@ -593,7 +593,7 @@ setToolTip(QWidget *parent, CQToolTipIFace *tooltip)
 {
   assert(parent);
 
-  CQToolTip *inst = CQToolTipInst;
+  auto *inst = CQToolTipInst;
 
   if (inst->tooltips_.contains(parent)) {
     delete inst->tooltips_.value(parent);
@@ -619,7 +619,7 @@ int
 CQToolTip::
 calcMargin() const
 {
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
   if (tooltip->margin() >= 0)
     return tooltip->margin();
@@ -631,9 +631,9 @@ QSize
 CQToolTip::
 calcSize() const
 {
-  CQToolTipIFace *tooltip = getToolTip(parent_);
+  auto *tooltip = getToolTip(parent_);
 
-  QSize s = tooltip->sizeHint();
+  auto s = tooltip->sizeHint();
 
   if (! s.isValid()) {
     assert(tooltip_);
@@ -648,7 +648,7 @@ QRect
 CQToolTip::
 desktopRect(const QPoint &pos) const
 {
-  QDesktopWidget *desktop = QApplication::desktop();
+  auto *desktop = QApplication::desktop();
 
   int snum;
 

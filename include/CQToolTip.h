@@ -72,7 +72,7 @@ class CQToolTipWidgetIFace : public CQToolTipIFace {
   virtual QWidget *showWidget(const QPoint &) { return w_; }
 
  private:
-  typedef QPointer<QWidget> QWidgetP;
+  using QWidgetP = QPointer<QWidget>;
 
   QWidgetP w_;
 };
@@ -116,16 +116,16 @@ class CQToolTip : public QWidget {
   void showAtPos(const QPoint &pos);
 
   // handle enter event
-  void enterEvent(QEvent *e);
+  void enterEvent(QEvent *e) override;
 
   // handle paint event
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
   // handle generic event
-  bool eventFilter(QObject *o, QEvent *e);
+  bool eventFilter(QObject *o, QEvent *e) override;
 
   // handle timer (hide) event
-  void timerEvent(QTimerEvent *event);
+  void timerEvent(QTimerEvent *event) override;
 
   // hide after timeout
   void hideLater();
@@ -148,7 +148,7 @@ class CQToolTip : public QWidget {
   void updateOpacity(CQToolTipIFace *tooltip);
 
   // size hint
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
   // calc widget margin
   int calcMargin() const;
@@ -164,18 +164,17 @@ class CQToolTip : public QWidget {
   void hideSlot();
 
  private:
-  typedef QPointer<QWidget> QWidgetP;
+  using QWidgetP  = QPointer<QWidget>;
+  using WidgetMap = QMap<QWidgetP,CQToolTipIFace *>;
 
-  typedef QMap<QWidgetP,CQToolTipIFace *> WidgetMap;
-
-  WidgetMap tooltips_;          // widget tooltips
-  QWidgetP  tooltip_;           // current tooltip widget
-  QWidgetP  parent_;            // current parent widget
-  double    hideSecs_  { 3 };   // default hide timeout
-  int       hideTimer_ { 0 };   // hide timer
-  int       margin_    { 1 };   // default margin
-  double    opacity_   { 0.8 }; // default opacity
-  QPoint    showPos_;           // default position
+  WidgetMap tooltips_;          //!< widget tooltips
+  QWidgetP  tooltip_;           //!< current tooltip widget
+  QWidgetP  parent_;            //!< current parent widget
+  double    hideSecs_  { 3.0 }; //!< default hide timeout
+  int       hideTimer_ { 0 };   //!< hide timer
+  int       margin_    { 1 };   //!< default margin
+  double    opacity_   { 0.8 }; //!< default opacity
+  QPoint    showPos_;           //!< default position
 };
 
 #endif
