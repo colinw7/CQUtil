@@ -57,6 +57,8 @@ CQTabWidget.cpp \
 CQCheckBox.cpp \
 CQTabSplit.cpp \
 \
+CQScrollArea.cpp \
+\
 CQTreeView.cpp \
 CQTableView.cpp \
 CQTableWidget.cpp \
@@ -130,6 +132,8 @@ HEADERS += \
 ../include/CQTabWidget.h \
 ../include/CQCheckBox.h \
 ../include/CQTabSplit.h \
+\
+../include/CQScrollArea.h \
 \
 ../include/CQTreeView.h \
 ../include/CQTableView.h \
