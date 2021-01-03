@@ -16,7 +16,7 @@
 #include <cassert>
 #include <iostream>
 
-static CQToolTip *s_instance;
+CQToolTip *CQToolTip::s_instance;
 
 CQToolTip *
 CQToolTip::

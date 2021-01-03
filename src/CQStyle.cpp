@@ -298,7 +298,7 @@ setTheme(const Theme &t)
   int num_roles = sizeof(roles)/sizeof(roles[0]);
 
   for (int r = 0; r < num_roles; ++r) {
-    if (roles[r] == QPalette::Window && roles[r] == QPalette::Base && roles[r] == QPalette::Button)
+    if (roles[r] == QPalette::Window || roles[r] == QPalette::Base || roles[r] == QPalette::Button)
       continue;
 
     QColor c = palette_.color(QPalette::Active, roles[r]);
@@ -1239,8 +1239,13 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
 
             int frameWidth = 0;
 
+#if 0
             if ((groupBox->features & QStyleOptionFrameV2::Flat) == 0)
               frameWidth = proxy()->pixelMetric(PM_DefaultFrameWidth, groupBox, widget);
+#else
+            if ((groupBox->features & QStyleOptionFrame::Flat) == 0)
+              frameWidth = proxy()->pixelMetric(PM_DefaultFrameWidth, groupBox, widget);
+#endif
 
             ret = frameRect.adjusted(frameWidth, frameWidth + topHeight - topMargin,
                                      -frameWidth, -frameWidth);
@@ -1251,10 +1256,14 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
             // FALL THROUGH
           case SC_GroupBoxLabel: {
             QFontMetrics fontMetrics = groupBox->fontMetrics;
-            int h    = fontMetrics.height();
-            int tw   = fontMetrics.size(Qt::TextShowMnemonic,
-                                        groupBox->text + QLatin1Char(' ')).width();
+            int h  = fontMetrics.height();
+            int tw = fontMetrics.size(Qt::TextShowMnemonic,
+                                      groupBox->text + QLatin1Char(' ')).width();
+#if 0
             int marg = (groupBox->features & QStyleOptionFrameV2::Flat ? 0 : 8);
+#else
+            int marg = (groupBox->features & QStyleOptionFrame::Flat ? 0 : 8);
+#endif
 
             ret = groupBox->rect.adjusted(marg, 0, -marg, 0);
             ret.setHeight(h);

@@ -139,6 +139,9 @@ addData(const QString &id, const uchar *data, int len)
     }
   }
 
+  if (getenv("CQPIXMAP_CACHE_DEBUG"))
+    std::cerr << "Add Pixmap '" << id.toStdString() << "' (" << len << " bytes)\n";
+
   idData_[id] = Data(data, len);
 }
 

@@ -48,6 +48,7 @@ CQPoint2DEdit.cpp \
 CQBBox2DEdit.cpp \
 CQRectEdit.cpp \
 CQImageButton.cpp \
+CQPixmapButton.cpp \
 CQFloatEdit.cpp \
 CQAutoHide.cpp \
 CQRadioButtons.cpp \
@@ -124,6 +125,7 @@ HEADERS += \
 ../include/CQBBox2DEdit.h \
 ../include/CQRectEdit.h \
 ../include/CQImageButton.h \
+../include/CQPixmapButton.h \
 ../include/CQFloatEdit.h \
 ../include/CQAutoHide.h \
 ../include/CQRadioButtons.h \
