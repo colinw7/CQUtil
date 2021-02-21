@@ -1,22 +1,33 @@
 #include <CQImageButton.h>
+
+#ifdef CQUTIL_IMAGE
 #include <CImageMgr.h>
 #include <CQImage.h>
+#endif
 
 CQImageButton::
 CQImageButton(const QString &fileName)
 {
   CImageFileSrc src(fileName.toStdString());
 
+#ifdef CQUTIL_IMAGE
   CImagePtr image = CImageMgrInst->lookupImage(src);
 
   init(image);
+#else
+  QPixmap pixmap(fileName);
+
+  init(pixmap);
+#endif
 }
 
+#ifdef CQUTIL_IMAGE
 CQImageButton::
 CQImageButton(CImagePtr image)
 {
   init(image);
 }
+#endif
 
 CQImageButton::
 CQImageButton(uchar *data, uint len)
@@ -40,6 +51,7 @@ CQImageButton(const QIcon &icon)
   init(icon);
 }
 
+#ifdef CQUTIL_IMAGE
 void
 CQImageButton::
 init(CImagePtr image)
@@ -54,6 +66,7 @@ init(CImagePtr image)
     init(pixmap);
   }
 }
+#endif
 
 void
 CQImageButton::

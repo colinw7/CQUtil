@@ -1,4 +1,7 @@
 #include <CQFont.h>
+
+#ifdef CQUTIL_FONT
+
 #include <CConfig.h>
 #include <CFontMgr.h>
 #include <CQImage.h>
@@ -344,3 +347,5 @@ getStringImage(const std::string &str)
 
   return image;
 }
+
+#endif

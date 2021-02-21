@@ -7,8 +7,12 @@
 //#include <CQToolTip.h>
 //#include <CQPerfGraph.h>
 #include <CConfig.h>
+#ifdef CQUTIL_IMAGE
 #include <CImageMgr.h>
+#endif
+#ifdef CQUTIL_FONT
 #include <CFontMgr.h>
+#endif
 #include <CScreenUnits.h>
 
 //#define USE_OBJEDIT 1
@@ -88,9 +92,13 @@ CQApp(int &argc, char **argv) :
   if (getenv("CQAPP_DARK_THEME"))
     setDarkTheme(true);
 
+#ifdef CQUTIL_IMAGE
   CQImage::setPrototype();
+#endif
 
+#ifdef CQUTIL_FONT
   CQFontMgrInst->setPrototype();
+#endif
 
 #ifdef USE_OBJEDIT
   addObjEditFilter(this);
@@ -149,10 +157,14 @@ CQApp(int &argc, char **argv) :
 CQApp::
 ~CQApp()
 {
+#ifdef CQUTIL_IMAGE
   CQImage::resetPrototype();
+#endif
 
+#ifdef CQUTIL_FONT
   CQFontMgrInst->resetPrototype();
   CQFontMgrInst->clear();
+#endif
 
   CQWindow::resetFactory();
 
@@ -164,12 +176,18 @@ CQApp::
 
 //CQToolTip::release();
 
+#ifdef CQUTIL_FONT
   CQFontMgr::release();
+#endif
 
 //CQPixmapCache::release();
 
-  CFontMgr ::release();
+#ifdef CQUTIL_FONT
+  CFontMgr::release();
+#endif
+#ifdef CQUTIL_IMAGE
   CImageMgr::release();
+#endif
 
   CWindowMgr::release();
 
@@ -190,6 +208,8 @@ showMetaEdit(QObject *obj)
 
   objEdit->raise();
 #else
+  assert(obj);
+
 /*
   CQMetaEdit *metaEdit = new CQMetaEdit;
 

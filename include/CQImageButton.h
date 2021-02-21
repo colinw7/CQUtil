@@ -8,7 +8,9 @@ class CQImageButton : public QToolButton {
   Q_OBJECT
 
  public:
+#ifdef CQUTIL_IMAGE
   CQImageButton(CImagePtr image);
+#endif
   CQImageButton(const QString &fileName);
   CQImageButton(uchar *data, uint len);
   CQImageButton(const QPixmap &pixmap);
@@ -20,7 +22,9 @@ class CQImageButton : public QToolButton {
   QSize minimumSizeHint() const;
 
  private:
+#ifdef CQUTIL_IMAGE
   void init(CImagePtr image);
+#endif
   void init(const QPixmap &pixmap);
   void init(const QIcon &icon);
 

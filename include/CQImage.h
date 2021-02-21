@@ -1,6 +1,8 @@
 #ifndef CQ_IMAGE_H
 #define CQ_IMAGE_H
 
+#ifdef CQUTIL_IMAGE
+
 #include <QImage>
 
 #include <CImage.h>
@@ -67,5 +69,7 @@ class CQImage : public CImage {
   QImage qimage_;
   bool   initialized_ { false };
 };
+
+#endif
 
 #endif

@@ -8,7 +8,8 @@ QT += widgets
 
 CONFIG += staticlib
 
-QMAKE_CXXFLAGS += -std=c++14 -DCQUTIL_IMAGE -DCQUTIL_FONT
+QMAKE_CXXFLAGS += -std=c++14
+#QMAKE_CXXFLAGS += -std=c++14 -DCQUTIL_IMAGE -DCQUTIL_FONT
 
 MOC_DIR = .moc
 
@@ -83,6 +84,8 @@ CQDragLabel.cpp \
 CQWidgetFactory.cpp \
 \
 CQStrUtil.cpp \
+\
+CQEnumCombo.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -160,6 +163,8 @@ HEADERS += \
 ../include/CQWidgetFactory.h \
 \
 ../include/CQStrUtil.h \
+\
+../include/CQEnumCombo.h \
 
 OBJECTS_DIR = ../obj
 

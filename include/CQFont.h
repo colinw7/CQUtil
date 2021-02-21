@@ -1,6 +1,8 @@
 #ifndef CQFONT_H
 #define CQFONT_H
 
+#ifdef CQUTIL_FONT
+
 #include <CFont.h>
 
 #include <QFont>
@@ -80,5 +82,7 @@ class CQFont : public CFont {
 
   QFont *qfont_ { 0 };
 };
+
+#endif
 
 #endif
