@@ -1,11 +1,9 @@
 #include <CQUtil.h>
-#include <CQImage.h>
 
-#ifdef CQUTIL_FONT
-#include <CQFont.h>
+#ifdef CQUTIL_EVENT
+#include <CEvent.h>
 #endif
 
-#include <CEvent.h>
 #include <CRegExp.h>
 
 #ifdef CQUTIL_LINE_DASH
@@ -75,6 +73,9 @@ initProperties()
 #endif
 }
 
+//------
+
+#ifdef CQUTIL_EVENT
 CMouseEvent *
 CQUtil::
 convertEvent(QMouseEvent *event)
@@ -430,6 +431,9 @@ convertModifier(Qt::KeyboardModifiers modifiers)
 
   return (CEventModifier) modifiers1;
 }
+#endif
+
+//------
 
 QColor
 CQUtil::
@@ -469,64 +473,6 @@ colorToRGBA(const QColor &color)
 {
   return CRGBA(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
-
-#ifdef CQUTIL_BRUSH
-QBrush
-CQUtil::
-toQBrush(const CBrush &brush)
-{
-  QBrush qbrush;
-
-  if      (brush.getStyle() == CBRUSH_STYLE_SOLID) {
-    qbrush = QBrush(CQUtil::rgbaToColor(brush.getColor()));
-  }
-  else if (brush.getStyle() == CBRUSH_STYLE_PATTERN) {
-    //qbrush = QBrush(CQUtil::toQPattern(brush.getPattern()));
-    std::cerr << "Invalid pattern brush" << std::endl;
-  }
-#ifdef CQUTIL_GRADIENT
-  else if (brush.getStyle() == CBRUSH_STYLE_GRADIENT) {
-    CLinearGradient *lgradient = dynamic_cast<CLinearGradient *>(brush.getGradient().get());
-    CRadialGradient *rgradient = dynamic_cast<CRadialGradient *>(brush.getGradient().get());
-
-    if      (lgradient)
-      qbrush = QBrush(CQUtil::toQGradient(lgradient));
-    else if (rgradient)
-      qbrush = QBrush(CQUtil::toQGradient(rgradient));
-    else
-      std::cerr << "Invalid gradient type" << std::endl;
-  }
-#endif
-#ifdef CQUTIL_IMAGE
-  else if (brush.getStyle() == CBRUSH_STYLE_TEXTURE) {
-    qbrush = QBrush(CQUtil::toQImage(brush.getTexture()));
-  }
-#endif
-  else {
-    std::cerr << "Invalid brush" << std::endl;
-  }
-
-  return qbrush;
-}
-#endif
-
-#ifdef CQUTIL_PEN
-QPen
-CQUtil::
-toQPen(const CPen &pen)
-{
-  QPen qpen;
-
-  penSetLineDash(qpen, pen.getLineDash());
-
-  qpen.setColor    (rgbaToColor(pen.getColor()));
-  qpen.setWidthF   (pen.getWidth());
-  qpen.setCapStyle (toPenCapStyle(pen.getLineCap()));
-  qpen.setJoinStyle(toPenJoinStyle(pen.getLineJoin()));
-
-  return qpen;
-}
-#endif
 
 Qt::PenCapStyle
 CQUtil::
@@ -2093,27 +2039,6 @@ paletteToString(const QPalette &palette)
 }
 #endif
 
-#ifdef CQUTIL_FONT
-QFont
-CQUtil::
-toQFont(CFontPtr font)
-{
-  CQFont *cqfont = font.cast<CQFont>();
-
-  if (cqfont)
-    return cqfont->getQFont();
-  else
-    return QFont();
-}
-
-CFontPtr
-CQUtil::
-fromQFont(QFont font)
-{
-  return CQFontMgrInst->lookupFont(font);
-}
-#endif
-
 //------------
 
 bool
@@ -2544,24 +2469,6 @@ userVariantFromString(QVariant &var, const QString &str)
 }
 
 //----------
-
-#ifdef CQUTIL_IMAGE
-QIcon
-CQUtil::
-imageToIcon(CImagePtr image)
-{
-  QImage qimage = toQImage(image);
-
-  return QIcon(QPixmap::fromImage(qimage));
-}
-
-QImage
-CQUtil::
-toQImage(CImagePtr image)
-{
-  return image.cast<CQImage>()->getQImage();
-}
-#endif
 
 #ifdef CQUTIL_GRADIENT
 QLinearGradient

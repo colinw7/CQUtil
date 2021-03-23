@@ -169,6 +169,8 @@ CQFont(const std::string &family, CFontStyle style, double size, double angle, d
 
     qfont_ = new QFont(qfamily.c_str(), isize1, weight, italic);
 
+    qfont_->setPointSizeF(size1);
+
     QFontMetricsF fm(*qfont_);
 
     double th = (style & CFONT_STYLE_FULL_SIZE ? fm.ascent() + fm.descent() : fm.ascent());

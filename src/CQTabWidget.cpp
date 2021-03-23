@@ -5,6 +5,9 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QHBoxLayout>
+#include <QMenu>
+#include <QAction>
+#include <QContextMenuEvent>
 
 #include <svg/new_svg.h>
 #include <svg/left_svg.h>
@@ -16,11 +19,11 @@
 
 CQTabWidget::
 CQTabWidget(QWidget *parent) :
- QTabWidget(parent), moveButtons_(false)
+ QTabWidget(parent)
 {
   setObjectName("tabWidget");
 
-  tabBar_ = new CQTabBar();
+  tabBar_ = new CQTabWidgetTabBar(this);
 
   setTabBar(tabBar_);
 
@@ -32,8 +35,8 @@ CQTabWidget(QWidget *parent) :
   connect(tabBar_, SIGNAL(tabMoved(int,int)), this, SIGNAL(swapTabs(int,int)));
 #endif
 
-  CQImageButton *leftButton  = new CQImageButton(CQPixmapCacheInst->getIcon("LEFT" ));
-  CQImageButton *rightButton = new CQImageButton(CQPixmapCacheInst->getIcon("RIGHT"));
+  auto *leftButton  = new CQImageButton(CQPixmapCacheInst->getIcon("LEFT" ));
+  auto *rightButton = new CQImageButton(CQPixmapCacheInst->getIcon("RIGHT"));
 
   leftButton ->setObjectName("left");
   rightButton->setObjectName("right");
@@ -48,11 +51,15 @@ CQTabWidget(QWidget *parent) :
 
   moveTabWidget_->setObjectName("moveTab");
 
-  QHBoxLayout *moveTabLayout = new QHBoxLayout(moveTabWidget_);
+  auto *moveTabLayout = new QHBoxLayout(moveTabWidget_);
   moveTabLayout->setMargin(2); moveTabLayout->setSpacing(2);
 
   moveTabLayout->addWidget(leftButton);
   moveTabLayout->addWidget(rightButton);
+
+  //---
+
+  setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
 void
@@ -93,10 +100,10 @@ moveTab(int fromIndex, int toIndex)
   if (fromIndex < 0 || fromIndex > count() - 1) return;
   if (toIndex   < 0 || toIndex   > count() - 1) return;
 
-  QWidget *widget = QTabWidget::widget(fromIndex);
+  auto *widget = QTabWidget::widget(fromIndex);
 
-  QIcon   icon = tabIcon(fromIndex);
-  QString text = tabText(fromIndex);
+  auto icon = tabIcon(fromIndex);
+  auto text = tabText(fromIndex);
 
   removeTab(fromIndex);
 
@@ -111,18 +118,65 @@ void
 CQTabWidget::
 addCreateButton()
 {
-  CQImageButton *newButton = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
+  auto *newButton = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
 
   connect(newButton, SIGNAL(clicked()), this, SIGNAL(createTab()));
 
   setCornerWidget(newButton, Qt::TopLeftCorner);
 }
 
+void
+CQTabWidget::
+contextMenuEvent(QContextMenuEvent *e)
+{
+  auto *menu = createTabMenu();
+
+  (void) menu->exec(e->globalPos());
+
+  delete menu;
+}
+
+QMenu *
+CQTabWidget::
+createTabMenu() const
+{
+  auto *menu = new QMenu;
+
+  menu->setObjectName("menu");
+
+  //---
+
+  for (int i = 0; i < count(); ++i) {
+    auto icon = tabIcon(i);
+    auto text = tabText(i);
+
+    auto *action = menu->addAction(icon, text);
+
+    action->setData(i);
+
+    connect(action, SIGNAL(triggered()), this, SLOT(tabSlot()));
+  }
+
+  return menu;
+}
+
+void
+CQTabWidget::
+tabSlot()
+{
+  auto *action = qobject_cast<QAction *>(sender());
+  if (! action) return;
+
+  int i = action->data().toInt();
+
+  setCurrentIndex(i);
+}
+
 //-----------
 
-CQTabBar::
-CQTabBar(QWidget *parent) :
- QTabBar(parent), edit_(nullptr), ind_(-1)
+CQTabWidgetTabBar::
+CQTabWidgetTabBar(CQTabWidget *tabWidget) :
+ QTabBar(tabWidget), tabWidget_(tabWidget)
 {
   setObjectName("tabBar");
 
@@ -131,21 +185,23 @@ CQTabBar(QWidget *parent) :
 #ifdef CQTAB_WIDGET_MOVABLE
   setMovable(true);
 #endif
+
+  setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
 #ifndef CQTAB_WIDGET_MOVABLE
 void
-CQTabBar::
+CQTabWidgetTabBar::
 mousePressEvent(QMouseEvent *event)
 {
   if (event->button() == Qt::LeftButton)
-    press_pos_ = event->pos();
+    pressPos_ = event->pos();
 
   QTabBar::mousePressEvent(event);
 }
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 mouseMoveEvent(QMouseEvent *event)
 {
   // If the left button isn't pressed anymore then return
@@ -153,15 +209,15 @@ mouseMoveEvent(QMouseEvent *event)
     return;
 
   // If the distance is too small then return
-  if ((event->pos() - press_pos_).manhattanLength() < QApplication::startDragDistance())
+  if ((event->pos() - pressPos_).manhattanLength() < QApplication::startDragDistance())
     return;
 
   // initiate Drag
-  QDrag *drag = new QDrag(this);
+  auto *drag = new QDrag(this);
 
   drag->setPixmap((CQPixmapCacheInst->getPixmap("TAB"));
 
-  QMimeData *mimeData = new QMimeData;
+  auto *mimeData = new QMimeData;
 
   // a crude way to distinguish tab-reordering drops from other ones
   mimeData->setData("action", "tab-reordering") ;
@@ -173,7 +229,7 @@ mouseMoveEvent(QMouseEvent *event)
 #endif
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 mouseDoubleClickEvent(QMouseEvent *event)
 {
   ind_ = tabAt(event->pos());
@@ -194,7 +250,7 @@ mouseDoubleClickEvent(QMouseEvent *event)
 
 #ifndef CQTAB_WIDGET_MOVABLE
 void
-CQTabBar::
+CQTabWidgetTabBar::
 dragEnterEvent(QDragEnterEvent *event)
 {
   // Only accept if it's an tab-reordering request
@@ -207,10 +263,10 @@ dragEnterEvent(QDragEnterEvent *event)
 }
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 dropEvent(QDropEvent *event)
 {
-  int fromIndex = tabAt(press_pos_);
+  int fromIndex = tabAt(pressPos_);
   int toIndex   = tabAt(event->pos());
 
   // Tell interested objects that
@@ -222,7 +278,7 @@ dropEvent(QDropEvent *event)
 #endif
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 paintEvent(QPaintEvent *event)
 {
   QTabBar::paintEvent(event);
@@ -232,14 +288,14 @@ paintEvent(QPaintEvent *event)
 }
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 stopEdit()
 {
   edit_->hide();
 }
 
 void
-CQTabBar::
+CQTabWidgetTabBar::
 tabEditFinished(const QString &text)
 {
   setTabText(ind_, text);
@@ -247,4 +303,15 @@ tabEditFinished(const QString &text)
   emit tabChanged(ind_);
 
   ind_ = -1;
+}
+
+void
+CQTabWidgetTabBar::
+contextMenuEvent(QContextMenuEvent *e)
+{
+  auto *menu = tabWidget_->createTabMenu();
+
+  (void) menu->exec(e->globalPos());
+
+  delete menu;
 }

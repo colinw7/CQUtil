@@ -1,15 +1,10 @@
 #ifndef CQUTIL_H
 #define CQUTIL_H
 
-//#define CQUTIL_FONT 1
-//#define CQUTIL_IMAGE 1
-
-#define CQUTIL_BRUSH 1
-#define CQUTIL_PEN 1
+#define CQUTIL_EVENT     1
 #define CQUTIL_LINE_DASH 1
-#define CQUTIL_ANGLE 1
-#define CQUTIL_GRADIENT 1
-#define CQUTIL_PALETTE 1
+#define CQUTIL_ANGLE     1
+#define CQUTIL_GRADIENT  1
 
 #include <Qt>
 #include <QColor>
@@ -19,7 +14,10 @@
 #include <QButtonGroup>
 #include <QPen>
 
+#ifdef CQUTIL_EVENT
 #include <CEvent.h>
+#endif
+
 #include <CRGBA.h>
 
 #ifdef CQUTIL_LINE_DASH
@@ -35,25 +33,12 @@
 #include <CLineJoinType.h>
 #include <CIBBox2D.h>
 
-#ifdef CQUTIL_FONT
-#include <CFont.h>
-#endif
-
-#ifdef CQUTIL_IMAGE
-#include <CImagePtr.h>
-#endif
-
 #include <CPoint2D.h>
 #include <CBBox2D.h>
 #include <CMatrix2D.h>
+#include <CAlignType.h>
 
-#ifdef CQUTIL_BRUSH
-#include <CBrush.h>
-#endif
-
-#ifdef CQUTIL_PEN
-#include <CPen.h>
-#endif
+#include <map>
 
 //---
 
@@ -134,12 +119,14 @@ namespace CQUtil {
 
   void initProperties();
 
+#ifdef CQUTIL_EVENT
   CMouseEvent *convertEvent(QMouseEvent *event);
   CKeyEvent   *convertEvent(QKeyEvent *event);
 
   CMouseButton   convertButton(Qt::MouseButton button);
   CKeyType       convertKey(int key, Qt::KeyboardModifiers modifiers);
   CEventModifier convertModifier(Qt::KeyboardModifiers modifiers);
+#endif
 
   QColor rgbToColor(const CRGB &rgb);
   QColor rgbaToColor(const CRGBA &rgba);
@@ -152,15 +139,7 @@ namespace CQUtil {
   CRGB  colorToRGB(const QColor &color);
   CRGBA colorToRGBA(const QColor &color);
 
-#ifdef CQUTIL_BRUSH
-  QBrush toQBrush(const CBrush &brush);
-#endif
-
-#ifdef CQUTIL_PEN
-  QPen toQPen(const CPen &pen);
-#endif
-
-  Qt::PenCapStyle toPenCapStyle(const CLineCapType &lineCap);
+  Qt::PenCapStyle  toPenCapStyle (const CLineCapType  &lineCap);
   Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
 
   inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
@@ -304,11 +283,6 @@ namespace CQUtil {
   QTransform toQTransform  (const CMatrix2D &m);
   CMatrix2D  fromQTransform(const QTransform &t);
 
-#ifdef CQUTIL_FONT
-  QFont    toQFont  (CFontPtr font);
-  CFontPtr fromQFont(QFont font);
-#endif
-
   QString variantToString(const QVariant &var);
   bool variantToString(const QVariant &var, QString &str);
 
@@ -336,12 +310,6 @@ namespace CQUtil {
 
   //---
 
-#ifdef CQUTIL_IMAGE
-  QIcon imageToIcon(CImagePtr image);
-
-  QImage toQImage(CImagePtr image);
-#endif
-
 #ifdef CQUTIL_GRADIENT
   QLinearGradient toQGradient(const CLinearGradient *lgradient,
                               QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
@@ -355,7 +323,9 @@ namespace CQUtil {
 
   void setDockVisible(QDockWidget *dock, bool visible);
 
+#ifdef CQUTIL_LINE_DASH
   void penSetLineDash(QPen &pen, const CLineDash &dash);
+#endif
 
   QString alignToString(Qt::Alignment align);
   bool stringToAlign(const QString &str, Qt::Alignment &align);

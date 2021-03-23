@@ -7,7 +7,9 @@
 #include <QTabBar>
 
 class CQFloatEdit;
-class CQTabBar;
+class CQTabWidgetTabBar;
+
+class QMenu;
 
 class CQTabWidget : public QTabWidget {
   Q_OBJECT
@@ -23,11 +25,17 @@ class CQTabWidget : public QTabWidget {
 
   void setShowMoveButtons(bool show);
 
+  void contextMenuEvent(QContextMenuEvent *e) override;
+
+  QMenu *createTabMenu() const;
+
  public slots:
   void moveTabLeft ();
   void moveTabRight();
 
   void moveTab(int fromIndex, int toIndex);
+
+  void tabSlot();
 
  signals:
   void tabChanged(int ind);
@@ -37,33 +45,35 @@ class CQTabWidget : public QTabWidget {
   void swapTabs(int ind1, int ind2);
 
  private:
-  CQTabBar *tabBar_ { nullptr };
-  bool      moveButtons_ { false };
-  QWidget  *moveTabWidget_ { nullptr };
+  CQTabWidgetTabBar* tabBar_        { nullptr };
+  bool               moveButtons_   { false };
+  QWidget*           moveTabWidget_ { nullptr };
 };
 
 //------
 
-class CQTabBar : public QTabBar {
+class CQTabWidgetTabBar : public QTabBar {
   Q_OBJECT
 
  public:
-  CQTabBar(QWidget *parent = 0);
+  CQTabWidgetTabBar(CQTabWidget *tabWidget);
 
   void stopEdit();
 
  protected:
-  void mouseDoubleClickEvent(QMouseEvent *event);
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 #ifndef CQTAB_WIDGET_MOVABLE
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent (QMouseEvent *event);
+  void mousePressEvent(QMouseEvent *event) override;
+  void mouseMoveEvent (QMouseEvent *event) override;
 
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dropEvent     (QDropEvent *event);
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent     (QDropEvent *event) override;
 #endif
 
-  void paintEvent(QPaintEvent *event);
+  void paintEvent(QPaintEvent *event) override;
+
+  void contextMenuEvent(QContextMenuEvent *e) override;
 
  signals:
   void tabChanged(int ind);
@@ -74,9 +84,10 @@ class CQTabBar : public QTabBar {
   void tabEditFinished(const QString &text);
 
  private:
-  CQFloatEdit *edit_ { nullptr };
-  int          ind_ { 0 };
-  QPoint       press_pos_;
+  CQTabWidget* tabWidget_ { nullptr };
+  CQFloatEdit *edit_      { nullptr };
+  int          ind_       { -1 };
+  QPoint       pressPos_;
 };
 
 #endif
