@@ -21,6 +21,7 @@ class CQTabSplit : public QFrame {
   Q_PROPERTY(State           state        READ state          WRITE setState       )
   Q_PROPERTY(bool            grouped      READ isGrouped      WRITE setGrouped     )
   Q_PROPERTY(bool            tabsClosable READ isTabsClosable WRITE setTabsClosable)
+  Q_PROPERTY(bool            autoFit      READ isAutoFit      WRITE setAutoFit     )
 
   Q_ENUMS(State)
 
@@ -35,8 +36,10 @@ class CQTabSplit : public QFrame {
   using Sizes = QList<int>;
 
  public:
-  CQTabSplit(Qt::Orientation orient, QWidget *parent=nullptr);
-  CQTabSplit(QWidget *parent=nullptr);
+  explicit CQTabSplit(Qt::Orientation orient, QWidget *parent=nullptr);
+  explicit CQTabSplit(QWidget *parent=nullptr);
+
+  //---
 
   //! get/set orientation
   Qt::Orientation orientation() const { return orient_; }
@@ -53,6 +56,12 @@ class CQTabSplit : public QFrame {
   //! get/set tabs closable
   bool isTabsClosable() const { return tabsClosable_; }
   void setTabsClosable(bool b);
+
+  //! get/set auto fit
+  bool isAutoFit() const { return autoFit_; }
+  void setAutoFit(bool b) { autoFit_ = b; }
+
+  //---
 
   //! get indexed widget
   QWidget *widget(int i) const;
@@ -80,12 +89,15 @@ class CQTabSplit : public QFrame {
   QSize sizeHint() const override;
 
  signals:
+  //! emitted when close of tab/splitter requested (if closable)
   void widgetCloseRequested(int i);
 
  public slots:
+  //! close specified tab (if closable)
   void tabCloseSlot(int i);
 
  private:
+  //! init widget
   void init();
 
  private:
@@ -108,6 +120,7 @@ class CQTabSplit : public QFrame {
   State           state_        { State::HSPLIT };  //!< current state
   bool            grouped_      { false };          //!< is grouped (use group boxes)
   bool            tabsClosable_ { false };          //!< are tabs closable
+  bool            autoFit_      { false };          //!< is auto fit
   Widgets         widgets_;                         //!< widgets
   Sizes           hsizes_;                          //!< splitter sizes (horizontal)
   Sizes           vsizes_;                          //!< splitter sizes (vertical)
@@ -117,6 +130,8 @@ class CQTabSplit : public QFrame {
 
 //---
 
+class CQTabSplitSplitterHandle;
+
 /*!
  * \brief custom splitter widget for CQTabSplot
  */
@@ -124,14 +139,36 @@ class CQTabSplitSplitter : public QSplitter {
   Q_OBJECT
 
  public:
+  using Sizes = QList<int>;
+
+ public:
   CQTabSplitSplitter(CQTabSplit *split);
 
+  //! get parent tab split
   CQTabSplit *split() const { return split_; }
 
+  //! create custom handle
   QSplitterHandle *createHandle() override;
 
+  //! get index for handle
+  int handleIndex(CQTabSplitSplitterHandle *handle) const;
+
+  //! fit specified split widget to size hint
+  void autoFit(int ind);
+
+  //! fit all split widgets to ize hint
+  void fitAll();
+
+  //! ensure sizes obey minimum size hint
+  void fixSizes();
+
+  //! handle resize
+  void resizeEvent(QResizeEvent *) override;
+
  private:
-  CQTabSplit *split_ { nullptr };
+  CQTabSplit *split_     { nullptr }; //!< parent tab split
+  QSize       lastSize_;              //!< last size
+  Sizes       lastSizes_;             //!< last splitter sizes
 };
 
 //---
@@ -149,25 +186,34 @@ class CQTabSplitSplitterHandle : public QSplitterHandle {
 
   CQTabSplitSplitter *splitter() const { return splitter_; }
 
+  //! get/set bar size
   int barSize() const { return barSize_; }
   void setBarSize(int i) { barSize_ = i; }
 
+  //! handle context menu event
   void contextMenuEvent(QContextMenuEvent *e) override;
 
+  //! handle double click menu event (auto fit)
+  void mouseDoubleClickEvent(QMouseEvent *) override;
+
+  //! paint handle
   void paintEvent(QPaintEvent *) override;
 
+  //! handle generic event (for hover)
   bool event(QEvent *event) override;
 
+  //! return size hint
   QSize sizeHint() const override;
 
  private slots:
   void tabSlot();
   void splitSlot();
+  void fitAllSlot();
 
  private:
-  CQTabSplitSplitter *splitter_ { nullptr };
-  int                 barSize_  { 8 };
-  bool                hover_    { false };
+  CQTabSplitSplitter *splitter_ { nullptr }; //!< parent splitter
+  int                 barSize_  { 8 };       //!< bar size
+  bool                hover_    { false };   //!< is hover
 };
 
 //---
@@ -181,16 +227,24 @@ class CQTabSplitTabWidget : public QTabWidget {
  public:
   CQTabSplitTabWidget(CQTabSplit *split);
 
+  //! get parent tab split
   CQTabSplit *split() const { return split_; }
 
+  //! handle context menu event
   void contextMenuEvent(QContextMenuEvent *e);
 
  private slots:
+  //! set to horizontal split mode
   void hsplitSlot();
+
+  //! set to vertical split mode
   void vsplitSlot();
 
+  //! set current tab from context menu
+  void tabSlot();
+
  private:
-  CQTabSplit *split_ { nullptr };
+  CQTabSplit *split_ { nullptr }; //!< parent tab split
 };
 
 #endif

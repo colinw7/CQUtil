@@ -152,6 +152,9 @@ createTabMenu() const
 
     auto *action = menu->addAction(icon, text);
 
+    action->setCheckable(true);
+    action->setChecked(i == currentIndex());
+
     action->setData(i);
 
     connect(action, SIGNAL(triggered()), this, SLOT(tabSlot()));

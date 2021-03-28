@@ -30,7 +30,7 @@ init()
 {
   setObjectName("tabSplit");
 
-  QHBoxLayout *layout = new QHBoxLayout(this);
+  auto *layout = new QHBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(0);
 
   splitter_  = new CQTabSplitSplitter (this);
@@ -207,7 +207,7 @@ setWidgetName(QWidget *w, const QString &name)
 
   data->name = name;
 
-  if (state_ == State::TAB) {
+  if      (state_ == State::TAB) {
     int i = tabWidget_->indexOf(data->w);
 
     if (i >= 0)
@@ -357,6 +357,137 @@ createHandle()
   return new CQTabSplitSplitterHandle(orientation(), this);
 }
 
+int
+CQTabSplitSplitter::
+handleIndex(CQTabSplitSplitterHandle *handle) const
+{
+  for (int i = 0; i < count(); ++i) {
+    auto *ihandle = this->handle(i);
+
+    if (ihandle == handle)
+      return i;
+  }
+
+  return -1;
+}
+
+void
+CQTabSplitSplitter::
+autoFit(int ind)
+{
+  int ind1 = ind - 1; // fit widget above splitter
+
+  int n = count();
+
+  if (ind1 < 0 || ind >= n - 1)
+    return;
+
+  auto sizes = this->sizes();
+
+  auto s1 = sizes[ind1];
+
+  auto *w = widget(ind1);
+
+  auto sh = w->sizeHint();
+
+  auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
+
+  auto ds = s2 - s1;
+
+  sizes[ind1 ] = s2;
+  sizes[n - 1] -= ds;
+
+  setSizes(sizes);
+
+  fixSizes();
+}
+
+void
+CQTabSplitSplitter::
+fitAll()
+{
+  auto sizes = this->sizes();
+
+  int n = count();
+
+  int ds = 0;
+
+  for (int i = 0; i < n - 1; ++i) {
+    auto *w = widget(i);
+
+    auto sh = w->sizeHint();
+
+    auto s1 = sizes[i] - ds;
+    auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
+
+    ds = s2 - s1;
+
+    sizes[i] = s2;
+  }
+
+  sizes[n - 1] -= ds;
+
+  setSizes(sizes);
+}
+
+void
+CQTabSplitSplitter::
+fixSizes()
+{
+  auto sizes = this->sizes();
+
+  int n = count();
+
+  int ds = 0;
+
+  for (int i = 0; i < n - 1; ++i) {
+    auto *w = widget(i);
+
+    auto sh = w->minimumSizeHint();
+
+    auto s1 = sizes[i] - ds;
+    auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
+
+    if (s1 < s2) {
+      ds = s2 - s1;
+
+      sizes[i] = s2;
+    }
+  }
+
+  sizes[n - 1] -= ds;
+
+  setSizes(sizes);
+}
+
+void
+CQTabSplitSplitter::
+resizeEvent(QResizeEvent *e)
+{
+  QSplitter::resizeEvent(e);
+
+  if (split()->isAutoFit()) {
+    if (lastSizes_.empty()) {
+      fitAll();
+    }
+    else {
+      auto s = size();
+
+      if (orientation() == Qt::Vertical) {
+        if (s.height() > lastSize_.height()) {
+        }
+      }
+      else {
+        if (s.width() > lastSize_.width()) {
+        }
+      }
+    }
+
+    lastSize_  = size();
+    lastSizes_ = sizes();
+  }
+}
+
 //------
 
 CQTabSplitSplitterHandle::
@@ -372,25 +503,31 @@ void
 CQTabSplitSplitterHandle::
 contextMenuEvent(QContextMenuEvent *e)
 {
-  QMenu *menu = new QMenu;
+  auto *menu = new QMenu;
 
   menu->setObjectName("menu");
 
   //---
 
-  QAction *tabAction = menu->addAction("Tabbed");
+  auto *tabAction = menu->addAction("Tabbed");
 
   connect(tabAction, SIGNAL(triggered()), this, SLOT(tabSlot()));
 
   if (splitter()->orientation() == Qt::Horizontal) {
-    QAction *splitAction = menu->addAction("Horizontal Split");
+    auto *splitAction = menu->addAction("Horizontal Split");
 
     connect(splitAction, SIGNAL(triggered()), this, SLOT(splitSlot()));
   }
   else {
-    QAction *splitAction = menu->addAction("Vertical Split");
+    auto *splitAction = menu->addAction("Vertical Split");
 
     connect(splitAction, SIGNAL(triggered()), this, SLOT(splitSlot()));
+  }
+
+  if (splitter()->split()->isAutoFit()) {
+    auto *fitAllAction = menu->addAction("Fit All");
+
+    connect(fitAllAction, SIGNAL(triggered()), this, SLOT(fitAllSlot()));
   }
 
   //---
@@ -398,6 +535,17 @@ contextMenuEvent(QContextMenuEvent *e)
   (void) menu->exec(e->globalPos());
 
   delete menu;
+}
+
+void
+CQTabSplitSplitterHandle::
+mouseDoubleClickEvent(QMouseEvent *)
+{
+  if (splitter()->split()->isAutoFit()) {
+    int ind = splitter_->handleIndex(this);
+
+    splitter_->autoFit(ind);
+  }
 }
 
 void
@@ -420,17 +568,17 @@ paintEvent(QPaintEvent *)
 
   QPainter painter(this);
 
-  QColor wc = palette().color(QPalette::Window);
+  auto wc = palette().color(QPalette::Window);
 
-  QColor fc = (hover_ ? blendColors(palette().color(QPalette::Highlight), wc, 0.3) :
-                        blendColors(palette().color(QPalette::Highlight), wc, 0.1));
+  auto fc = (hover_ ? blendColors(palette().color(QPalette::Highlight), wc, 0.3) :
+                      blendColors(palette().color(QPalette::Highlight), wc, 0.1));
 
   painter.fillRect(rect(), fc);
 
   //---
 
-  QColor fg = palette().color(QPalette::Text);
-  QColor bg = palette().color(QPalette::Base);
+  auto fg = palette().color(QPalette::Text);
+  auto bg = palette().color(QPalette::Base);
 
   int ss = 2*barSize();
 
@@ -552,11 +700,18 @@ splitSlot()
     splitter()->setOrientation(Qt::Horizontal);
 }
 
+void
+CQTabSplitSplitterHandle::
+fitAllSlot()
+{
+  splitter()->fitAll();
+}
+
 QSize
 CQTabSplitSplitterHandle::
 sizeHint() const
 {
-  QSize s = QSplitterHandle::sizeHint();
+  auto s = QSplitterHandle::sizeHint();
 
   if (splitter()->orientation() == Qt::Horizontal)
     return QSize(barSize(), s.height());
@@ -581,23 +736,44 @@ void
 CQTabSplitTabWidget::
 contextMenuEvent(QContextMenuEvent *e)
 {
-  QPoint p = e->pos();
-  QRect  r = tabBar()->rect();
+  if (! count())
+    return;
+
+  auto p = e->pos();
+  auto r = tabBar()->rect();
 
   if (p.y() >= r.height())
     return;
 
-  QMenu *menu = new QMenu;
+  auto *menu = new QMenu;
 
   menu->setObjectName("menu");
 
   //---
 
-  QAction *hsplitAction = menu->addAction("Horizontal Split");
-  QAction *vsplitAction = menu->addAction("Vertical Split");
+  auto *hsplitAction = menu->addAction("Horizontal Split");
+  auto *vsplitAction = menu->addAction("Vertical Split");
 
   connect(hsplitAction, SIGNAL(triggered()), this, SLOT(hsplitSlot()));
   connect(vsplitAction, SIGNAL(triggered()), this, SLOT(vsplitSlot()));
+
+  //---
+
+  menu->addSeparator();
+
+  for (int i = 0; i < count(); ++i) {
+    auto icon = tabIcon(i);
+    auto text = tabText(i);
+
+    auto *action = menu->addAction(icon, text);
+
+    action->setCheckable(true);
+    action->setChecked(i == currentIndex());
+
+    action->setData(i);
+
+    connect(action, SIGNAL(triggered()), this, SLOT(tabSlot()));
+  }
 
   //---
 
@@ -618,4 +794,16 @@ CQTabSplitTabWidget::
 vsplitSlot()
 {
   split()->setState(CQTabSplit::State::VSPLIT);
+}
+
+void
+CQTabSplitTabWidget::
+tabSlot()
+{
+  auto *action = qobject_cast<QAction *>(sender());
+  if (! action) return;
+
+  int i = action->data().toInt();
+
+  setCurrentIndex(i);
 }
