@@ -54,6 +54,8 @@ setTitleFont()
   titleFont_.setPointSizeF(titleFont_.pointSizeF()*titleScale_);
 
   titleFont_.setBold(titleBold_);
+
+  calculateFrame();
 }
 
 void
@@ -62,7 +64,7 @@ setTitle(const QString &title)
 {
   title_ = title;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -73,7 +75,7 @@ setTitleBold(bool bold)
 
   setTitleFont();
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -84,7 +86,7 @@ setTitleScale(double scale)
 
   setTitleFont();
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -93,7 +95,7 @@ setTitleAlignment(Qt::Alignment alignment)
 {
   titleAlignment_ = alignment;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -102,7 +104,7 @@ setHasLineTop(bool line)
 {
   lineTop_ = line;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -111,7 +113,7 @@ setHasLineBottom(bool line)
 {
   lineBottom_ = line;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -120,7 +122,7 @@ setLineTopAlignment(Qt::Alignment alignment)
 {
   lineTopAlignment_ = alignment;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -129,7 +131,7 @@ setLineBottomAlignment(Qt::Alignment alignment)
 {
   lineBottomAlignment_ = alignment;
 
-  update();
+  calculateFrame();
 }
 
 void
@@ -139,8 +141,6 @@ setMarginLeft(int margin)
   marginLeft_ = margin;
 
   calculateFrame();
-
-  update();
 }
 
 void
@@ -150,8 +150,6 @@ setMarginRight(int margin)
   marginRight_ = margin;
 
   calculateFrame();
-
-  update();
 }
 
 void
@@ -161,8 +159,6 @@ setMarginBottom(int margin)
   marginBottom_ = margin;
 
   calculateFrame();
-
-  update();
 }
 
 void
@@ -172,8 +168,6 @@ setMarginTop(int margin)
   marginTop_ = margin;
 
   calculateFrame();
-
-  update();
 }
 
 void
@@ -185,7 +179,7 @@ setCheckable(bool checkable)
 
     updateEnabled();
 
-    update();
+    calculateFrame();
   }
 }
 
@@ -215,7 +209,7 @@ setCollapsible(bool collapsible)
 
     updateCollapsed();
 
-    update();
+    calculateFrame();
   }
 }
 
@@ -229,9 +223,9 @@ setCollapsed(bool collapsed)
     if (isCollapsible()) {
       updateCollapsed();
 
-      emit collapse(isCollapsed());
+      calculateFrame();
 
-      update();
+      emit collapse(isCollapsed());
     }
   }
 }
@@ -655,13 +649,18 @@ spaceTop() const
   if (marginTop_ >= 0)
     return marginTop_;
 
+  int t = 0;
+
   if (title_ != "") {
     QFontMetrics fm(titleFont_);
 
-    return fm.height() + 4;
+    t += fm.height();
   }
-  else
-    return 4;
+
+  if (cornerWidget_)
+    t = std::max(t, cornerWidget_->height());
+
+  return t + 4;
 }
 
 int
@@ -715,6 +714,9 @@ minimumSizeHint() const
   if (isCollapsible())
     baseWidth += fm.height();
 
+  if (cornerWidget_)
+    baseWidth += cornerWidget_->minimumSizeHint().width();
+
   QSize size;
 
   if (! isCollapsed()) {
@@ -738,6 +740,8 @@ calculateFrame()
   if (! l) return;
 
   l->setContentsMargins(marginLeft(), spaceTop(), marginRight(), spaceBottom());
+
+  update();
 }
 
 void

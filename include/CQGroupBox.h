@@ -92,34 +92,35 @@ class CQGroupBox : public QWidget {
 
   bool isCollapsed() const { return collapsed_; }
 
+  QWidget *cornerwidget() const { return cornerWidget_; }
   void setCornerWidget(QWidget *w);
 
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
  private:
   void init();
 
   void setTitleFont();
 
-  void changeEvent(QEvent *e);
+  void changeEvent(QEvent *e) override;
 
-  void childEvent(QChildEvent *e);
+  void childEvent(QChildEvent *e) override;
 
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
-  void focusInEvent(QFocusEvent *e);
+  void focusInEvent(QFocusEvent *e) override;
 
-  void mouseMoveEvent(QMouseEvent *e);
-  void mousePressEvent(QMouseEvent *e);
-  void mouseReleaseEvent(QMouseEvent *e);
+  void mouseMoveEvent(QMouseEvent *e) override;
+  void mousePressEvent(QMouseEvent *e) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
 
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
 
   void drawArcShape(QPainter *painter, double xc, double yc, double r,
                     double startAngle, int sides) const;
 
-  void resizeEvent(QResizeEvent *e);
+  void resizeEvent(QResizeEvent *e) override;
 
   int spaceTop() const;
   int spaceBottom() const;
@@ -142,39 +143,44 @@ class CQGroupBox : public QWidget {
  private:
 //CQGroupBoxArea *area_           { nullptr };
 
-  QString         title_;
-  bool            titleBold_      { true };
-  double          titleScale_     { 1.0 };
-  Qt::Alignment   titleAlignment_ { Qt::AlignLeft | Qt::AlignBottom };
+  // title
+  QString       title_;
+  bool          titleBold_      { true };
+  double        titleScale_     { 1.0 };
+  Qt::Alignment titleAlignment_ { Qt::AlignLeft | Qt::AlignBottom };
+  QRect         titleRect_;
+  QFont         titleFont_;
 
-  bool            lineTop_             { false };
-  bool            lineBottom_          { true };
-  Qt::Alignment   lineTopAlignment_    { Qt::AlignBottom };
-  Qt::Alignment   lineBottomAlignment_ { Qt::AlignVCenter };
+  // underline
+  bool          lineTop_             { false };
+  bool          lineBottom_          { true };
+  Qt::Alignment lineTopAlignment_    { Qt::AlignBottom };
+  Qt::Alignment lineBottomAlignment_ { Qt::AlignVCenter };
+  QColor        lineColor_;
 
-  int             marginLeft_   { 6 };
-  int             marginRight_  { 2 };
-  int             marginBottom_ { -1 };
-  int             marginTop_    { -1 };
+  // margins
+  int marginLeft_   { 6 };
+  int marginRight_  { 2 };
+  int marginBottom_ { -1 };
+  int marginTop_    { -1 };
 
-  bool            checkable_  { false };
-  bool            checked_    { false };
-  bool            checkPress_ { false };
+  // check
+  bool  checkable_  { false };
+  bool  checked_    { false };
+  bool  checkPress_ { false };
+  QRect checkRect_;
 
-  bool            collapsible_   { false };
-  bool            collapsed_     { false };
-  bool            collapsePress_ { false };
+  // collapse
+  bool  collapsible_   { false };
+  bool  collapsed_     { false };
+  bool  collapsePress_ { false };
+  QRect collapseRect_;
 
-  QRect           checkRect_;
-  QRect           collapseRect_;
-  QRect           titleRect_;
-  QFont           titleFont_;
-  QColor          lineColor_;
+  int dx_ { 2 }; // title/line x margin
+//int dy_ { 2 };
 
-  int             dx_ { 2 };
-  int             dy_ { 2 };
-
-  QWidget*        cornerWidget_ { nullptr };
+  // corner widget
+  QWidget* cornerWidget_ { nullptr };
 };
 
 //----
@@ -184,7 +190,7 @@ class CQGroupBoxArea : public QWidget {
  public:
   CQGroupBoxArea(QWidget *parent=0);
 
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
 };
 #endif
 
