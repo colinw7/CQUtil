@@ -1,18 +1,36 @@
 #include <CQApp.h>
+#include <CQStyleMgr.h>
 #include <CQStyle.h>
 #include <CQFont.h>
 #include <CQImage.h>
+
+#define CQAPP_WINDOW 1
+
+#ifdef CQAPP_WINDOW
 #include <CQWindow.h>
-//#include <CQPixmapCache.h>
-//#include <CQToolTip.h>
-//#include <CQPerfGraph.h>
+#endif
+
+#ifdef CQUTIL_PIXMAP_CACHE
+#include <CQPixmapCache.h>
+#endif
+
+#ifdef CQUTIL_TOOLTIP
+#include <CQToolTip.h>
+#endif
+
+#ifdef CQUTIL_PERF_GRAPH
+#include <CQPerfGraph.h>
+#endif
+
 #include <CConfig.h>
+
 #ifdef CQUTIL_IMAGE
 #include <CImageMgr.h>
 #endif
 #ifdef CQUTIL_FONT
 #include <CFontMgr.h>
 #endif
+
 #include <CScreenUnits.h>
 
 //#define USE_OBJEDIT 1
@@ -59,7 +77,7 @@ eventFilter(QObject *obj, QEvent *event)
       return true;
     }
 
-#if 0
+#ifdef CQUTIL_PERF_GRAPH
     if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_End) {
       CQApp::showPerfDialog();
       return true;
@@ -83,11 +101,8 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  if (! getenv("CQAPP_NO_STYLE")) {
-    style_ = new CQStyle;
-
-    setStyle(style_);
-  }
+  if (! getenv("CQAPP_NO_STYLE"))
+    CQStyleMgrInst->createStyle();
 
   if (getenv("CQAPP_DARK_THEME"))
     setDarkTheme(true);
@@ -180,7 +195,9 @@ CQApp::
   CQFontMgr::release();
 #endif
 
-//CQPixmapCache::release();
+#ifdef CQUTIL_PIXMAP_CACHE
+  CQPixmapCache::release();
+#endif
 
 #ifdef CQUTIL_FONT
   CFontMgr::release();
@@ -199,7 +216,7 @@ CQApp::
 showMetaEdit(QObject *obj)
 {
 #ifdef USE_OBJEDIT_OBJEDIT
-  CQObjEdit *objEdit = CQObjEdit::createInstance();
+  auto *objEdit = CQObjEdit::createInstance();
 
   if (obj)
     objEdit->setObject(obj);
@@ -211,7 +228,7 @@ showMetaEdit(QObject *obj)
   assert(obj);
 
 /*
-  CQMetaEdit *metaEdit = new CQMetaEdit;
+  auto *metaEdit = new CQMetaEdit;
 
   if (obj)
     metaEdit->setObject(obj);
@@ -227,28 +244,25 @@ void
 CQApp::
 showPerfDialog()
 {
-  //CQPerfDialog *dialog = CQPerfDialog::instance();
+#ifdef CQUTIL_PERF_GRAPH
+  auto *dialog = CQPerfDialog::instance();
 
-  //dialog->show();
+  dialog->show();
+#endif
 }
 
 bool
 CQApp::
 isDarkTheme() const
 {
-  return (style()->theme() == CQStyle::Theme::DARK);
+  return (CQStyleMgrInst->theme() == CQStyleMgr::Theme::DARK);
 }
 
 void
 CQApp::
 setDarkTheme(bool b)
 {
-//CQPixmapCacheInst->setDark(b);
-
-  if (b)
-    style()->setTheme(CQStyle::Theme::DARK);
-  else
-    style()->setTheme(CQStyle::Theme::LIGHT);
+  CQStyleMgrInst->setTheme(b ? CQStyleMgr::Theme::DARK : CQStyleMgr::Theme::LIGHT);
 }
 
 #ifdef USE_OBJEDIT

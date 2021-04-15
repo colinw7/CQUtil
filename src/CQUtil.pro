@@ -28,6 +28,7 @@ CQImageUtil.cpp \
 \
 CQPixmapCache.cpp \
 CQStyle.cpp \
+CQStyleMgr.cpp \
 \
 CQColorChooser.cpp \
 CQAlphaButton.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
 \
 ../include/CQPixmapCache.h \
 ../include/CQStyle.h \
+../include/CQStyleMgr.h \
 \
 ../include/CQMenu.h \
 ../include/CQWidgetUtil.h \

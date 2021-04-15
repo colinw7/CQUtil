@@ -32,63 +32,63 @@ class CQWindow : public QWidget, public CWindow {
   virtual void setPressed(bool b);
 
   // get current position and size
-  virtual void getPosition(int *x, int *y) const;
-  virtual void getSize(uint *w, uint *h) const;
+  void getPosition(int *x, int *y) const override;
+  void getSize(uint *w, uint *h) const override;
 
-  virtual void getScreenSize(uint *w, uint *h) const;
+  void getScreenSize(uint *w, uint *h) const override;
 
   // destrow window
-  virtual void destroy();
+  void destroy() override;
 
   // move window
-  virtual void move(int x, int y);
+  void move(int x, int y) override;
 
   // resize window
-  virtual void resize(uint width, uint height);
+  void resize(uint width, uint height) override;
 
   // map/unmap window
-  virtual void map  ();
-  virtual void unmap();
+  void map  () override;
+  void unmap() override;
 
   // get if window is mapped
-  virtual bool isMapped();
+  bool isMapped() override;
 
   // iconize/deiconize window
-  virtual void iconize  ();
-  virtual void deiconize();
+  void iconize  () override;
+  void deiconize() override;
 
   // maximize/demaximize window
-  virtual void maximize  ();
-  virtual void demaximize();
+  void maximize  () override;
+  void demaximize() override;
 
   // lower/raise window
-  virtual void lower();
-  virtual void raise();
+  void lower() override;
+  void raise() override;
 
   // set window/icon title
-  virtual void setWindowTitle(const std::string &title);
-  virtual void setIconTitle(const std::string &);
+  void setWindowTitle(const std::string &title) override;
+  void setIconTitle(const std::string &) override;
 
   // get window/icon title
-  virtual void getWindowTitle(std::string &title) const;
-  virtual void getIconTitle(std::string &title) const;
+  void getWindowTitle(std::string &title) const override;
+  void getIconTitle(std::string &title) const override;
 
   // signal expose event
-  virtual void expose();
+  void expose() override;
 
   // set event adapter
-  virtual void setEventAdapter(CEventAdapter *eventAdpater);
+  void setEventAdapter(CEventAdapter *eventAdpater) override;
 
   // property
-  virtual bool setProperty(const std::string &name, const std::string &value);
+  bool setProperty(const std::string &name, const std::string &value) override;
 
   // selection
-  virtual bool setSelectText(const std::string &text);
+  bool setSelectText(const std::string &text) override;
 
   // draw window contents
-  virtual void redraw();
+  void redraw() override;
 
-  virtual void beep();
+  void beep() override;
 
   //------
 
@@ -100,30 +100,30 @@ class CQWindow : public QWidget, public CWindow {
 
   //------
 
-  virtual void mousePressEvent(QMouseEvent *);
-  virtual void mouseReleaseEvent(QMouseEvent *);
-  virtual void mouseDoubleClickEvent(QMouseEvent *);
-  virtual void mouseMoveEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
+  void mouseDoubleClickEvent(QMouseEvent *) override;
+  void mouseMoveEvent(QMouseEvent *) override;
 
-  virtual void keyPressEvent(QKeyEvent *);
-  virtual bool keyPressEvent(const CKeyEvent &);
-  virtual void keyReleaseEvent(QKeyEvent *);
-  virtual bool keyReleaseEvent(const CKeyEvent &);
+  void keyPressEvent(QKeyEvent *) override;
+  bool keyPressEvent(const CKeyEvent &) override;
+  void keyReleaseEvent(QKeyEvent *) override;
+  bool keyReleaseEvent(const CKeyEvent &) override;
 
-  virtual void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  virtual void resizeEvent(QResizeEvent *);
-  virtual bool resizeEvent();
+  void resizeEvent(QResizeEvent *) override;
+  bool resizeEvent() override;
 
-  virtual void hideEvent(QHideEvent *);
-  virtual bool hideEvent();
-  virtual void showEvent(QShowEvent *);
-  virtual bool showEvent();
+  void hideEvent(QHideEvent *) override;
+  bool hideEvent() override;
+  void showEvent(QShowEvent *) override;
+  bool showEvent() override;
 
-  virtual void enterEvent(QEvent *);
-  virtual bool enterEvent();
-  virtual void leaveEvent(QEvent *);
-  virtual bool leaveEvent();
+  void enterEvent(QEvent *) override;
+  bool enterEvent() override;
+  void leaveEvent(QEvent *) override;
+  bool leaveEvent() override;
 
  private:
   bool pressed_ { false };

@@ -53,6 +53,10 @@ class CQTabSplit : public QFrame {
   bool isGrouped() const { return grouped_; }
   void setGrouped(bool b);
 
+  //! get/set grouped (per widget)
+  bool isGrouped(QWidget *w) const;
+  void setGrouped(QWidget *w, bool b);
+
   //! get/set tabs closable
   bool isTabsClosable() const { return tabsClosable_; }
   void setTabsClosable(bool b);
@@ -156,7 +160,7 @@ class CQTabSplitSplitter : public QSplitter {
   //! fit specified split widget to size hint
   void autoFit(int ind);
 
-  //! fit all split widgets to ize hint
+  //! fit all split widgets to size hint
   void fitAll();
 
   //! ensure sizes obey minimum size hint
@@ -167,7 +171,6 @@ class CQTabSplitSplitter : public QSplitter {
 
  private:
   CQTabSplit *split_     { nullptr }; //!< parent tab split
-  QSize       lastSize_;              //!< last size
   Sizes       lastSizes_;             //!< last splitter sizes
 };
 

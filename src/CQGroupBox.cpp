@@ -1,4 +1,6 @@
 #include <CQGroupBox.h>
+#include <CQStyleMgr.h>
+
 #include <QChildEvent>
 #include <QLayout>
 #include <QPainter>
@@ -43,6 +45,10 @@ init()
   //area_->setParent(this);
 
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+  //----
+
+  connect(CQStyleMgrInst, SIGNAL(colorsChanged()), this, SLOT(updateSlot()));
 }
 
 void
@@ -87,6 +93,15 @@ setTitleScale(double scale)
   setTitleFont();
 
   calculateFrame();
+}
+
+void
+CQGroupBox::
+setTitleColored(bool b)
+{
+  titleColored_ = b;
+
+  update();
 }
 
 void
@@ -476,10 +491,18 @@ paintEvent(QPaintEvent *)
 
     p.fillRect(titleRect_, QBrush(palette().color(QPalette::Background)));
 
-    if (isEnabled())
-      p.setPen(palette().color(QPalette::Active, QPalette::WindowText));
+    QColor titleColor;
+
+    if (isEnabled()) {
+      if (isTitleColored())
+        titleColor = CQStyleMgrInst->calcBaseColor();
+      else
+        titleColor = palette().color(QPalette::Active, QPalette::WindowText);
+    }
     else
-      p.setPen(palette().color(QPalette::Disabled, QPalette::WindowText));
+      titleColor = palette().color(QPalette::Disabled, QPalette::WindowText);
+
+    p.setPen(titleColor);
 
     p.drawText(textX, textY, title_);
   }
@@ -654,13 +677,15 @@ spaceTop() const
   if (title_ != "") {
     QFontMetrics fm(titleFont_);
 
-    t += fm.height();
+    t = fm.height();
   }
 
   if (cornerWidget_)
-    t = std::max(t, cornerWidget_->height());
+    t = std::max(t, cornerWidget_->sizeHint().height());
 
-  return t + 4;
+  t += 4;
+
+  return t;
 }
 
 int
@@ -690,6 +715,8 @@ setCornerWidget(QWidget *w)
 
     resizeEvent(nullptr);
   }
+
+  calculateFrame();
 }
 
 QSize
@@ -800,6 +827,13 @@ updateCollapsed()
   size.setHeight(minimumSizeHint().height());
 
   resize(size);
+}
+
+void
+CQGroupBox::
+updateSlot()
+{
+  update();
 }
 
 //-----------

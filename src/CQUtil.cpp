@@ -1,4 +1,5 @@
 #include <CQUtil.h>
+#include <CQStyleMgr.h>
 
 #ifdef CQUTIL_EVENT
 #include <CEvent.h>
@@ -567,6 +568,9 @@ nameToObject(const QString &name)
 //if (name == QApplication::applicationName())
   if (name == "APPLICATION")
     return qApp;
+
+  if (name == "STYLE_MGR")
+    return CQStyleMgrInst;
 
   QStringList names = name.split("|");
 

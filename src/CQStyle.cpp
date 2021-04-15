@@ -26,7 +26,7 @@ drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
 
   QLinearGradient *gradient;
 
-  switch(direction) {
+  switch (direction) {
     case FromLeft:
       gradient = new QLinearGradient(rect.left(), y, rect.right(), y);
       break;
@@ -216,18 +216,18 @@ setTheme(const Theme &t)
 
   palette_ = qApp->palette();
 
-  QColor windowTextColor    = QColor("#000000");
-  QColor buttonColor        = QColor("#efebe7");
-  QColor textColor          = QColor("#000000");
-  QColor buttonTextColor    = QColor("#000000");
-  QColor baseColor          = QColor("#ffffff");
-  QColor windowColor        = QColor("#efebe7");
-  QColor altBaseColor       = baseColor.darker(110);
-  QColor highlightColor     = Qt::darkBlue;
-  QColor highlightTextColor = Qt::white;
-  QColor linkColor          = Qt::blue;
-  QColor linkVisitedColor   = Qt::magenta;
-  QColor brightTextColor    = Qt::yellow;
+  auto windowTextColor    = QColor("#000000");
+  auto buttonColor        = QColor("#efebe7");
+  auto textColor          = QColor("#000000");
+  auto buttonTextColor    = QColor("#000000");
+  auto baseColor          = QColor("#ffffff");
+  auto windowColor        = QColor("#efebe7");
+  auto altBaseColor       = baseColor.darker(110);
+  auto highlightColor     = QColor(Qt::darkBlue);
+  auto highlightTextColor = QColor(Qt::white);
+  auto linkColor          = QColor(Qt::blue);
+  auto linkVisitedColor   = QColor(Qt::magenta);
+  auto brightTextColor    = QColor(Qt::yellow);
 
   if      (theme_ == Theme::LIGHT) {
     windowTextColor    = QColor("#000000");
@@ -272,11 +272,11 @@ setTheme(const Theme &t)
 
   //---
 
-  QColor lightColor    = mergedColors(buttonColor, Qt::white  );
-  QColor shadowColor   = mergedColors(buttonColor, Qt::black  );
-  QColor midlightColor = mergedColors(buttonColor, lightColor );
-  QColor darkColor     = mergedColors(buttonColor, shadowColor);
-  QColor midColor      = mergedColors(buttonColor, darkColor  );
+  auto lightColor    = mergedColors(buttonColor, Qt::white  );
+  auto shadowColor   = mergedColors(buttonColor, Qt::black  );
+  auto midlightColor = mergedColors(buttonColor, lightColor );
+  auto darkColor     = mergedColors(buttonColor, shadowColor);
+  auto midColor      = mergedColors(buttonColor, darkColor  );
 
   palette_.setColor(QPalette::Active, QPalette::Light     , lightColor     );
   palette_.setColor(QPalette::Active, QPalette::Midlight  , midlightColor  );
@@ -298,10 +298,10 @@ setTheme(const Theme &t)
   int num_roles = sizeof(roles)/sizeof(roles[0]);
 
   for (int r = 0; r < num_roles; ++r) {
-    if (roles[r] == QPalette::Window || roles[r] == QPalette::Base || roles[r] == QPalette::Button)
-      continue;
+//  if (roles[r] == QPalette::Window || roles[r] == QPalette::Base || roles[r] == QPalette::Button)
+//    continue;
 
-    QColor c = palette_.color(QPalette::Active, roles[r]);
+    auto c = palette_.color(QPalette::Active, roles[r]);
 
     palette_.setColor(QPalette::Inactive, roles[r], inactiveColor(c, windowColor));
     palette_.setColor(QPalette::Disabled, roles[r], disabledColor(c, windowColor));
@@ -319,10 +319,9 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 {
   switch (control) {
     case CC_GroupBox: {
-      if (const QStyleOptionGroupBox *groupBox =
-            qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+      if (const auto *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
         // Draw frame
-        QRect textRect = proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
+        auto textRect = proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
 
         QRect checkBoxRect =
           proxy()->subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
@@ -372,7 +371,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
         // Draw title
         if ((groupBox->subControls & QStyle::SC_GroupBoxLabel) && !groupBox->text.isEmpty()) {
-          QColor textColor = groupBox->textColor;
+          auto textColor = groupBox->textColor;
 
           if (textColor.isValid())
             painter->setPen(textColor);
@@ -413,9 +412,9 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
       break;
     }
     case CC_ScrollBar: {
-      QPalette palette = option->palette;
+      auto palette = option->palette;
 
-      QColor button = palette.button().color();
+      auto button = palette.button().color();
 
       QColor dark;
 
@@ -444,10 +443,10 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         alphaCornerColor = mergedColors(palette.background().color(), darkOutline);
       }
 
-      QColor gripShadow         = grooveColor.darker(110);
-    //QColor buttonShadow       = palette.button().color().darker(110);
-      QColor gradientStartColor = palette.button().color().lighter(108);
-      QColor gradientStopColor  = mergedColors(palette.button().color().darker(108),
+      auto gripShadow         = grooveColor.darker(110);
+    //auto buttonShadow       = palette.button().color().darker(110);
+      auto gradientStartColor = palette.button().color().lighter(108);
+      auto gradientStopColor  = mergedColors(palette.button().color().darker(108),
                                                dark.lighter(150), 70);
 
       //---
@@ -456,8 +455,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
       painter->setRenderHint(QPainter::Antialiasing, true);
 
-      if (const QStyleOptionSlider *scrollBar =
-            qstyleoption_cast<const QStyleOptionSlider *>(option)) {
+      if (const auto *scrollBar = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
         bool isEnabled  = scrollBar->state & State_Enabled;
 //      bool reverse    = scrollBar->direction == Qt::RightToLeft;
         bool horizontal = scrollBar->orientation == Qt::Horizontal;
@@ -496,7 +494,8 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
         //paint slider
         if (scrollBar->subControls & SC_ScrollBarSlider) {
-          QRect pixmapRect = scrollBarSlider;
+          auto pixmapRect = scrollBarSlider;
+
           //if (horizontal)
           //  pixmapRect.adjust(-1, 0, 0, -1);
           //else
@@ -632,10 +631,10 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         if (scrollBar->subControls & SC_ScrollBarSubLine) {
           //int scrollBarExtent = proxy()->pixelMetric(PM_ScrollBarExtent, option, widget);
 
-          QRect pixmapRect = scrollBarSubLine;
+          auto pixmapRect = scrollBarSubLine;
 
           if (isEnabled ) {
-            QRect fillRect = pixmapRect.adjusted(1, 1, -1, -1);
+            auto fillRect = pixmapRect.adjusted(1, 1, -1, -1);
 
             // Gradients
             if ((scrollBar->activeSubControls & SC_ScrollBarSubLine) && sunken) {
@@ -697,7 +696,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           else
             arrow = PE_IndicatorArrowUp;
 
-          QStyleOption arrowOpt = *option;
+          auto arrowOpt = *option;
 
           arrowOpt.rect = scrollBarSubLine.adjusted(3, 3, -2, -2);
 
@@ -709,12 +708,12 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           //QString addLinePixmapName =
           //  QStyleHelper::uniqueName(QLatin1String("scrollbar_addline"), option, QSize(16, 16));
 
-          QString addLinePixmapName = "scrollbar_addline_123";
+          auto addLinePixmapName = QString("scrollbar_addline_123");
 
-          QRect pixmapRect = scrollBarAddLine;
+          auto pixmapRect = scrollBarAddLine;
 
           if (isEnabled) {
-            QRect fillRect = pixmapRect.adjusted(1, 1, -1, -1);
+            auto fillRect = pixmapRect.adjusted(1, 1, -1, -1);
 
             // Gradients
             if ((scrollBar->activeSubControls & SC_ScrollBarAddLine) && sunken) {
@@ -774,7 +773,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           else
             arrow = PE_IndicatorArrowDown;
 
-          QStyleOption arrowOpt = *option;
+          auto arrowOpt = *option;
 
           arrowOpt.rect = scrollBarAddLine.adjusted(3, 3, -2, -2);
 
@@ -793,7 +792,6 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
   }
 }
 
-#if 0
 void
 CQStyle::
 drawControl(ControlElement element, const QStyleOption *option, QPainter *painter,
@@ -816,30 +814,29 @@ drawItemText(QPainter *painter, const QRect &rect, int flags, const QPalette &pa
 {
   return QProxyStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
-#endif
 
 void
 CQStyle::
 drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
               const QWidget *widget) const
 {
-  QRectF rect  = option->rect;
-  int    state = option->state;
+  // TODO: PE_PanelButtonCommand for button (with arrow pixmap)
+  auto rect  = option->rect;
+  int  state = option->state;
 
-  QColor base          = option->palette.base().color();
-  QColor button        = option->palette.button().color();
-  QColor text          = option->palette.text().color();
-  QColor buttonShadow  = (theme_ == Theme::DARK ? mergedColors(base, text) : button.darker(120));
-  QColor highlight     = option->palette.highlight().color();
-  QColor darkHighlight = highlight.darker(110);
+  auto base          = option->palette.base().color();
+  auto button        = option->palette.button().color();
+  auto text          = option->palette.text().color();
+  auto buttonShadow  = (theme_ == Theme::DARK ? mergedColors(base, text) : button.darker(120));
+  auto highlight     = option->palette.highlight().color();
+  auto darkHighlight = highlight.darker(110);
 
   switch (element) {
     case PE_FrameGroupBox: {
 #if QT_VERSION >= 0x050000
-      if (const QStyleOptionFrame *frame =
-            qstyleoption_cast<const QStyleOptionFrame *>(option)) {
+      if (const auto *frame = qstyleoption_cast<const QStyleOptionFrame *>(option)) {
         if (frame->features & QStyleOptionFrame::Flat) {
-          QRect fr = frame->rect;
+          auto fr = frame->rect;
 
           QPoint p1(fr.x(), fr.y() + 1);
           QPoint p2(fr.x() + fr.width(), p1.y());
@@ -854,10 +851,9 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
         }
       }
 #else
-      if (const QStyleOptionFrameV2 *frame =
-            qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
+      if (const auto *frame = qstyleoption_cast<const QStyleOptionFrameV2 *>(option)) {
         if (frame->features & QStyleOptionFrameV2::Flat) {
-          QRect fr = frame->rect;
+          auto fr = frame->rect;
 
           QPoint p1(fr.x(), fr.y() + 1);
           QPoint p2(fr.x() + fr.width(), p1.y());
@@ -881,7 +877,7 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
       //---
 
-      QRectF oRect = rect.adjusted(b, b, -b, -b);
+      auto oRect = rect.adjusted(b, b, -b, -b);
 
       QPainterPath opath;
 
@@ -889,10 +885,10 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
       //---
 
-      QPointF c = rect.center();
-      QPointF d = QPointF(w/2, w/2);
+      auto c = rect.center();
+      auto d = QPointF(w/2, w/2);
 
-      QRectF iRect = QRectF(c - d, c + d);
+      auto iRect = QRectF(c - d, c + d);
 
       QPainterPath ipath;
 
@@ -930,13 +926,13 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
       //---
 
-      QRectF oRect = rect.adjusted(ob, ob, -ob, -ob);
+      auto oRect = rect.adjusted(ob, ob, -ob, -ob);
       QPainterPath opath;
       opath.addRect(oRect);
 
       //---
 
-      QRectF iRect = rect.adjusted(ib, ib, -ib, -ib);
+      auto iRect = rect.adjusted(ib, ib, -ib, -ib);
 
       //---
 
@@ -968,7 +964,7 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
     case PE_IndicatorArrowDown:
     case PE_IndicatorArrowRight:
     case PE_IndicatorArrowLeft: {
-      QRect r = option->rect;
+      auto r = option->rect;
 
       int size = qMin(r.height(), r.width());
       if (size <= 1) break;
@@ -1009,7 +1005,7 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
       path.closeSubpath();
 
-      QColor button = option->palette.button().color();
+      auto button = option->palette.button().color();
 
       QColor dark;
       dark.setHsv(button.hue(),
@@ -1033,14 +1029,12 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
   }
 }
 
-#if 0
 QPixmap
 CQStyle::
 generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *opt) const
 {
   return QProxyStyle::generatedIconPixmap(iconMode, pixmap, opt);
 }
-#endif
 
 QStyle::SubControl
 CQStyle::
@@ -1051,8 +1045,7 @@ hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
 
   switch (control) {
     case CC_GroupBox: {
-      if (const QStyleOptionGroupBox *groupBox =
-            qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+      if (const auto *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
         QRect r;
 
         uint ctrl = SC_GroupBoxCheckBox;
@@ -1080,7 +1073,6 @@ hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
   return sc;
 }
 
-#if 0
 QRect
 CQStyle::
 itemPixmapRect(const QRect &r, int flags, const QPixmap &pixmap) const
@@ -1095,7 +1087,6 @@ itemTextRect(const QFontMetrics &fm, const QRect &r, int flags, bool enabled,
 {
   return QProxyStyle::itemTextRect(fm, r, flags, enabled, text);
 }
-#endif
 
 int
 CQStyle::
@@ -1149,7 +1140,7 @@ sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &siz
 
   switch (type) {
     case CT_GroupBox: {
-      if (const QGroupBox *grb = qobject_cast<const QGroupBox *>(widget))
+      if (const auto *grb = qobject_cast<const QGroupBox *>(widget))
         sz += QSize(grb && !grb->isFlat() ? 16 : 0, 0);
       break;
     }
@@ -1162,21 +1153,12 @@ sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &siz
   return sz;
 }
 
-#if 0
-QPalette
-CQStyle::
-standardPalette() const
-{
-  return QProxyStyle::standardPalette();
-}
-
 QPixmap
 CQStyle::
 standardPixmap(StandardPixmap standardPixmap, const QStyleOption *opt, const QWidget *widget) const
 {
   return QProxyStyle::standardPixmap(standardPixmap, opt, widget);
 }
-#endif
 
 int
 CQStyle::
@@ -1209,8 +1191,7 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
 
   switch (control) {
     case CC_GroupBox: {
-      if (const QStyleOptionGroupBox *groupBox =
-            qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+      if (const auto *groupBox = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
         switch (sc) {
           case SC_GroupBoxFrame:
             // FALL THROUGH
@@ -1229,7 +1210,7 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
                 topMargin = topHeight;
             }
 
-            QRect frameRect = groupBox->rect;
+            auto frameRect = groupBox->rect;
             frameRect.setTop(topMargin);
 
             if (sc == SC_GroupBoxFrame) {
@@ -1255,7 +1236,8 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
           case SC_GroupBoxCheckBox:
             // FALL THROUGH
           case SC_GroupBoxLabel: {
-            QFontMetrics fontMetrics = groupBox->fontMetrics;
+            auto fontMetrics = groupBox->fontMetrics;
+
             int h  = fontMetrics.height();
             int tw = fontMetrics.size(Qt::TextShowMnemonic,
                                       groupBox->text + QLatin1Char(' ')).width();
@@ -1275,8 +1257,8 @@ subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubCon
             int  checkBoxSize = hasCheckBox ? (indicatorWidth + indicatorSpace) : 0;
 
             // Adjusted rect for label + indicatorWidth + indicatorSpace
-            QRect totalRect = alignedRect(groupBox->direction, groupBox->textAlignment,
-                                          QSize(tw + checkBoxSize, h), ret);
+            auto totalRect = alignedRect(groupBox->direction, groupBox->textAlignment,
+                                         QSize(tw + checkBoxSize, h), ret);
 
             // Adjust totalRect if checkbox is set
             if (hasCheckBox) {

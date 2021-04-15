@@ -28,7 +28,7 @@ class CQSwitch : public QAbstractButton {
   bool isHighlightOn() const { return highlightOn_; }
   void setHighlightOn(bool b) { highlightOn_ = b; }
 
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
  public slots:
   void click();
@@ -42,10 +42,10 @@ class CQSwitch : public QAbstractButton {
  private:
   void init();
 
-  void mousePressEvent  (QMouseEvent *);
-  void mouseReleaseEvent(QMouseEvent *);
+  void mousePressEvent  (QMouseEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *) override;
 
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
  private:
   QString onLabel_     { "On"  };

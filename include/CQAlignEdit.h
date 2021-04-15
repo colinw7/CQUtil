@@ -17,7 +17,7 @@ class CQAlignEdit : public QFrame {
 
   QString toString() const;
 
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
   static QString toString(Qt::Alignment align);
   static Qt::Alignment fromString(const QString &str);
@@ -26,9 +26,9 @@ class CQAlignEdit : public QFrame {
   void valueChanged(Qt::Alignment);
 
  private:
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void mousePressEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
 
   void initStyleOption(QStyleOptionComboBox &opt) const;
 
@@ -44,16 +44,16 @@ class CQAlignEditMenuWidget : public QFrame {
  public:
   CQAlignEditMenuWidget(CQAlignEdit *edit);
 
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
  private:
-  void resizeEvent(QResizeEvent *);
+  void resizeEvent(QResizeEvent *) override;
 
-  void paintEvent(QPaintEvent *);
+  void paintEvent(QPaintEvent *) override;
 
-  void mouseMoveEvent(QMouseEvent *);
+  void mouseMoveEvent(QMouseEvent *) override;
 
-  void mousePressEvent(QMouseEvent *);
+  void mousePressEvent(QMouseEvent *) override;
 
   void drawAlignRect(QPainter *p, Qt::Alignment rectAlign, bool on);
 

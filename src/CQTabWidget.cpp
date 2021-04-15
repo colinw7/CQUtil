@@ -62,13 +62,20 @@ CQTabWidget(QWidget *parent) :
   setContextMenuPolicy(Qt::DefaultContextMenu);
 }
 
+CQTabWidget::
+~CQTabWidget()
+{
+  if (! moveTabWidget_->parent())
+    delete moveTabWidget_;
+}
+
 void
 CQTabWidget::
 setShowMoveButtons(bool show)
 {
   moveButtons_ = show;
 
-  setCornerWidget((show ? moveTabWidget_ : 0), Qt::TopRightCorner);
+  setCornerWidget((show ? moveTabWidget_ : nullptr), Qt::TopRightCorner);
 
   moveTabWidget_->setVisible(show);
 }

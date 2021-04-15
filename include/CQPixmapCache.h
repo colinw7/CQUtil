@@ -8,7 +8,9 @@
 
 #define CQPixmapCacheInst CQPixmapCache::instance()
 
-class CQPixmapCache {
+class CQPixmapCache : public QObject {
+  Q_OBJECT
+
  public:
   static CQPixmapCache *instance();
 
@@ -36,6 +38,9 @@ class CQPixmapCache {
 
  private:
   CQPixmapCache();
+
+ private slots:
+  void updateTheme();
 
  private:
   struct Data {

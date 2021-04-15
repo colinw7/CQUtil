@@ -17,7 +17,8 @@ class CQTabWidget : public QTabWidget {
   Q_PROPERTY(bool showMoveButtons READ getShowMoveButtons WRITE setShowMoveButtons)
 
  public:
-  CQTabWidget(QWidget *parent = 0);
+  CQTabWidget(QWidget *parent=nullptr);
+ ~CQTabWidget();
 
   void addCreateButton();
 

@@ -15,6 +15,7 @@ class CQGroupBox : public QWidget {
   Q_PROPERTY(QString       title          READ title          WRITE setTitle         )
   Q_PROPERTY(bool          titleBold      READ isTitleBold    WRITE setTitleBold     )
   Q_PROPERTY(double        titleScale     READ titleScale     WRITE setTitleScale    )
+  Q_PROPERTY(bool          titleColored   READ isTitleColored WRITE setTitleColored  )
   Q_PROPERTY(Qt::Alignment titleAlignment READ titleAlignment WRITE setTitleAlignment)
 
   // line top/bottom
@@ -46,6 +47,8 @@ class CQGroupBox : public QWidget {
 
   ~CQGroupBox();
 
+  //---
+
   const QString &title() const { return title_; }
   void setTitle(const QString &title);
 
@@ -55,8 +58,13 @@ class CQGroupBox : public QWidget {
   double titleScale() const { return titleScale_; }
   void setTitleScale(double scale);
 
+  bool isTitleColored() const { return titleColored_; }
+  void setTitleColored(bool b);
+
   Qt::Alignment titleAlignment() const { return titleAlignment_; }
   void setTitleAlignment(Qt::Alignment alignment);
+
+  //---
 
   bool hasLineTop() const { return lineTop_; }
   void setHasLineTop(bool line);
@@ -70,6 +78,8 @@ class CQGroupBox : public QWidget {
   Qt::Alignment lineBottomAlignment() const { return lineBottomAlignment_; }
   void setLineBottomAlignment(Qt::Alignment alignment);
 
+  //---
+
   int marginLeft() const { return marginLeft_; }
   void setMarginLeft(int margin);
 
@@ -82,18 +92,26 @@ class CQGroupBox : public QWidget {
   int marginTop() const { return marginTop_; }
   void setMarginTop(int margin);
 
+  //---
+
   bool isCheckable() const { return checkable_; }
   void setCheckable(bool checkable);
 
   bool isChecked() const { return checked_; }
+
+  //---
 
   bool isCollapsible() const { return collapsible_; }
   void setCollapsible(bool collapsible);
 
   bool isCollapsed() const { return collapsed_; }
 
+  //---
+
   QWidget *cornerwidget() const { return cornerWidget_; }
   void setCornerWidget(QWidget *w);
+
+  //---
 
   QSize sizeHint() const override;
   QSize minimumSizeHint() const override;
@@ -140,13 +158,17 @@ class CQGroupBox : public QWidget {
   void setChecked(bool checked);
   void setCollapsed(bool collapsed);
 
+ private slots:
+  void updateSlot();
+
  private:
-//CQGroupBoxArea *area_           { nullptr };
+//CQGroupBoxArea *area_ { nullptr };
 
   // title
   QString       title_;
   bool          titleBold_      { true };
   double        titleScale_     { 1.0 };
+  bool          titleColored_   { false };
   Qt::Alignment titleAlignment_ { Qt::AlignLeft | Qt::AlignBottom };
   QRect         titleRect_;
   QFont         titleFont_;

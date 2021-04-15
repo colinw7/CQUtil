@@ -1,4 +1,6 @@
 #include <CQPixmapCache.h>
+#include <CQStyleMgr.h>
+
 #include <QIconEngine>
 #include <QPainter>
 #include <cassert>
@@ -99,6 +101,7 @@ release()
 CQPixmapCache::
 CQPixmapCache()
 {
+  connect(CQStyleMgrInst, SIGNAL(themeChanged()), this, SLOT(updateTheme()));
 }
 
 CQPixmapCache::
@@ -111,6 +114,13 @@ CQPixmapCache::
 clear()
 {
   idData_.clear();
+}
+
+void
+CQPixmapCache::
+updateTheme()
+{
+  setDark(CQStyleMgrInst->theme() == CQStyleMgr::Theme::DARK);
 }
 
 void

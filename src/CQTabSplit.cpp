@@ -69,6 +69,28 @@ setGrouped(bool b)
 
 void
 CQTabSplit::
+setGrouped(QWidget *w, bool b)
+{
+  w->setProperty("CQTabSplit::grouped", QVariant(b ? 1 : 0));
+}
+
+bool
+CQTabSplit::
+isGrouped(QWidget *w) const
+{
+  auto var = w->property("CQTabSplit::grouped");
+
+  if (var.isValid()) {
+    bool ok;
+    auto i =var.toInt(&ok);
+    if (ok) return i;
+  }
+
+  return isGrouped();
+}
+
+void
+CQTabSplit::
 setTabsClosable(bool b)
 {
   if (b != tabsClosable_) {
@@ -98,7 +120,7 @@ addWidget(QWidget *w, const QString &name)
 
   WidgetData data(w, name);
 
-  if (isGrouped()) {
+  if (isGrouped(w)) {
     data.group = new CQGroupBox(name);
     data.group->setObjectName("group");
 
@@ -113,7 +135,7 @@ addWidget(QWidget *w, const QString &name)
   if (state_ == State::HSPLIT || state_ == State::VSPLIT) {
     assert(splitter_);
 
-    if (isGrouped())
+    if (isGrouped(w))
       splitter_->addWidget(data.group);
     else
       splitter_->addWidget(data.w);
@@ -214,7 +236,7 @@ setWidgetName(QWidget *w, const QString &name)
       tabWidget_->setTabText(i, data->name);
   }
   else if (state_ == State::HSPLIT || state_ == State::VSPLIT) {
-    if (isGrouped())
+    if (isGrouped(w))
       data->group->setTitle(data->name);
   }
 }
@@ -255,12 +277,12 @@ setState(State state)
       if (! data.w)
         continue;
 
-      if (isGrouped())
+      if (isGrouped(data.w))
         splitter_->addWidget(data.group);
       else
         splitter_->addWidget(data.w);
 
-      if (isGrouped()) {
+      if (isGrouped(data.w)) {
         data.layout->addWidget(data.w);
 
         data.group->setVisible(true);
@@ -300,7 +322,7 @@ setState(State state)
       if (! data.w)
         continue;
 
-      if (isGrouped())
+      if (isGrouped(data.w))
         data.group->setParent(this);
       else
         data.w->setParent(this);
@@ -378,6 +400,7 @@ autoFit(int ind)
   int ind1 = ind - 1; // fit widget above splitter
 
   int n = count();
+  if (n <= 1) return;
 
   if (ind1 < 0 || ind >= n - 1)
     return;
@@ -409,6 +432,7 @@ fitAll()
   auto sizes = this->sizes();
 
   int n = count();
+  if (n <= 1) return;
 
   int ds = 0;
 
@@ -428,6 +452,8 @@ fitAll()
   sizes[n - 1] -= ds;
 
   setSizes(sizes);
+
+  fixSizes();
 }
 
 void
@@ -437,6 +463,7 @@ fixSizes()
   auto sizes = this->sizes();
 
   int n = count();
+  if (n <= 1) return;
 
   int ds = 0;
 
@@ -467,23 +494,9 @@ resizeEvent(QResizeEvent *e)
   QSplitter::resizeEvent(e);
 
   if (split()->isAutoFit()) {
-    if (lastSizes_.empty()) {
+    if (lastSizes_.empty())
       fitAll();
-    }
-    else {
-      auto s = size();
 
-      if (orientation() == Qt::Vertical) {
-        if (s.height() > lastSize_.height()) {
-        }
-      }
-      else {
-        if (s.width() > lastSize_.width()) {
-        }
-      }
-    }
-
-    lastSize_  = size();
     lastSizes_ = sizes();
   }
 }
@@ -524,11 +537,9 @@ contextMenuEvent(QContextMenuEvent *e)
     connect(splitAction, SIGNAL(triggered()), this, SLOT(splitSlot()));
   }
 
-  if (splitter()->split()->isAutoFit()) {
-    auto *fitAllAction = menu->addAction("Fit All");
+  auto *fitAllAction = menu->addAction("Fit All");
 
-    connect(fitAllAction, SIGNAL(triggered()), this, SLOT(fitAllSlot()));
-  }
+  connect(fitAllAction, SIGNAL(triggered()), this, SLOT(fitAllSlot()));
 
   //---
 
@@ -541,11 +552,9 @@ void
 CQTabSplitSplitterHandle::
 mouseDoubleClickEvent(QMouseEvent *)
 {
-  if (splitter()->split()->isAutoFit()) {
-    int ind = splitter_->handleIndex(this);
+  int ind = splitter()->handleIndex(this);
 
-    splitter_->autoFit(ind);
-  }
+  splitter()->autoFit(ind);
 }
 
 void
