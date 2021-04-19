@@ -2,6 +2,7 @@
 #include <CQStyle.h>
 
 #include <QApplication>
+#include <QWidget>
 
 CQStyleMgr *
 CQStyleMgr::
@@ -54,4 +55,85 @@ CQStyleMgr::
 calcBaseColor() const
 {
   return (theme() == Theme::DARK ? darkBaseColor() : lightBaseColor());
+}
+
+void
+CQStyleMgr::
+setIconSize(int i)
+{
+  iconSize_ = i;
+
+  emit iconSizeChanged();
+}
+
+void
+CQStyleMgr::
+setIconSizeFromFont()
+{
+  QFontMetrics fm(font_);
+
+  setIconSize(fm.height() + 4);
+}
+
+void
+CQStyleMgr::
+setLargeIconSize(int i)
+{
+  largeIconSize_ = i;
+
+  emit iconSizeChanged();
+}
+
+int
+CQStyleMgr::
+calcLargeIconSize() const
+{
+  if (largeIconSize_ > 0)
+    return largeIconSize_;
+
+  return int(1.25*iconSize_);
+}
+
+void
+CQStyleMgr::
+setSmallIconSize(int i)
+{
+  smallIconSize_ = i;
+
+  emit iconSizeChanged();
+}
+
+int
+CQStyleMgr::
+calcSmallIconSize() const
+{
+  if (smallIconSize_ > 0)
+    return smallIconSize_;
+
+  return int(0.85*iconSize_);
+}
+
+void
+CQStyleMgr::
+setFont(const QFont &font)
+{
+  font_ = font;
+
+  qApp->setFont(font_);
+
+  const auto &widgets = qApp->allWidgets();
+
+  for (const auto &w : widgets)
+    w->setFont(font_);
+
+  emit fontChanged();
+}
+
+void
+CQStyleMgr::
+setFixedFont(const QFont &font)
+{
+  fixedFont_ = font;
+
+  emit fixedFontChanged();
 }

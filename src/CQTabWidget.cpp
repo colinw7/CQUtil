@@ -1,5 +1,5 @@
 #include <CQTabWidget.h>
-#include <CQImageButton.h>
+#include <CQIconButton.h>
 #include <CQFloatEdit.h>
 
 #include <QApplication>
@@ -9,12 +9,18 @@
 #include <QAction>
 #include <QContextMenuEvent>
 
-#include <svg/new_svg.h>
-#include <svg/left_svg.h>
-#include <svg/right_svg.h>
+#include <svg/new_tab_light_svg.h>
+#include <svg/new_tab_dark_svg.h>
+
+#include <svg/left_light_svg.h>
+#include <svg/left_dark_svg.h>
+
+#include <svg/right_light_svg.h>
+#include <svg/right_dark_svg.h>
 
 #ifndef CQTAB_WIDGET_MOVABLE
-#include <svg/tab_svg.h>
+#include <svg/move_tab_light_svg.h>
+#include <svg/move_tab_dark_svg.h>
 #endif
 
 CQTabWidget::
@@ -35,8 +41,8 @@ CQTabWidget(QWidget *parent) :
   connect(tabBar_, SIGNAL(tabMoved(int,int)), this, SIGNAL(swapTabs(int,int)));
 #endif
 
-  auto *leftButton  = new CQImageButton(CQPixmapCacheInst->getIcon("LEFT" ));
-  auto *rightButton = new CQImageButton(CQPixmapCacheInst->getIcon("RIGHT"));
+  auto *leftButton  = new CQIconButton; leftButton ->setIcon("LEFT" );
+  auto *rightButton = new CQIconButton; rightButton->setIcon("RIGHT");
 
   leftButton ->setObjectName("left");
   rightButton->setObjectName("right");
@@ -125,7 +131,7 @@ void
 CQTabWidget::
 addCreateButton()
 {
-  auto *newButton = new CQImageButton(CQPixmapCacheInst->getIcon("NEW" ));
+  auto *newButton = new CQIconButton; newButton->setIcon("NEW_TAB");
 
   connect(newButton, SIGNAL(clicked()), this, SIGNAL(createTab()));
 
@@ -225,7 +231,7 @@ mouseMoveEvent(QMouseEvent *event)
   // initiate Drag
   auto *drag = new QDrag(this);
 
-  drag->setPixmap((CQPixmapCacheInst->getPixmap("TAB"));
+  drag->setPixmap((CQPixmapCacheInst->getPixmap("MOVE_TAB"));
 
   auto *mimeData = new QMimeData;
 

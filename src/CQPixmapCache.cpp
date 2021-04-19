@@ -210,6 +210,16 @@ getSizedPixmap(const QString &id, const QSize &s)
 
 QIcon
 CQPixmapCache::
+getLightDarkIcon(const QString &iconName)
+{
+  if (hasPixmap(iconName + "_LIGHT"))
+    return getIcon(iconName + "_LIGHT", iconName + "_DARK");
+  else
+    return getIcon(iconName);
+}
+
+QIcon
+CQPixmapCache::
 getIcon(const QString &lightId, const QString &darkId)
 {
   return QIcon(new CQPixmapIcon(lightId, darkId));

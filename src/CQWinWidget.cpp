@@ -14,6 +14,7 @@
 #include <svg/maximize_svg.h>
 #include <svg/minimize_svg.h>
 #include <svg/close_svg.h>
+
 #include <cursors/select.xbm>
 #include <cursors/selectmask.xbm>
 

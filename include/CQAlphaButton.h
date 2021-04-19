@@ -7,7 +7,7 @@ class CQAlphaButton : public QWidget {
   Q_OBJECT
 
  public:
-  CQAlphaButton(QWidget *parent=0);
+  CQAlphaButton(QWidget *parent=nullptr);
 
   double getAlpha() const;
 
@@ -18,8 +18,8 @@ class CQAlphaButton : public QWidget {
  private:
   void paintEvent(QPaintEvent *) override;
 
-  void mousePressEvent(QMouseEvent *e) override;
-  void mouseMoveEvent(QMouseEvent *e) override;
+  void mousePressEvent  (QMouseEvent *e) override;
+  void mouseMoveEvent   (QMouseEvent *e) override;
   void mouseReleaseEvent(QMouseEvent *e) override;
 
   void posToAlpha(int pos);
@@ -29,7 +29,7 @@ class CQAlphaButton : public QWidget {
   void valueChanged();
 
  private:
-  double alpha_;
+  double alpha_ { 1.0 };
   QColor fg_, bg_;
 };
 

@@ -1,6 +1,6 @@
 #include <CQColorChooser.h>
 #include <CQAlphaButton.h>
-#include <CQPixmapCache.h>
+#include <CQIconButton.h>
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -9,18 +9,19 @@
 #include <QHBoxLayout>
 #include <QColorDialog>
 
-#include <svg/color_dialog_svg.h>
+#include <svg/color_dialog_light_svg.h>
+#include <svg/color_dialog_dark_svg.h>
 
 CQColorChooser::
 CQColorChooser(QWidget *parent) :
- QWidget(parent), styles_(Text | ColorButton), editable_(true)
+ QWidget(parent), styles_(Text | ColorButton)
 {
   init();
 }
 
 CQColorChooser::
 CQColorChooser(uint styles, QWidget *parent) :
- QWidget(parent), styles_(styles), editable_(true)
+ QWidget(parent), styles_(styles)
 {
   init();
 }
@@ -45,14 +46,14 @@ init()
   cedit_   = new QLineEdit    (this); cedit_  ->setObjectName("cedit"  ); // text color
   cbutton_ = new QToolButton  (this); cbutton_->setObjectName("cbutton"); // click color button
   clabel_  = new QLabel       (this); clabel_ ->setObjectName("clabel" ); // static color button
-  button_  = new QToolButton  (this); button_ ->setObjectName("button" ); // image click button
+  button_  = new CQIconButton (this); button_ ->setObjectName("button" ); // image click button
   alphab_  = new CQAlphaButton(this); alphab_ ->setObjectName("alphab" ); // alpha button
 
   //cbutton_->setFixedSize(QSize(24,24));
   //clabel_ ->setFixedSize(QSize(24,24));
   //button_ ->setFixedSize(QSize(24,24));
 
-  button_->setIcon(CQPixmapCacheInst->getIcon("COLOR_DIALOG"));
+  button_->setIcon("COLOR_DIALOG");
 
   layout->addWidget(cedit_  );
   layout->addWidget(cbutton_);

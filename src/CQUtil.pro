@@ -18,6 +18,9 @@ CQUtil.cpp \
 CQMsgHandler.cpp \
 \
 CQApp.cpp \
+CQAppOptions.cpp \
+CQDialog.cpp \
+\
 CQMainWindow.cpp \
 CQWorkspace.cpp \
 CQToolBar.cpp \
@@ -46,14 +49,16 @@ CQRealEdit.cpp \
 CQIntegerSpin.cpp \
 CQRealSpin.cpp \
 \
+CQImageButton.cpp \
+CQPixmapButton.cpp \
+CQIconButton.cpp \
+CQRadioButtons.cpp \
+\
 CQPoint2DEdit.cpp \
 CQBBox2DEdit.cpp \
 CQRectEdit.cpp \
-CQImageButton.cpp \
-CQPixmapButton.cpp \
 CQFloatEdit.cpp \
 CQAutoHide.cpp \
-CQRadioButtons.cpp \
 CQAngleSpinBox.cpp \
 CQToolTip.cpp \
 CQTabWidget.cpp \
@@ -93,6 +98,9 @@ HEADERS += \
 ../include/CQMsgHandler.h \
 \
 ../include/CQApp.h \
+../include/CQAppOptions.h \
+../include/CQDialog.h \
+\
 ../include/CQMainWindow.h \
 ../include/CQToolBar.h \
 ../include/CQWorkspace.h \
@@ -126,14 +134,16 @@ HEADERS += \
 ../include/CQIntegerSpin.h \
 ../include/CQRealSpin.h \
 \
+../include/CQImageButton.h \
+../include/CQPixmapButton.h \
+../include/CQIconButton.h \
+../include/CQRadioButtons.h \
+\
 ../include/CQPoint2DEdit.h \
 ../include/CQBBox2DEdit.h \
 ../include/CQRectEdit.h \
-../include/CQImageButton.h \
-../include/CQPixmapButton.h \
 ../include/CQFloatEdit.h \
 ../include/CQAutoHide.h \
-../include/CQRadioButtons.h \
 ../include/CQAngleSpinBox.h \
 ../include/CQToolTip.h \
 ../include/CQTabWidget.h \

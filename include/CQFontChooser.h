@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+class CQIconButton;
 class QLineEdit;
 class QPushButton;
 class QToolButton;
@@ -28,7 +29,7 @@ class CQFontChooser : public QWidget {
     FontCombo
   };
 
-  CQFontChooser(QWidget *parent=0);
+  CQFontChooser(QWidget *parent=nullptr);
 
   const QFont &font() const { return font_; }
 
@@ -72,18 +73,18 @@ class CQFontChooser : public QWidget {
   void fontApplied(const QString &fontName);
 
  private:
-  Style          style_;
-  bool           fixedWidth_;
+  Style          style_       { FontButton };
+  bool           fixedWidth_  { false };
   QFont          font_;
   QString        fontName_;
-  QString        exampleText_;
-  QLineEdit     *cedit_;
-  QToolButton   *cbutton_;
-  QLabel        *clabel_;
-  QToolButton   *button_;
-  QFontComboBox *ncombo_;
-  QComboBox     *scombo_;
-  QComboBox     *zcombo_;
+  QString        exampleText_ { "Abc" };
+  QLineEdit*     cedit_       { nullptr };
+  QToolButton*   cbutton_     { nullptr };
+  QLabel*        clabel_      { nullptr };
+  CQIconButton*  button_      { nullptr };
+  QFontComboBox* ncombo_      { nullptr };
+  QComboBox*     scombo_      { nullptr };
+  QComboBox*     zcombo_      { nullptr };
 };
 
 #endif

@@ -3,11 +3,13 @@
 
 #include <QWidget>
 
+class CQIconButton;
+class CQAlphaButton;
+
 class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QLabel;
-class CQAlphaButton;
 
 class CQColorChooser : public QWidget {
   Q_OBJECT
@@ -139,17 +141,17 @@ class CQColorChooser : public QWidget {
   void colorApplied(const QString &colorName);
 
  private:
-  uint           styles_;
-  bool           editable_;
-  bool           has_alpha_;
+  uint           styles_    { 0 };
+  bool           editable_  { true };
+  bool           has_alpha_ { false };
   QColor         color_;
   QString        colorName_;
-  double         alpha_;
-  QLineEdit     *cedit_;   // text color name
-  QToolButton   *cbutton_; // click color button
-  QLabel        *clabel_;  // static color button
-  CQAlphaButton *alphab_;  // alpha slider
-  QToolButton   *button_;  // image click button
+  double         alpha_     { 1.0 };
+  QLineEdit     *cedit_     { nullptr }; // text color name
+  QToolButton   *cbutton_   { nullptr }; // click color button
+  QLabel        *clabel_    { nullptr }; // static color button
+  CQAlphaButton *alphab_    { nullptr }; // alpha slider
+  CQIconButton  *button_    { nullptr }; // image click button
 };
 
 #endif

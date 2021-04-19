@@ -1,21 +1,21 @@
 #include <CQFontChooser.h>
 #include <CQFontDialog.h>
-#include <CQPixmapCache.h>
+#include <CQIconButton.h>
 
 #include <QLineEdit>
 #include <QPushButton>
-#include <QToolButton>
 #include <QLabel>
 #include <QFontComboBox>
 #include <QHBoxLayout>
 #include <QFontDialog>
 #include <QFontDatabase>
 
-#include <svg/font_dialog_svg.h>
+#include <svg/font_dialog_light_svg.h>
+#include <svg/font_dialog_dark_svg.h>
 
 CQFontChooser::
 CQFontChooser(QWidget *parent) :
- QWidget(parent), style_(FontButton), fixedWidth_(false), exampleText_("Abc")
+ QWidget(parent)
 {
   setObjectName("fontChooser");
 
@@ -26,19 +26,19 @@ CQFontChooser(QWidget *parent) :
 
   //-----
 
-  QHBoxLayout *layout = new QHBoxLayout(this);
+  auto *layout = new QHBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(0);
 
-  cedit_   = new QLineEdit  (this); cedit_  ->setObjectName("cedit");
-  cbutton_ = new QToolButton(this); cbutton_->setObjectName("cbutton");
-  clabel_  = new QLabel     (this); clabel_ ->setObjectName("clabel");
-  button_  = new QToolButton(this); button_ ->setObjectName("button");
+  cedit_   = new QLineEdit   (this); cedit_  ->setObjectName("cedit");
+  cbutton_ = new QToolButton (this); cbutton_->setObjectName("cbutton");
+  clabel_  = new QLabel      (this); clabel_ ->setObjectName("clabel");
+  button_  = new CQIconButton(this); button_ ->setObjectName("button");
 
   ncombo_ = new QFontComboBox(this); ncombo_->setObjectName("ncombo");
   scombo_ = new QComboBox    (this); scombo_->setObjectName("scombo");
   zcombo_ = new QComboBox    (this); zcombo_->setObjectName("zcombo");
 
-  button_->setIcon(CQPixmapCacheInst->getIcon("FONT_DIALOG"));
+  button_->setIcon("FONT_DIALOG");
 
   ncombo_->setWritingSystem(QFontDatabase::Latin);
 
@@ -92,7 +92,8 @@ void
 CQFontChooser::
 setStyle(Style style)
 {
-  if (style_ == style) return;
+  if (style_ == style)
+    return;
 
   style_ = style;
 
@@ -137,7 +138,8 @@ void
 CQFontChooser::
 setFixedWidth(bool fixedWidth)
 {
-  if (fixedWidth == fixedWidth_) return;
+  if (fixedWidth == fixedWidth_)
+    return;
 
   fixedWidth_ = fixedWidth;
 
@@ -150,7 +152,8 @@ void
 CQFontChooser::
 setExampleText(const QString &exampleText)
 {
-  if (exampleText == exampleText_) return;
+  if (exampleText == exampleText_)
+    return;
 
   exampleText_ = exampleText;
 

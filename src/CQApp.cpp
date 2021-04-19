@@ -1,6 +1,7 @@
 #include <CQApp.h>
+#include <CQAppOptions.h>
 #include <CQStyleMgr.h>
-#include <CQStyle.h>
+#include <CQUtil.h>
 #include <CQFont.h>
 #include <CQImage.h>
 
@@ -83,6 +84,11 @@ eventFilter(QObject *obj, QEvent *event)
       return true;
     }
 #endif
+
+    if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_PageDown) {
+      CQAppOptions::show();
+      return true;
+    }
   }
 
   // standard event processing
@@ -97,6 +103,12 @@ CQApp::
 CQApp(int &argc, char **argv) :
  QApplication(argc, argv)
 {
+  assert(! app_);
+
+  app_ = this;
+
+  //---
+
   setObjectName("app");
 
   //---
@@ -154,12 +166,22 @@ CQApp(int &argc, char **argv) :
 
   QFont font(fontName.c_str(), fontSize);
 
-  qApp->setFont(font);
+  CQStyleMgrInst->setFont(font);
 
-  QFontMetrics fm(qApp->font());
+  QFontMetrics fm(CQStyleMgrInst->font());
 
   CScreenUnitsMgrInst->setEmSize(fm.height());
   CScreenUnitsMgrInst->setExSize(fm.width("x"));
+
+  auto fixedFont = CQUtil::getMonospaceFont();
+
+  fixedFont.setPixelSize(fontSize);
+
+  CQStyleMgrInst->setFixedFont(fixedFont);
+
+  //---
+
+  CQStyleMgrInst->setIconSizeFromFont();
 
   //---
 
@@ -202,6 +224,7 @@ CQApp::
 #ifdef CQUTIL_FONT
   CFontMgr::release();
 #endif
+
 #ifdef CQUTIL_IMAGE
   CImageMgr::release();
 #endif

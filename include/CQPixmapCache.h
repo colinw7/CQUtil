@@ -30,6 +30,8 @@ class CQPixmapCache : public QObject {
 
   const QPixmap &getPixmap(const QString &id);
 
+  QIcon getLightDarkIcon(const QString &name);
+
   QIcon getIcon(const QString &lightId, const QString &darkId="");
 
   QIcon getPixmapIcon(const QString &id);
