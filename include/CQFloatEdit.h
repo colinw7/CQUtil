@@ -16,7 +16,7 @@ class CQFloatEdit : public QLineEdit {
   void display(const QRect &rect, const QString &text);
 
  private:
-  bool event(QEvent *e);
+  bool event(QEvent *e) override;
 
  private slots:
   void acceptSlot();

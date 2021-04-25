@@ -46,13 +46,13 @@ class CQLineEdit : public QLineEdit {
 
  protected:
   //! handle focus in event
-  void focusInEvent(QFocusEvent *e);
+  void focusInEvent(QFocusEvent *e) override;
 
   //! handle focus out event
-  void focusOutEvent(QFocusEvent *e);
+  void focusOutEvent(QFocusEvent *e) override;
 
   //! handle change event
-  void changeEvent(QEvent *e);
+  void changeEvent(QEvent *e) override;
 
  private:
   QColor placeColor_;  //! placeholder text color

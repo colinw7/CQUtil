@@ -107,7 +107,7 @@ class CQWidgetMenuArea : public QWidget {
   virtual void resetSize();
 
   //! return size hint
-  virtual QSize sizeHint() const;
+  QSize sizeHint() const override;
 
   //! update widget placement in menu
   virtual void updateLayout();
@@ -120,7 +120,7 @@ class CQWidgetMenuArea : public QWidget {
 
  private:
   //! handle resize event
-  void resizeEvent(QResizeEvent *);
+  void resizeEvent(QResizeEvent *) override;
 
  private slots:
   //! handle menu shown signal

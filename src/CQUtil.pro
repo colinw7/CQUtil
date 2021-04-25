@@ -48,10 +48,12 @@ CQIntegerEdit.cpp \
 CQRealEdit.cpp \
 CQIntegerSpin.cpp \
 CQRealSpin.cpp \
+CQLabel.cpp \
 \
 CQImageButton.cpp \
 CQPixmapButton.cpp \
 CQIconButton.cpp \
+CQIconRadio.cpp \
 CQRadioButtons.cpp \
 \
 CQPoint2DEdit.cpp \
@@ -133,10 +135,12 @@ HEADERS += \
 \
 ../include/CQIntegerSpin.h \
 ../include/CQRealSpin.h \
+../include/CQLabel.h \
 \
 ../include/CQImageButton.h \
 ../include/CQPixmapButton.h \
 ../include/CQIconButton.h \
+../include/CQIconRadio.h \
 ../include/CQRadioButtons.h \
 \
 ../include/CQPoint2DEdit.h \

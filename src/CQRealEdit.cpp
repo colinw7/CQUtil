@@ -51,7 +51,7 @@ addMenuValue(double value)
     connect(menu_, SIGNAL(triggered(QAction *)), this, SLOT(menuItemActivated(QAction *)));
   }
 
-  CQRealEditAction *action = new CQRealEditAction(value);
+  auto *action = new CQRealEditAction(value);
 
   menu_->addAction(action);
 }
@@ -119,7 +119,7 @@ void
 CQRealEdit::
 menuItemActivated(QAction *action)
 {
-  CQRealEditAction *raction = dynamic_cast<CQRealEditAction *>(action);
+  auto *raction = dynamic_cast<CQRealEditAction *>(action);
   if (! raction) return;
 
   double value = raction->getValue();

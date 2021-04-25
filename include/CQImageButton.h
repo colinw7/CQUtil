@@ -18,8 +18,8 @@ class CQImageButton : public QToolButton {
 
   virtual ~CQImageButton() { }
 
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
  private:
 #ifdef CQUTIL_IMAGE

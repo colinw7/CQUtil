@@ -19,8 +19,8 @@ class CQPixmapButton : public QToolButton {
   int margin() const { return margin_; }
   void setMargin(int i);
 
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
  private:
   void init(const QPixmap &pixmap);

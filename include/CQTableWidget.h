@@ -109,7 +109,7 @@ class CQTableWidget : public QTableWidget {
   void emitValueChanged(int row, int col);
 
  protected:
-  void showEvent(QShowEvent *);
+  void showEvent(QShowEvent *) override;
 
   void fixTableColumnWidths(QTableWidget *table, int max_len, bool init);
 

@@ -27,7 +27,7 @@ class CQAutoHide : public QObject {
   void autoHide();
 
  private:
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event) override;
 
   bool processEvent(QObject *obj, QEvent *event);
 
