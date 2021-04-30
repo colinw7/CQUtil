@@ -87,6 +87,16 @@ class CQWidgetFactoryMgr : public QObject {
 
   bool isWidgetFactory(const QString &name) const;
 
+  template<typename T>
+  void addWidgetFactoryT(const QString &name) {
+    addWidgetFactory(name, new CQWidgetFactoryT<T>());
+  }
+
+  template<typename T>
+  void addWidgetFactoryNoArgsT(const QString &name) {
+    addWidgetFactory(name, new CQWidgetFactoryNoArgsT<T>());
+  }
+
   void addWidgetFactory(const QString &name, CQWidgetFactory *factory);
 
   void removeWidgetFactory(const QString &name);
