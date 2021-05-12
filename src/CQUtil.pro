@@ -48,6 +48,8 @@ CQIntegerEdit.cpp \
 CQRealEdit.cpp \
 CQIntegerSpin.cpp \
 CQRealSpin.cpp \
+CQComboSlider.cpp \
+CQSlider.cpp \
 CQLabel.cpp \
 \
 CQImageButton.cpp \
@@ -135,6 +137,8 @@ HEADERS += \
 \
 ../include/CQIntegerSpin.h \
 ../include/CQRealSpin.h \
+../include/CQComboSlider.h \
+../include/CQSlider.h \
 ../include/CQLabel.h \
 \
 ../include/CQImageButton.h \
