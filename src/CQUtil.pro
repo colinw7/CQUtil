@@ -108,6 +108,8 @@ CQWidgetFactory.cpp \
 CQStrUtil.cpp \
 \
 CQEnumCombo.cpp \
+\
+CQTrie.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -197,6 +199,8 @@ HEADERS += \
 ../include/CQStrUtil.h \
 \
 ../include/CQEnumCombo.h \
+\
+../include/CQTrie.h \
 
 OBJECTS_DIR = ../obj
 
