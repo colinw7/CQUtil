@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-TARGET = CQUtil
+TARGET = CQUtilMin
 
 DEPENDPATH += .
 
@@ -8,17 +8,15 @@ QT += widgets
 
 CONFIG += staticlib
 
-#QMAKE_CXXFLAGS += \
+QMAKE_CXXFLAGS += \
 -std=c++14
 
-QMAKE_CXXFLAGS += \
--std=c++14 \
--DCQUTIL_PALETTE \
--DCQUTIL_PEN \
--DCQUTIL_BRUSH \
--DCQUTIL_FONT \
--DCQUTIL_IMAGE \
--DCBRUSH_IMAGE \
+#QMAKE_CXXFLAGS += \
+#-std=c++14 \
+#-DCQUTIL_PEN \
+#-DCQUTIL_BRUSH \
+#-DCQUTIL_FONT \
+#-DCQUTIL_IMAGE \
 
 MOC_DIR = .moc
 
@@ -34,9 +32,6 @@ CQMainWindow.cpp \
 CQWorkspace.cpp \
 CQToolBar.cpp \
 CQWindow.cpp \
-\
-CQPenUtil.cpp \
-CQBrushUtil.cpp \
 \
 CQImage.cpp \
 CQImageUtil.cpp \
@@ -198,9 +193,9 @@ HEADERS += \
 \
 ../include/CQEnumCombo.h \
 
-OBJECTS_DIR = ../obj
+OBJECTS_DIR = ../minObj
 
-DESTDIR = ../lib
+DESTDIR = ../minLib
 
 INCLUDEPATH += \
 . \

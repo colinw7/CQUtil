@@ -1,0 +1,1 @@
+../src/CQAutoHide.cpp
