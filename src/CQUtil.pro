@@ -68,6 +68,7 @@ CQImageButton.cpp \
 CQPixmapButton.cpp \
 CQIconButton.cpp \
 CQIconRadio.cpp \
+CQIconLabel.cpp \
 CQRadioButtons.cpp \
 \
 CQPoint2DEdit.cpp \
@@ -159,6 +160,7 @@ HEADERS += \
 ../include/CQPixmapButton.h \
 ../include/CQIconButton.h \
 ../include/CQIconRadio.h \
+../include/CQIconLabel.h \
 ../include/CQRadioButtons.h \
 \
 ../include/CQPoint2DEdit.h \
