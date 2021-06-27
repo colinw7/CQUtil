@@ -134,8 +134,8 @@ fitColumnSlot()
   if (menuSection_ < 0)
     return;
 
-  QTreeView  *tree  = qobject_cast<QTreeView  *>(parentWidget());
-  QTableView *table = qobject_cast<QTableView *>(parentWidget());
+  auto *tree  = qobject_cast<QTreeView  *>(parentWidget());
+  auto *table = qobject_cast<QTableView *>(parentWidget());
 
   if      (tree) {
     int nr = tree->model()->rowCount();
@@ -143,9 +143,9 @@ fitColumnSlot()
     int w = 0;
 
     for (int r = 0; r < nr; ++r) {
-      QModelIndex ind = tree->model()->index(r, menuSection_);
+      auto ind = tree->model()->index(r, menuSection_);
 
-      QSize s = tree->model()->data(ind, Qt::SizeHintRole).toSize();
+      auto s = tree->model()->data(ind, Qt::SizeHintRole).toSize();
 
       w = std::max(w, s.width());
     }
@@ -159,9 +159,9 @@ fitColumnSlot()
     int w = 0;
 
     for (int r = 0; r < nr; ++r) {
-      QModelIndex ind = table->model()->index(r, menuSection_);
+      auto ind = table->model()->index(r, menuSection_);
 
-      QSize s = table->model()->data(ind, Qt::SizeHintRole).toSize();
+      auto s = table->model()->data(ind, Qt::SizeHintRole).toSize();
 
       w = std::max(w, s.width());
     }
@@ -175,8 +175,8 @@ void
 CQHeaderView::
 fitAllSlot()
 {
-  QTreeView  *tree  = qobject_cast<QTreeView  *>(parentWidget());
-  QTableView *table = qobject_cast<QTableView *>(parentWidget());
+  auto *tree  = qobject_cast<QTreeView  *>(parentWidget());
+  auto *table = qobject_cast<QTableView *>(parentWidget());
 
   ColumnWidths columnWidths;
 
@@ -199,7 +199,7 @@ fitAllSlot()
   int nc = model->columnCount();
 
   for (int c = 0; c < nc; ++c) {
-    QSize s = model->headerData(c, Qt::Horizontal, Qt::SizeHintRole).toSize();
+    auto s = model->headerData(c, Qt::Horizontal, Qt::SizeHintRole).toSize();
 
     if (! s.isValid() && header)
       s = QSize(header->sectionSizeHint(c), 0);
@@ -230,7 +230,7 @@ calcTreeWidths(QTreeView *tree, const QModelIndex &ind, int depth, ColumnWidths 
 
   QFontMetrics fm(font());
 
-  QAbstractItemModel *model = tree->model();
+  auto *model = tree->model();
 
   int nc = model->columnCount();
 
@@ -239,15 +239,15 @@ calcTreeWidths(QTreeView *tree, const QModelIndex &ind, int depth, ColumnWidths 
 
   for (int r = 0; r < nr; ++r) {
     for (int c = 0; c < nc; ++c) {
-      QModelIndex ind1 = model->index(r, c, ind);
+      auto ind1 = model->index(r, c, ind);
 
-      QSize s = model->data(ind1, Qt::SizeHintRole).toSize();
+      auto s = model->data(ind1, Qt::SizeHintRole).toSize();
 
       if (! s.isValid())
         s = tree->sizeHintForIndex(ind1);
 
       if (! s.isValid()) {
-        QString str = model->data(ind1, Qt::DisplayRole).toString();
+        auto str = model->data(ind1, Qt::DisplayRole).toString();
 
         s = QSize(fm.width(str), fm.height());
       }
@@ -258,7 +258,7 @@ calcTreeWidths(QTreeView *tree, const QModelIndex &ind, int depth, ColumnWidths 
 
   // process children (column 0)
   for (int r = 0; r < nr; ++r) {
-    QModelIndex ind1 = model->index(r, 0, ind);
+    auto ind1 = model->index(r, 0, ind);
 
     calcTreeWidths(tree, ind1, depth + 1, columnWidths);
   }
@@ -270,7 +270,7 @@ calcTableWidths(QTableView *table, ColumnWidths &columnWidths)
 {
   QFontMetrics fm(font());
 
-  QAbstractItemModel *model = table->model();
+  auto *model = table->model();
 
   int nc = model->columnCount();
 
@@ -279,15 +279,15 @@ calcTableWidths(QTableView *table, ColumnWidths &columnWidths)
 
   for (int r = 0; r < nr; ++r) {
     for (int c = 0; c < nc; ++c) {
-      QModelIndex ind = model->index(r, c);
+      auto ind = model->index(r, c);
 
-      QSize s = model->data(ind, Qt::SizeHintRole).toSize();
+      auto s = model->data(ind, Qt::SizeHintRole).toSize();
 
       if (! s.isValid())
         s = table->sizeHintForIndex(ind);
 
       if (! s.isValid()) {
-        QString str = model->data(ind, Qt::DisplayRole).toString();
+        auto str = model->data(ind, Qt::DisplayRole).toString();
 
         s = QSize(fm.width(str), fm.height());
       }
@@ -317,7 +317,7 @@ resetSortSlot()
 {
   setSortIndicator(-1, Qt::AscendingOrder);
 
-  QSortFilterProxyModel *proxyModel = this->proxyModel();
+  auto *proxyModel = this->proxyModel();
 
   if (proxyModel) {
     sortRole_ = proxyModel->sortRole();
@@ -357,7 +357,7 @@ initWidgets()
     widgets_.push_back(0);
 
   while (widgets_.size() > n) {
-    QWidget *w = widgets_.back();
+    auto *w = widgets_.back();
 
     delete w;
 
@@ -365,7 +365,7 @@ initWidgets()
   }
 
   for (int i = 0; i < n; ++i) {
-    QWidget *w = widgets_[i];
+    auto *w = widgets_[i];
 
     if (! w) {
       w = factory_->createWidget(i);
@@ -395,7 +395,7 @@ handleSectionResized(int section, int oldSize, int newSize)
     if (logical < 0 || logical >= widgets_.size())
       continue;
 
-    QWidget *w = widgets_[logical];
+    auto *w = widgets_[logical];
 
     w->setGeometry(sectionViewportPosition(logical), 0, sectionSize(logical) - 5, height());
   }
@@ -411,7 +411,7 @@ handleSectionMoved(int /*logical*/, int oldVisualIndex, int newVisualIndex)
     if (logical < 0 || logical >= widgets_.size())
       continue;
 
-    QWidget *w = widgets_[logical];
+    auto *w = widgets_[logical];
 
     w->setGeometry(sectionViewportPosition(logical), 0, sectionSize(logical) - 5, height());
   }
@@ -422,7 +422,7 @@ CQHeaderView::
 handleSectionClicked(int /*logical*/)
 {
   if (sortRole_ >= 0) {
-    QSortFilterProxyModel *proxyModel = this->proxyModel();
+    auto *proxyModel = this->proxyModel();
 
     if (proxyModel)
       proxyModel->setSortRole(sortRole_);
@@ -448,7 +448,7 @@ CQHeaderView::
 fixWidgetPositions()
 {
   for (int i = 0; i < count(); ++i) {
-    QWidget *w = widgets_[i];
+    auto *w = widgets_[i];
 
     w->setGeometry(sectionViewportPosition(i), 0, sectionSize(i) - 5, height());
   }
@@ -458,8 +458,8 @@ QSortFilterProxyModel *
 CQHeaderView::
 proxyModel()
 {
-  QTreeView  *tree  = qobject_cast<QTreeView  *>(parentWidget());
-  QTableView *table = qobject_cast<QTableView *>(parentWidget());
+  auto *tree  = qobject_cast<QTreeView  *>(parentWidget());
+  auto *table = qobject_cast<QTableView *>(parentWidget());
 
   QSortFilterProxyModel *proxyModel = nullptr;
 
