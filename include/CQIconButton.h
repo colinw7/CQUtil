@@ -6,7 +6,8 @@
 class CQIconButton : public QToolButton {
   Q_OBJECT
 
-  Q_PROPERTY(Size size READ size WRITE setSize)
+  Q_PROPERTY(QString iconName READ icon WRITE setIcon)
+  Q_PROPERTY(Size    size     READ size WRITE setSize)
 
   Q_ENUMS(Size)
 
@@ -19,13 +20,17 @@ class CQIconButton : public QToolButton {
 
  public:
   CQIconButton(QWidget *parent=nullptr);
+  CQIconButton(const QString &iconName, QWidget *parent=nullptr);
 
   const Size &size() const { return size_; }
   void setSize(const Size &s);
 
+  const QString &icon() const { return iconName_; }
   void setIcon(const QString &iconName);
 
  private slots:
+  void init();
+
   void updateIcon();
 
  private:

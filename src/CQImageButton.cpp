@@ -61,7 +61,7 @@ init(CImagePtr image)
   CQImage *qimage = image.cast<CQImage>();
 
   if (qimage) {
-    QPixmap pixmap = QPixmap::fromImage(qimage->getQImage());
+    auto pixmap = QPixmap::fromImage(qimage->getQImage());
 
     init(pixmap);
   }

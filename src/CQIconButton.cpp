@@ -6,6 +6,20 @@ CQIconButton::
 CQIconButton(QWidget *parent) :
  QToolButton(parent)
 {
+  init();
+}
+
+CQIconButton::
+CQIconButton(const QString &iconName, QWidget *parent) :
+ QToolButton(parent), iconName_(iconName)
+{
+  init();
+}
+
+void
+CQIconButton::
+init()
+{
   connect(CQStyleMgrInst, SIGNAL(themeChanged()), this, SLOT(updateIcon()));
   connect(CQStyleMgrInst, SIGNAL(iconSizeChanged()), this, SLOT(updateIcon()));
 
