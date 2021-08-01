@@ -60,8 +60,8 @@ class CQFont : public CFont {
   CQFont(const QFont &qfont);
   CQFont(const CQFont &qfont);
 
-  const CQFont &operator=(const CFont &qfont);
-  const CQFont &operator=(const CQFont &qfont);
+  CQFont &operator=(const CFont &qfont);
+  CQFont &operator=(const CQFont &qfont);
 
  public:
   const QFont &getQFont() const { return *qfont_; }

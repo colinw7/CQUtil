@@ -1,6 +1,8 @@
 #include <CQTableWidget.h>
 #include <CQHeaderView.h>
 
+#include <CQColorChooser.h>
+
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QItemDelegate>
@@ -12,12 +14,12 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 
-//----------------------------
+//---
 
 class CQTableWidgetDelegate : public QItemDelegate {
  public:
-  CQTableWidgetDelegate(CQTableWidget *t) :
-   QItemDelegate(t), t_(t) {
+  CQTableWidgetDelegate(CQTableWidget *table) :
+   QItemDelegate(table), table_(table) {
   }
 
   // Override to create editor
@@ -38,21 +40,35 @@ class CQTableWidgetDelegate : public QItemDelegate {
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
              const QModelIndex &index) const;
 
+  void drawBoolCheck(QPainter *painter, const QStyleOptionViewItem &option,
+                     const QRect &rect, bool b) {
+    Qt::CheckState checkState = (b ? Qt::Checked : Qt::Unchecked);
+
+    QItemDelegate::drawCheck(painter, option, rect, checkState);
+  }
+
+  void drawDisplayText(QPainter *painter, const QStyleOptionViewItem &option,
+                       const QRect &rect, const QString &str) {
+    QItemDelegate::drawDisplay(painter, option, rect, str);
+  }
+
  private:
-  CQTableWidget *t_;
+  CQTableWidget *table_;
 };
 
-//----------------------------
+//---
 
 uint CQTableWidgetItem::type_ = 0;
 
-//----------------------------
+//---
 
 CQTableWidget::
 CQTableWidget(QWidget* parent) :
  QTableWidget(parent)
 {
   setObjectName("table");
+
+  //--
 
   verticalHeader()->hide();
 
@@ -64,21 +80,38 @@ CQTableWidget(QWidget* parent) :
 
   //---
 
-  // Set Item Delegate
-  CQTableWidgetDelegate *delegate = new CQTableWidgetDelegate(this);
+//setUniformRowHeights(true);
+  setAlternatingRowColors(true);
 
-  setItemDelegate(delegate);
-  setEditTriggers(QAbstractItemView::AllEditTriggers);
+  setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+//setEditTriggers(QAbstractItemView::AllEditTriggers);
 
   setSelectionMode(QAbstractItemView::SingleSelection);
   setSelectionBehavior(QAbstractItemView::SelectRows);
 
+  //---
+
+  // Set Item Delegate
+  delegate_ = new CQTableWidgetDelegate(this);
+
+  setItemDelegate(delegate_);
+
+//connect(delegate_, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)),
+//        this, SLOT(closeEditorSlot(QWidget*, QAbstractItemDelegate::EndEditHint)));
+
+  //--
+
+  connect(this, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(itemClickedSlot(const QModelIndex &)));
+
+  //---
+
   // Set the value column to stretch to fit the table and other table attributes.
-  QHeaderView *header = horizontalHeader();
+  auto *header = horizontalHeader();
 
   header->setStretchLastSection(true);
 
-  setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+  //---
 
   //setSortingEnabled(false);
 
@@ -87,6 +120,11 @@ CQTableWidget(QWidget* parent) :
 
   horizontalScrollBar()->setObjectName("hbar");
   verticalScrollBar  ()->setObjectName("vbar");
+
+  //---
+
+  registerType(CQTableWidgetColorItem::TYPE, new CQTableWidgetBoolItem (this, false));
+  registerType(CQTableWidgetColorItem::TYPE, new CQTableWidgetColorItem(this, QColor()));
 }
 
 CQTableWidget::
@@ -109,7 +147,7 @@ void
 CQTableWidget::
 setColumnLabel(int col, const QString &label)
 {
-  QTableWidgetItem *item = horizontalHeaderItem(col);
+  auto *item = horizontalHeaderItem(col);
 
   if (! item) {
     item = new QTableWidgetItem;
@@ -126,7 +164,7 @@ setRowLabel(int row, const QString &label)
 {
   verticalHeader()->show();
 
-  QTableWidgetItem *item = verticalHeaderItem(row);
+  auto *item = verticalHeaderItem(row);
 
   if (! item) {
     item = new QTableWidgetItem;
@@ -159,7 +197,7 @@ createItem(int row, int column, uint type)
 {
   assert(types_.find(type) != types_.end());
 
-  CQTableWidgetItem *item = types_[type]->clone();
+  auto *item = types_[type]->clone();
 
   QTableWidget::setItem(row, column, item);
 
@@ -172,7 +210,7 @@ setItem(int row, int column, CQTableWidgetItem *item)
 {
   QTableWidget::setItem(row, column, item);
 
-  QModelIndex index = model()->index(row, column);
+  auto index = model()->index(row, column);
 
   model()->setData(index, item->getString());
 }
@@ -183,7 +221,7 @@ setItem(int row, int column, QTableWidgetItem *item)
 {
   QTableWidget::setItem(row, column, item);
 
-  QModelIndex index = model()->index(row, column);
+  auto index = model()->index(row, column);
 
   model()->setData(index, item->text());
 }
@@ -192,7 +230,7 @@ void
 CQTableWidget::
 setItem(int row, int column, const QString &str)
 {
-  QTableWidgetItem *item = new QTableWidgetItem(str);
+  auto *item = new QTableWidgetItem(str);
 
   item->setFlags(item->flags() & ~Qt::ItemIsEditable);
 
@@ -217,6 +255,24 @@ showEvent(QShowEvent *)
 
 void
 CQTableWidget::
+itemClickedSlot(const QModelIndex &index)
+{
+  int row    = index.row();
+  int column = index.column();
+
+  auto *item = this->item(row, column);
+
+  auto *boolItem = dynamic_cast<CQTableWidgetBoolItem *>(item);
+
+  if (boolItem) {
+    boolItem->click();
+
+    emit boolClicked(row, column, boolItem->value());
+  }
+}
+
+void
+CQTableWidget::
 fitAll()
 {
   header_->fitAllSlot();
@@ -235,7 +291,7 @@ void
 CQTableWidget::
 fixTableColumnWidths(QTableWidget *table, int max_len, bool init)
 {
-  const QFont &font = table->font();
+  const auto &font = table->font();
 
   QFontMetrics fm(font);
 
@@ -247,12 +303,12 @@ fixTableColumnWidths(QTableWidget *table, int max_len, bool init)
     int width = (init ? 0 : table->columnWidth(c));
 
     if (table->horizontalHeader()->isVisible()) {
-      QTableWidgetItem *item = table->horizontalHeaderItem(c);
+      auto *item = table->horizontalHeaderItem(c);
 
       if (item) {
-        QVariant var = item->data(Qt::DisplayRole);
+        auto var = item->data(Qt::DisplayRole);
 
-        QString str = var.toString();
+        auto str = var.toString();
 
         if (str.length() <= max_len)
           width = qMax(width, fm.width(str) + 10);
@@ -262,17 +318,17 @@ fixTableColumnWidths(QTableWidget *table, int max_len, bool init)
     int num_rows = table->rowCount();
 
     for (int r = 0; r < num_rows; ++r) {
-      QTableWidgetItem *item = table->item(r, c);
+      auto *item = table->item(r, c);
 
       if (item) {
-        QVariant var = item->data(Qt::DisplayRole);
+        auto var = item->data(Qt::DisplayRole);
 
-        QString str = var.toString();
+        auto str = var.toString();
 
         if (str.length() <= max_len)
           width = qMax(width, fm.width(str) + 28);
 
-        QWidget *w = table->cellWidget(r, c);
+        auto *w = table->cellWidget(r, c);
 
         if (w)
           width = qMax(width, w->width());
@@ -290,18 +346,18 @@ emitValueChanged(int row, int col)
   emit valueChanged(row, col);
 }
 
-//----------------------------
+//---
 
 QWidget *
 CQTableWidgetDelegate::
 createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QTableWidgetItem *item = t_->item(index.row(), index.column());
+  auto *item = table_->item(index.row(), index.column());
 
-  CQTableWidgetItem *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
 
   if (item1) {
-    QWidget *w = item1->createEditor(parent);
+    auto *w = item1->createEditor(parent);
 
     if (w)
       w->installEventFilter(const_cast<CQTableWidgetDelegate*>(this));
@@ -316,9 +372,9 @@ void
 CQTableWidgetDelegate::
 setEditorData(QWidget *, const QModelIndex &index) const
 {
-  QTableWidgetItem *item = t_->item(index.row(), index.column());
+  auto *item = table_->item(index.row(), index.column());
 
-  CQTableWidgetItem *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
 
   if (item1)
     item1->setEditorData();
@@ -328,9 +384,9 @@ void
 CQTableWidgetDelegate::
 setModelData(QWidget *, QAbstractItemModel *model, const QModelIndex &index) const
 {
-  QTableWidgetItem *item = t_->item(index.row(), index.column());
+  auto *item = table_->item(index.row(), index.column());
 
-  CQTableWidgetItem *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
 
   if (item1) {
     QString str;
@@ -339,7 +395,7 @@ setModelData(QWidget *, QAbstractItemModel *model, const QModelIndex &index) con
 
     model->setData(index, str);
 
-    t_->emitValueChanged(index.row(), index.column());
+    table_->emitValueChanged(index.row(), index.column());
   }
 }
 
@@ -347,9 +403,9 @@ QSize
 CQTableWidgetDelegate::
 sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QTableWidgetItem *item = t_->item(index.row(), index.column());
+  auto *item = table_->item(index.row(), index.column());
 
-  CQTableWidgetItem *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
 
   if (item1) {
     QSize size;
@@ -373,19 +429,19 @@ void
 CQTableWidgetDelegate::
 paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  QTableWidgetItem *item = t_->item(index.row(), index.column());
+  auto *item = table_->item(index.row(), index.column());
 
-  CQTableWidgetItem *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
 
   if (! item1 || ! item1->paint(painter, option))
     QItemDelegate::paint(painter, option, index);
 }
 
-//------------------------------
+//---
 
 CQTableWidgetItem::
-CQTableWidgetItem(CQTableWidget *t) :
- t_(t)
+CQTableWidgetItem(CQTableWidget *table) :
+ table_(table)
 {
 }
 
@@ -414,11 +470,11 @@ setTextPen(QPainter *painter, const QStyleOptionViewItem &option) const
     painter->setPen(option.palette.color(cg, QPalette::Text));
 }
 
-//------------------------------
+//---
 
 #if 0
-CQObjEditStdItem::
-CQObjEditStdItem(const QString &label) :
+CQTableWidgetStdItem::
+CQTableWidgetStdItem(const QString &label) :
  CQTableWidgetItem(CQOBJ_EDIT_STD_ITEM_ID)
 {
   setText(label);
@@ -426,8 +482,8 @@ CQObjEditStdItem(const QString &label) :
   setFlags(flags() | Qt::ItemIsEditable);
 }
 
-CQObjEditStdItem::
-CQObjEditStdItem(const CQObjEditStdItem &item) :
+CQTableWidgetStdItem::
+CQTableWidgetStdItem(const CQTableWidgetStdItem &item) :
  QTreeWidgetItem(item)
 {
   for (int i = 0; i < item.childCount(); ++i)
@@ -437,9 +493,112 @@ CQObjEditStdItem(const CQObjEditStdItem &item) :
 }
 
 bool
-CQObjEditStdItem::
+CQTableWidgetStdItem::
 paint(QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const
 {
   return false;
 }
 #endif
+
+//---
+
+QWidget *
+CQTableWidgetBoolItem::
+createEditor(QWidget *) const
+{
+  return nullptr;
+}
+
+void
+CQTableWidgetBoolItem::
+setEditorData()
+{
+}
+
+void
+CQTableWidgetBoolItem::
+getEditorData(QString &str)
+{
+  str = getString();
+}
+
+bool
+CQTableWidgetBoolItem::
+paint(QPainter *painter, const QStyleOptionViewItem &option) const
+{
+  paintBackground(painter, option);
+
+  auto rect = option.rect;
+
+  rect.setWidth(option.rect.height());
+
+  rect.adjust(0, 1, -3, -2);
+
+  table_->delegate()->drawBoolCheck(painter, option, rect, b_);
+
+  int x = rect.right() + 4;
+
+  QRect rect1;
+
+  rect1.setCoords(x, option.rect.top(), option.rect.right(), option.rect.bottom());
+
+  table_->delegate()->drawDisplayText(painter, option, rect1, getString());
+
+  return true;
+}
+
+//---
+
+QWidget *
+CQTableWidgetColorItem::
+createEditor(QWidget *parent) const
+{
+  uint styles = CQColorChooser::Text | CQColorChooser::ColorButton | CQColorChooser::AlphaButton;
+
+  edit_ = new CQColorChooser(styles, parent);
+
+  return edit_;
+}
+
+void
+CQTableWidgetColorItem::
+setEditorData()
+{
+  if (edit_.isNull())
+    return;
+
+  edit_->setColor(c_);
+}
+
+void
+CQTableWidgetColorItem::
+getEditorData(QString &str)
+{
+  if (edit_.isNull()) return;
+
+  c_ = edit_->color();
+
+  str = getString();
+}
+
+bool
+CQTableWidgetColorItem::
+paint(QPainter *painter, const QStyleOptionViewItem &option) const
+{
+  if (edit_.isNull()) {
+    paintBackground(painter, option);
+
+    QFontMetrics fm(option.font);
+
+    auto rect = option.rect.adjusted(2, 2, -4, -2);
+
+    painter->fillRect(rect, QBrush(c_));
+
+    setTextPen(painter, option);
+
+    painter->drawText(QRect(QPoint(rect.right() + 2, rect.top()),
+                            QPoint(rect.right() + 2, rect.bottom())), getString());
+  }
+
+  return true;
+}

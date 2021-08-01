@@ -238,7 +238,7 @@ dup(const std::string &family, CFontStyle style, double size, double angle, doub
   return CFontPtr(qfont);
 }
 
-const CQFont &
+CQFont &
 CQFont::
 operator=(const CQFont &qfont)
 {

@@ -2,6 +2,7 @@
 #define CQTableWidget_H
 
 #include <QTableWidget>
+#include <QPointer>
 
 #include <cassert>
 #include <vector>
@@ -21,7 +22,7 @@ class CQTableWidgetItem : public QTableWidgetItem {
 
   //------
 
-  CQTableWidgetItem(CQTableWidget *t);
+  CQTableWidgetItem(CQTableWidget *table);
 
  ~CQTableWidgetItem() { }
 
@@ -43,8 +44,8 @@ class CQTableWidgetItem : public QTableWidgetItem {
   // drawing override for static (not editted) item
   virtual bool paint(QPainter *, const QStyleOptionViewItem &) const { return false; }
 
-  // set string value
-  virtual QString getString() = 0;
+  // get string value
+  virtual QString getString() const = 0;
 
   virtual bool validate() const { return true; }
 
@@ -57,16 +58,22 @@ class CQTableWidgetItem : public QTableWidgetItem {
  protected:
   static uint type_;
 
-  CQTableWidget *t_;
+  CQTableWidget *table_ { nullptr };
 };
+
+//---
+
+class CQTableWidgetDelegate;
 
 class CQTableWidget : public QTableWidget {
   Q_OBJECT
 
  public:
-  CQTableWidget(QWidget* parent = 0);
+  CQTableWidget(QWidget* parent=nullptr);
 
   virtual ~CQTableWidget();
+
+  CQTableWidgetDelegate *delegate() const { return delegate_; }
 
   void registerType(uint type, CQTableWidgetItem *item);
 
@@ -85,9 +92,9 @@ class CQTableWidget : public QTableWidget {
 
   template<typename T>
   T *getItem(int row, int column) {
-    QTableWidgetItem *i = item(row, column);
+    auto *i = item(row, column);
 
-    CQTableWidgetItem *i1 = dynamic_cast<CQTableWidgetItem *>(i);
+    auto *i1 = dynamic_cast<CQTableWidgetItem *>(i);
     assert(i1 != NULL);
 
     assert(i1->getType() == T::getType());
@@ -102,6 +109,8 @@ class CQTableWidget : public QTableWidget {
   void setItem(int row, int column, const QString &str);
   void setItem(int row, int column, QWidget *w);
 
+  //---
+
   void fitAll();
 
   void fixTableColumnWidths();
@@ -113,14 +122,95 @@ class CQTableWidget : public QTableWidget {
 
   void fixTableColumnWidths(QTableWidget *table, int max_len, bool init);
 
+ protected slots:
+  void itemClickedSlot(const QModelIndex &index);
+
  signals:
   void valueChanged(int row, int col);
 
- protected:
-  typedef std::map<uint,CQTableWidgetItem*> TypeList;
+  void boolClicked(int row, int col, bool value);
 
-  CQHeaderView *header_ { nullptr };
-  TypeList      types_;
+ protected:
+  using TypeList = std::map<uint,CQTableWidgetItem*>;
+
+  CQHeaderView*          header_ { nullptr };
+  TypeList               types_;
+  CQTableWidgetDelegate* delegate_ { nullptr };
+};
+
+//---
+
+class CQTableWidgetBoolItem : public CQTableWidgetItem {
+ public:
+  enum { TYPE = QTableWidgetItem::UserType + 1 };
+
+  CQTableWidgetBoolItem(CQTableWidget *table, bool b) :
+   CQTableWidgetItem(table), b_(b) {
+  }
+
+  CQTableWidgetBoolItem *clone() const override { return new CQTableWidgetBoolItem(table_, b_); }
+
+  QString getString() const override { return (b_ ? "true" : "false"); }
+
+  QWidget *createEditor(QWidget *parent) const override;
+
+  void setEditorData() override;
+  void getEditorData(QString &str) override;
+
+  bool sizeHint(const QStyleOptionViewItem &option, QSize &size) const override {
+    size = QSize(128, option.rect.height());
+
+    return true;
+  }
+
+  bool paint(QPainter *painter, const QStyleOptionViewItem &option) const override;
+
+  void click() { b_ = ! b_; }
+
+  bool value() const { return b_; }
+
+ private:
+  static uint type_;
+
+  bool b_ { false };
+};
+
+//---
+
+class CQColorChooser;
+
+class CQTableWidgetColorItem : public CQTableWidgetItem {
+ public:
+  enum { TYPE = QTableWidgetItem::UserType + 2 };
+
+  CQTableWidgetColorItem(CQTableWidget *table, const QColor &c) :
+   CQTableWidgetItem(table), c_(c) {
+  }
+
+  CQTableWidgetColorItem *clone() const override { return new CQTableWidgetColorItem(table_, c_); }
+
+  QString getString() const override { return c_.name(); }
+
+  QWidget *createEditor(QWidget *parent) const override;
+
+  void setEditorData() override;
+  void getEditorData(QString &str) override;
+
+  bool sizeHint(const QStyleOptionViewItem &option, QSize &size) const override {
+    size = QSize(128, option.rect.height());
+
+    return true;
+  }
+
+  bool paint(QPainter *painter, const QStyleOptionViewItem &option) const override;
+
+ private:
+  using ColorChooserP = QPointer<CQColorChooser>;
+
+  static uint type_;
+
+  mutable ColorChooserP edit_;
+  QColor                c_;
 };
 
 #endif
