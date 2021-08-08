@@ -168,6 +168,7 @@ class CQTableWidgetBoolItem : public CQTableWidgetItem {
   void click() { b_ = ! b_; }
 
   bool value() const { return b_; }
+  void setValue(bool b) { b_ = b; }
 
  private:
   static uint type_;

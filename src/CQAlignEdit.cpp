@@ -55,7 +55,7 @@ void
 CQAlignEdit::
 mousePressEvent(QMouseEvent *e)
 {
-  QPoint p = e->pos();
+  auto p = e->pos();
 
   QStyleOptionComboBox opt;
 
@@ -72,13 +72,13 @@ mousePressEvent(QMouseEvent *e)
     return;
 #endif
 
-  CQWidgetMenu *menu = new CQWidgetMenu;
+  auto *menu = new CQWidgetMenu;
 
-  CQAlignEditMenuWidget *widget = new CQAlignEditMenuWidget(this);
+  auto *widget = new CQAlignEditMenuWidget(this);
 
   menu->setWidget(widget);
 
-  QPoint gpos = mapToGlobal(rect().bottomLeft());
+  auto gpos = mapToGlobal(rect().bottomLeft());
 
   menu->exec(gpos);
 
@@ -109,13 +109,13 @@ paintEvent(QPaintEvent *)
 
   //---
 
-  QRect r = style()->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
+  auto r = style()->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
 
   painter.setClipRect(r);
 
   //---
 
-  QString str = toString();
+  auto str = toString();
 
   QFontMetrics fm(font());
 
@@ -126,7 +126,7 @@ QString
 CQAlignEdit::
 toString() const
 {
-  Qt::Alignment align = this->align();
+  auto align = this->align();
 
   return toString(align);
 }
@@ -154,7 +154,7 @@ QSize
 CQAlignEdit::
 sizeHint() const
 {
-  QString str = toString();
+  auto str = toString();
 
   QFontMetrics fm(font());
 
@@ -191,7 +191,7 @@ void
 CQAlignEditMenuWidget::
 resizeEvent(QResizeEvent *)
 {
-  QRect rect = this->rect();
+  auto rect = this->rect();
 
   int m = 4;
   int s = 8;
@@ -218,9 +218,9 @@ void
 CQAlignEditMenuWidget::
 paintEvent(QPaintEvent *)
 {
-  QColor bg = palette().color(QPalette::Window);
+  auto bg = palette().color(QPalette::Window);
 
-  QRect rect = this->rect();
+  auto rect = this->rect();
 
   QPainter painter(this);
 
@@ -280,13 +280,13 @@ void
 CQAlignEditMenuWidget::
 drawAlignRect(QPainter *p, Qt::Alignment rectAlign, bool on)
 {
-  Qt::Alignment align = edit_->align();
+  auto align = edit_->align();
 
-  QColor bg       = palette().color(QPalette::Window);
-  QColor onColor  = QColor("#586e75");
-  QColor offColor = blendColors(onColor, bg, 0.5);
+  auto bg       = palette().color(QPalette::Window);
+  auto onColor  = QColor("#586e75");
+  auto offColor = blendColors(onColor, bg, 0.5);
 
-  QColor highlight = palette().color(QPalette::Highlight);
+  auto highlight = palette().color(QPalette::Highlight);
 
   if (! alignRect_[rectAlign].inside) {
     if (align & rectAlign) {

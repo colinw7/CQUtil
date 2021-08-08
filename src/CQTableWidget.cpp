@@ -24,21 +24,22 @@ class CQTableWidgetDelegate : public QItemDelegate {
 
   // Override to create editor
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                        const QModelIndex &index) const;
+                        const QModelIndex &index) const override;
 
   // Override to get content from editor
-  void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
   // Override to set editor from content
-  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+  void setModelData(QWidget *editor, QAbstractItemModel *model,
+                    const QModelIndex &index) const override;
 
-  QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
   void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                            const QModelIndex &index) const;
+                            const QModelIndex &index) const override;
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option,
-             const QModelIndex &index) const;
+             const QModelIndex &index) const override;
 
   void drawBoolCheck(QPainter *painter, const QStyleOptionViewItem &option,
                      const QRect &rect, bool b) {
@@ -450,8 +451,7 @@ CQTableWidgetItem::
 paintBackground(QPainter *painter, const QStyleOptionViewItem &option) const
 {
   if (option.state & QStyle::State_Selected) {
-    QPalette::ColorGroup cg =
-     (option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled);
+    auto cg = (option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled);
 
     painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
   }
@@ -461,8 +461,7 @@ void
 CQTableWidgetItem::
 setTextPen(QPainter *painter, const QStyleOptionViewItem &option) const
 {
-  QPalette::ColorGroup cg =
-   (option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled);
+  auto cg = (option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled);
 
   if (option.state & QStyle::State_Selected)
     painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
@@ -587,8 +586,6 @@ paint(QPainter *painter, const QStyleOptionViewItem &option) const
 {
   if (edit_.isNull()) {
     paintBackground(painter, option);
-
-    QFontMetrics fm(option.font);
 
     auto rect = option.rect.adjusted(2, 2, -4, -2);
 

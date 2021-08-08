@@ -23,7 +23,7 @@ namespace {
 QColor mergedColors(const QColor &colorA, const QColor &colorB, double factor = 50.0) {
   const double maxFactor = 100.0;
 
-  QColor tmp = colorA;
+  auto tmp = colorA;
 
   tmp.setRed  ((tmp.red  ()*factor)/maxFactor + (colorB.red  ()*(maxFactor - factor))/maxFactor);
   tmp.setGreen((tmp.green()*factor)/maxFactor + (colorB.green()*(maxFactor - factor))/maxFactor);
@@ -322,12 +322,12 @@ paintEvent(QPaintEvent *)
 
   // draw header
   if (decoration_.type & HeaderDecoration) {
-    QPalette pal = palette();
+    auto pal = palette();
 
     int hh = getHeaderHeight();
 
     // draw background
-    QBrush bgBrush = QBrush(pal.color(QPalette::Window));
+    auto bgBrush = QBrush(pal.color(QPalette::Window));
 
     if      (decoration_.headerSide == SideTop)
       decoration_.headerRect = QRect(b, b, width() - 2*b, hh);
@@ -339,8 +339,8 @@ paintEvent(QPaintEvent *)
       decoration_.headerRect = QRect(width() - b - hh, b, hh, height() - 2*b);
 
 #if 1
-  //QColor barColor = palette().button().color();
-    QColor barColor = this->barColor();
+  //auto barColor = palette().button().color();
+    auto barColor = this->barColor();
 
     QColor dark;
 
@@ -348,8 +348,8 @@ paintEvent(QPaintEvent *)
                 qMin(255, (int)(barColor.saturation()*1.9)),
                 qMin(255, (int)(barColor.value()*0.7)));
 
-    QColor gradientStartColor = barColor.lighter(108);
-    QColor gradientStopColor  = mergedColors(barColor.darker(108), dark.lighter(150), 70);
+    auto gradientStartColor = barColor.lighter(108);
+    auto gradientStopColor  = mergedColors(barColor.darker(108), dark.lighter(150), 70);
 
     if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
       drawGradient(&painter, decoration_.headerRect, gradientStartColor, gradientStopColor,
@@ -409,7 +409,7 @@ paintEvent(QPaintEvent *)
 #endif
 
     // draw title
-    QString text = windowTitle();
+    auto text = windowTitle();
 
     if (text.length()) {
       painter.setPen(pal.color(QPalette::WindowText));
@@ -561,7 +561,7 @@ mousePressEvent(QMouseEvent *event)
     state_.moving   = false;
     state_.resizing = false;
 
-    QPoint p = event->pos();
+    auto p = event->pos();
 
     if (decoration_.type & HeaderDecoration) {
       closeButton_   .updateActive(p, pressed_);
@@ -620,9 +620,9 @@ CQWinWidget::
 mouseMoveEvent(QMouseEvent *event)
 {
   if      (state_.moving) {
-    QPoint d = event->globalPos() - state_.pressPos;
+    auto d = event->globalPos() - state_.pressPos;
 
-    QPoint p = state_.initPos + d;
+    auto p = state_.initPos + d;
 
     if (checkMove(p))
       move(p);
@@ -657,7 +657,7 @@ mouseMoveEvent(QMouseEvent *event)
 
   setCursor(select_bits, selectmask_bits, 2, 2);
 
-  QPoint p = event->pos();
+  auto p = event->pos();
 
   if (decoration_.type & HeaderDecoration) {
     bool insideClose    = closeButton_   .rect.contains(p);
@@ -731,7 +731,7 @@ mouseReleaseEvent(QMouseEvent *event)
     }
   }
 
-  QPoint p = event->pos();
+  auto p = event->pos();
 
   if (decoration_.type & HeaderDecoration) {
     closeButton_   .updateActive(p, pressed_);
@@ -766,7 +766,7 @@ showContextMenu(const QPoint &gpos)
 {
   auto *menu = new QMenu(this);
 
-  QAction *headerAction = menu->addAction("Show Header");
+  auto *headerAction = menu->addAction("Show Header");
 
   headerAction->setCheckable(true);
   headerAction->setChecked  (isHeaderVisible());
@@ -886,7 +886,7 @@ void
 CQWinWidget::HeaderButton::
 draw(QPainter *painter, CQWinWidget *preview)
 {
-  QStyle *style = preview->style();
+  auto *style = preview->style();
 
   QStyleOptionButton opt;
 
@@ -910,15 +910,15 @@ draw(QPainter *painter, CQWinWidget *preview)
   int shiftVertical   = (opt.state & QStyle::State_Sunken ?
                          style->pixelMetric(QStyle::PM_ButtonShiftVertical  , &opt, preview) : 0);
 
-  QRect r = rect;
+  auto r = rect;
 
   r.adjust(2, 2, -2, -2);
 
   r.translate(shiftHorizontal, shiftVertical);
 
-  QPixmap pm = icon.pixmap(r.size(),
-                           active  ? QIcon::Active : QIcon::Normal,
-                           pressed ? QIcon::On     : QIcon::Off);
+  auto pm = icon.pixmap(r.size(),
+                        active  ? QIcon::Active : QIcon::Normal,
+                        pressed ? QIcon::On     : QIcon::Off);
 
   style->drawItemPixmap(painter, r, Qt::AlignCenter, pm);
 }
@@ -980,7 +980,7 @@ CQWinImage(QWidget *parent, const char *name) :
 
   menu_ = new QMenu(this);
 
-  QAction *loadAction = menu_->addAction("Load Image");
+  auto *loadAction = menu_->addAction("Load Image");
 
   connect(loadAction, SIGNAL(triggered()), this, SLOT(loadImage()));
 }
@@ -1002,7 +1002,7 @@ setImage(const QImage &image)
 {
   image_ = image;
 
-  QPixmap pixmap = QPixmap::fromImage(image_);
+  auto pixmap = QPixmap::fromImage(image_);
 
   if (! pixmap.isNull()) {
     setPixmap(pixmap);
@@ -1026,7 +1026,7 @@ void
 CQWinImage::
 loadImage()
 {
-  QString fileName = QFileDialog::getOpenFileName(this,
+  auto fileName = QFileDialog::getOpenFileName(this,
     "Open Image", "", "Image Files (*.png *.gif *.jpg)");
 
   if (fileName.length())

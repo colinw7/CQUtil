@@ -38,7 +38,7 @@ CWindow *
 CQWindowFactory::
 createWindow(int x, int y, uint width, uint height)
 {
-  CQWindow *window = new CQWindow;
+  auto *window = new CQWindow;
 
   window->move  (x, y);
   window->resize(width, height);
@@ -50,11 +50,11 @@ CWindow *
 CQWindowFactory::
 createWindow(CWindow *parent, int x, int y, uint width, uint height)
 {
-  CQWindow *qparent = dynamic_cast<CQWindow *>(parent);
+  auto *qparent = dynamic_cast<CQWindow *>(parent);
 
   assert(qparent);
 
-  CQWindow *window = new CQWindow(qparent);
+  auto *window = new CQWindow(qparent);
 
   window->move  (x, y);
   window->resize(width, height);
@@ -136,9 +136,9 @@ void
 CQWindow::
 move(int x, int y)
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
-  QPoint p = mapTo(parent, QPoint(0, 0));
+  auto p = mapTo(parent, QPoint(0, 0));
 
   parent->move(x - p.x(), y - p.y());
 }
@@ -175,7 +175,7 @@ void
 CQWindow::
 iconize()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowState(parent->windowState() | Qt::WindowMinimized);
 }
@@ -184,7 +184,7 @@ void
 CQWindow::
 deiconize()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowState(parent->windowState() & ~Qt::WindowMinimized);
 }
@@ -193,7 +193,7 @@ void
 CQWindow::
 maximize()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowState(parent->windowState() | Qt::WindowMaximized);
 }
@@ -202,7 +202,7 @@ void
 CQWindow::
 demaximize()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowState(parent->windowState() & ~Qt::WindowMaximized);
 }
@@ -211,7 +211,7 @@ void
 CQWindow::
 lower()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->lower();
 }
@@ -220,7 +220,7 @@ void
 CQWindow::
 raise()
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->raise();
 }
@@ -229,7 +229,7 @@ void
 CQWindow::
 setWindowTitle(const std::string &title)
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowTitle(title.c_str());
 }
@@ -238,7 +238,7 @@ void
 CQWindow::
 setIconTitle(const std::string &title)
 {
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   parent->setWindowIconText(title.c_str());
 }
@@ -247,7 +247,7 @@ void
 CQWindow::
 getWindowTitle(std::string &title) const
 {
-  QWidget *parent = CQUtil::getToplevelWidget((QWidget *) this);
+  auto *parent = CQUtil::getToplevelWidget((QWidget *) this);
 
   title = parent->windowTitle().toStdString();
 }
@@ -256,7 +256,7 @@ void
 CQWindow::
 getIconTitle(std::string &title) const
 {
-  QWidget *parent = CQUtil::getToplevelWidget((QWidget *) this);
+  auto *parent = CQUtil::getToplevelWidget((QWidget *) this);
 
   title = parent->windowIconText().toStdString();
 }
@@ -280,7 +280,7 @@ CQWindow::
 setProperty(const std::string &name, const std::string &value)
 {
 #ifndef QT_NO_X11
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
 
@@ -468,7 +468,7 @@ CQWindow::
 setMinSize(int width, int height)
 {
 #ifndef QT_NO_X11
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
   if (xwin == 0) return;
@@ -499,7 +499,7 @@ CQWindow::
 setBaseSize(int width, int height)
 {
 #ifndef QT_NO_X11
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
   if (xwin == 0) return;
@@ -530,7 +530,7 @@ CQWindow::
 setResizeInc(int width, int height)
 {
 #ifndef QT_NO_X11
-  QWidget *parent = CQUtil::getToplevelWidget(this);
+  auto *parent = CQUtil::getToplevelWidget(this);
 
   Window xwin = parent->winId();
   if (xwin == 0) return;

@@ -81,10 +81,10 @@ bool
 CQAutoHide::
 processEvent(QObject *obj, QEvent *event)
 {
-  QEvent::Type type = event->type();
+  auto type = event->type();
 
   // ignore if not a widget
-  QWidget *w = qobject_cast<QWidget *>(obj);
+  auto *w = qobject_cast<QWidget *>(obj);
   if (! w) return true;
 
   bool showValid = true;
@@ -92,7 +92,7 @@ processEvent(QObject *obj, QEvent *event)
   // ignore if not a button event
   if      (type == QEvent::MouseButtonPress || type == QEvent::MouseButtonDblClick) {
     // hide if event is not in an allowable widget or rectangle
-    QMouseEvent *me = static_cast<QMouseEvent *>(event);
+    auto *me = static_cast<QMouseEvent *>(event);
 
     pressWidget_   = w;
     hideOnRelease_ = false;
@@ -106,7 +106,7 @@ processEvent(QObject *obj, QEvent *event)
     if (pressWidget_ != w) return true;
 
     // stop preview if event is not in an allowable widget or rectangle
-    QMouseEvent *me = static_cast<QMouseEvent *>(event);
+    auto *me = static_cast<QMouseEvent *>(event);
 
     if (hideOnRelease_) {
       if (! menuActive_ && ! QWidget::mouseGrabber())
@@ -156,7 +156,7 @@ bool
 CQAutoHide::
 isPreviewValid() const
 {
-  QPoint gp = QCursor::pos();
+  auto gp = QCursor::pos();
 
   return isPreviewValid(qApp->widgetAt(gp), gp);
 }
@@ -201,9 +201,9 @@ checkPreviewRects(const QPoint &gp, int tol) const
   int n = rects_.size();
 
   for (int i = 0; i < n; ++i) {
-    const QRect &r = rects_[i];
+    const auto &r = rects_[i];
 
-    QRect r1 = r.adjusted(-tol, -tol, tol, tol);
+    auto r1 = r.adjusted(-tol, -tol, tol, tol);
 
     if (r1.contains(gp)) {
       found = true;
@@ -219,7 +219,7 @@ bool
 CQAutoHide::
 isPreviewWidget(QWidget *w) const
 {
-  QWidget *w1 = w;
+  auto *w1 = w;
 
   while (w1) {
     if (widgets_.contains(w1))
@@ -236,10 +236,10 @@ bool
 CQAutoHide::
 isModalDialogWidget(QWidget *w) const
 {
-  QWidget *w1 = w;
+  auto *w1 = w;
 
   while (w1) {
-    QDialog *dialog = qobject_cast<QDialog *>(w1);
+    auto *dialog = qobject_cast<QDialog *>(w1);
 
     if (dialog && dialog->isModal())
       return true;
