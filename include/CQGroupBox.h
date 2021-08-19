@@ -34,8 +34,9 @@ class CQGroupBox : public QWidget {
   Q_PROPERTY(int marginTop    READ marginTop    WRITE setMarginTop   )
 
   // check
-  Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
-  Q_PROPERTY(bool checked   READ isChecked   WRITE setChecked  )
+  Q_PROPERTY(bool checkable     READ isCheckable     WRITE setCheckable    )
+  Q_PROPERTY(bool checked       READ isChecked       WRITE setChecked      )
+  Q_PROPERTY(bool enableChecked READ isEnableChecked WRITE setEnableChecked)
 
   // collapse
   Q_PROPERTY(bool collapsible READ isCollapsible WRITE setCollapsible)
@@ -99,6 +100,9 @@ class CQGroupBox : public QWidget {
 
   bool isChecked() const { return checked_; }
 
+  bool isEnableChecked() const { return enableChecked_; }
+  void setEnableChecked(bool b);
+
   //---
 
   bool isCollapsible() const { return collapsible_; }
@@ -129,8 +133,11 @@ class CQGroupBox : public QWidget {
 
   void focusInEvent(QFocusEvent *e) override;
 
-  void mouseMoveEvent(QMouseEvent *e) override;
-  void mousePressEvent(QMouseEvent *e) override;
+  void leaveEvent(QEvent *) override;
+  void enterEvent(QEvent *) override;
+
+  void mouseMoveEvent   (QMouseEvent *e) override;
+  void mousePressEvent  (QMouseEvent *e) override;
   void mouseReleaseEvent(QMouseEvent *e) override;
 
   void paintEvent(QPaintEvent *e) override;
@@ -187,9 +194,10 @@ class CQGroupBox : public QWidget {
   int marginTop_    { -1 };
 
   // check
-  bool  checkable_  { false };
-  bool  checked_    { false };
-  bool  checkPress_ { false };
+  bool  checkable_     { false };
+  bool  checked_       { false };
+  bool  enableChecked_ { true };
+  bool  checkPress_    { false };
   QRect checkRect_;
 
   // collapse
@@ -197,6 +205,10 @@ class CQGroupBox : public QWidget {
   bool  collapsed_     { false };
   bool  collapsePress_ { false };
   QRect collapseRect_;
+
+  bool pressed_        { false };
+  bool insideCheck_    { false };
+  bool insideCollapse_ { false };
 
   int dx_ { 2 }; // title/line x margin
 //int dy_ { 2 };

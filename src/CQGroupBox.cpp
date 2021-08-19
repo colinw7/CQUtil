@@ -46,6 +46,8 @@ init()
 
   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
+  setMouseTracking(true);
+
   //----
 
   connect(CQStyleMgrInst, SIGNAL(colorsChanged()), this, SLOT(updateSlot()));
@@ -217,6 +219,21 @@ setChecked(bool checked)
 
 void
 CQGroupBox::
+setEnableChecked(bool b)
+{
+  if (b != enableChecked_) {
+    enableChecked_ = b;
+
+    if (isCheckable()) {
+      updateEnabled();
+
+      update();
+    }
+  }
+}
+
+void
+CQGroupBox::
 setCollapsible(bool collapsible)
 {
   if (collapsible != collapsible_) {
@@ -277,7 +294,7 @@ CQGroupBox::
 event(QEvent *e)
 {
   if      (e->type() == QEvent::KeyPress) {
-    QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+    auto *ke = static_cast<QKeyEvent*>(e);
 
     if (ke->key() == Qt::Key_Select || ke->key() == Qt::Key_Space) {
       if (isCheckable()) {
@@ -290,7 +307,7 @@ event(QEvent *e)
     }
   }
   else if (e->type() == QEvent::KeyRelease) {
-    QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+    auto *ke = static_cast<QKeyEvent*>(e);
 
     if (ke->key() == Qt::Key_Select || ke->key() == Qt::Key_Space) {
       if (isCheckable()) {
@@ -319,33 +336,38 @@ focusInEvent(QFocusEvent *e)
 
 void
 CQGroupBox::
+leaveEvent(QEvent *)
+{
+  insideCheck_    = false;
+  insideCollapse_ = false;
+}
+
+void
+CQGroupBox::
+enterEvent(QEvent *)
+{
+  insideCheck_    = false;
+  insideCollapse_ = false;
+}
+
+void
+CQGroupBox::
 mouseMoveEvent(QMouseEvent *e)
 {
-  if (isCheckable()) {
-    bool inside = checkRect_.contains(e->pos()) || titleRect_.contains(e->pos());
+  if (! pressed_) {
+    bool insideCheck    = insideCheck_;
+    bool insideCollapse = insideCollapse_;
 
-    bool oldCheckPress = checkPress_;
+    insideCheck_    = false;
+    insideCollapse_ = false;
 
-    if      (! checkPress_ && inside)
-      checkPress_ = true;
-    else if (  checkPress_ && ! inside)
-      checkPress_ = false;
+    if (isCheckable())
+      insideCheck_ = checkRect_.contains(e->pos()) || titleRect_.contains(e->pos());
 
-    if (checkPress_ != oldCheckPress)
-      update();
-  }
+    if (isCollapsible())
+      insideCollapse_ = collapseRect_.contains(e->pos());
 
-  if (isCollapsible()) {
-    bool inside = collapseRect_.contains(e->pos());
-
-    bool oldCollapsePress = collapsePress_;
-
-    if      (! collapsePress_ && inside)
-      collapsePress_ = true;
-    else if (  collapsePress_ && ! inside)
-      collapsePress_ = false;
-
-    if (collapsePress_ != oldCollapsePress)
+    if (insideCheck != insideCheck_ || insideCollapse != insideCollapse_)
       update();
   }
 
@@ -356,6 +378,8 @@ void
 CQGroupBox::
 mousePressEvent(QMouseEvent *e)
 {
+  pressed_ = true;
+
   if (isCheckable()) {
     bool inside = checkRect_.contains(e->pos()) || titleRect_.contains(e->pos());
 
@@ -387,6 +411,8 @@ void
 CQGroupBox::
 mouseReleaseEvent(QMouseEvent *e)
 {
+  pressed_ = false;
+
   if (isCheckable()) {
     bool inside = checkRect_.contains(e->pos()) || titleRect_.contains(e->pos());
 
@@ -420,11 +446,11 @@ void
 CQGroupBox::
 paintEvent(QPaintEvent *)
 {
-  QPainter p(this);
+  QStylePainter painter(this);
 
-  p.setRenderHints(QPainter::Antialiasing);
+  painter.setRenderHints(QPainter::Antialiasing);
 
-  p.fillRect(rect(), QBrush(palette().color(QPalette::Background)));
+  painter.fillRect(rect(), QBrush(palette().color(QPalette::Background)));
 
   QFontMetrics fm(titleFont_);
 
@@ -474,14 +500,14 @@ paintEvent(QPaintEvent *)
     else
       lineY = spaceTop() - 2;
 
-    p.setPen(lineColor_);
+    painter.setPen(lineColor_);
 
-    p.drawLine(dx_, lineY, width() - 2*dx_, lineY);
+    painter.drawLine(dx_, lineY, width() - 2*dx_, lineY);
   }
 
   // draw title
   if (title_ != "") {
-    p.setFont(titleFont_);
+    painter.setFont(titleFont_);
 
     int tw1 = width() - checkSize - collapseSize - 4*dx_;
 
@@ -489,7 +515,7 @@ paintEvent(QPaintEvent *)
 
     titleRect_ = QRect(textX - dx_, textY - fm.ascent() + fm.descent(), tw2 + dx_, fm.height());
 
-    p.fillRect(titleRect_, QBrush(palette().color(QPalette::Background)));
+    painter.fillRect(titleRect_, QBrush(palette().color(QPalette::Background)));
 
     QColor titleColor;
 
@@ -502,9 +528,9 @@ paintEvent(QPaintEvent *)
     else
       titleColor = palette().color(QPalette::Disabled, QPalette::WindowText);
 
-    p.setPen(titleColor);
+    painter.setPen(titleColor);
 
-    p.drawText(textX, textY, title_);
+    painter.drawText(textX, textY, title_);
   }
 
   // draw bottom line
@@ -518,25 +544,27 @@ paintEvent(QPaintEvent *)
     else
       lineY = height() - 2;
 
-    p.setPen(lineColor_);
+    painter.setPen(lineColor_);
 
-    p.drawLine(dx_, lineY, width() - 2*dx_, lineY);
+    painter.drawLine(dx_, lineY, width() - 2*dx_, lineY);
   }
 
   //------
 
   // draw check (if checkable)
   if (isCheckable()) {
+    bool isChecked = this->isChecked();
+
+    //---
+
     int checkX1    = checkX + 2;
     int checkSize1 = checkSize - 4;
     int checkY1    = checkY - checkSize1/2;
 
     checkRect_ = QRect(checkX1, checkY1, checkSize1, checkSize1);
 
-    p.fillRect(QRect(checkX1 - 2, checkY1 - 2, checkSize1 + 4, checkSize1 + 4),
-               QBrush(palette().color(QPalette::Background)));
-
-    QStylePainter p(this);
+    painter.fillRect(QRect(checkX1 - 2, checkY1 - 2, checkSize1 + 4, checkSize1 + 4),
+                     QBrush(palette().color(QPalette::Background)));
 
     QStyleOptionButton opt;
 
@@ -544,58 +572,56 @@ paintEvent(QPaintEvent *)
 
     opt.rect = checkRect_;
 
-    opt.state |= (isChecked() ? QStyle::State_On : QStyle::State_Off);
+    opt.state |= (isChecked ? QStyle::State_On : QStyle::State_Off);
 
     if (checkPress_)
       opt.state |= QStyle::State_Sunken;
 
-#if 0
-    if (testAttribute(Qt::WA_Hover) && underMouse()) {
-      if (d->hovering)
-        opt.state |= QStyle::State_MouseOver;
-      else
-        opt.state &= ~QStyle::State_MouseOver;
-    }
+    if (insideCheck_)
+      opt.state |= QStyle::State_MouseOver;
+    else
+      opt.state &= ~QStyle::State_MouseOver;
 
-    opt.text = d->text;
-    opt.icon = d->icon;
-    opt.iconSize = iconSize();
-#endif
-
-    p.drawControl(QStyle::CE_CheckBox, opt);
+    painter.drawControl(QStyle::CE_CheckBox, opt);
   }
 
   //------
 
   // draw collpase state (if collapsible)
   if (isCollapsible()) {
+    bool isCollapsed = this->isCollapsed();
+
+    //---
+
     double collapseSize1 = collapseSize - 4;
 
     double collapseX1 = collapseX + 2;
-    double collapseY1 = collapseY - collapseSize1/2;
+    double collapseY1 = collapseY - collapseSize1/2.0;
     double collapseX2 = collapseX1 + collapseSize1;
     double collapseY2 = collapseY1 + collapseSize1;
 
-    collapseRect_ = QRect(collapseX1, collapseY1, collapseSize1, collapseSize1);
+    collapseRect_ = QRect(int(collapseX1), int(collapseY1), int(collapseSize1), int(collapseSize1));
 
-    p.fillRect(QRect(collapseX1 - 2, collapseY1 - 2, collapseSize1 + 4, collapseSize1 + 4),
-               QBrush(palette().color(QPalette::Background)));
+    painter.fillRect(QRectF(collapseX1 - 2, collapseY1 - 2, collapseSize1 + 4, collapseSize1 + 4),
+                            QBrush(palette().color(QPalette::Background)));
 
-    double collapseXM = (collapseX1 + collapseX2)/2;
-    double collapseYM = (collapseY1 + collapseY2)/2;
+    double collapseXM = (collapseX1 + collapseX2)/2.0;
+    double collapseYM = (collapseY1 + collapseY2)/2.0;
 
-    p.setPen(Qt::NoPen);
+    painter.setPen(Qt::NoPen);
 
-    if (collapsePress_)
-      p.setBrush(palette().color(QPalette::Active, QPalette::Dark));
+    if      (insideCollapse_)
+      painter.setBrush(palette().color(QPalette::Active, QPalette::Highlight));
+    else if (collapsePress_)
+      painter.setBrush(palette().color(QPalette::Active, QPalette::Dark));
     else
-      p.setBrush(palette().color(QPalette::Active, QPalette::Text));
+      painter.setBrush(palette().color(QPalette::Active, QPalette::Text));
 
-    if (! isCollapsed()) {
-      drawArcShape(&p, collapseXM, collapseYM, collapseSize1/2, 90, 3);
+    if (! isCollapsed) {
+      drawArcShape(&painter, collapseXM, collapseYM, collapseSize1/2.0, 90, 3);
     }
     else {
-      drawArcShape(&p, collapseXM, collapseYM, collapseSize1/2, -90, 3);
+      drawArcShape(&painter, collapseXM, collapseYM, collapseSize1/2.0, -90, 3);
     }
   }
 }
@@ -639,7 +665,7 @@ drawArcShape(QPainter *painter, double xc, double yc, double r, double startAngl
 
     //---
 
-    QPointF p12 = (p1 + p2)/2;
+    auto p12 = (p1 + p2)/2;
 
     double ar = 2*hypot(p1.x() - p12.x(), p1.y() - p12.y())/sides;
 
@@ -763,7 +789,7 @@ void
 CQGroupBox::
 calculateFrame()
 {
-  QLayout *l = layout();
+  auto *l = layout();
   if (! l) return;
 
   l->setContentsMargins(marginLeft(), spaceTop(), marginRight(), spaceBottom());
@@ -777,25 +803,30 @@ updateEnabled()
 {
   bool enabled = isEnabled();
 
-  QObjectList childList = children();
+  auto childList = children();
 
   for (int i = 0; i < childList.size(); ++i) {
-    QObject *o = childList.at(i);
+    auto *o = childList.at(i);
 
     if (! o->isWidgetType()) continue;
 
-    QWidget *w = static_cast<QWidget *>(o);
+    auto *w = static_cast<QWidget *>(o);
 
     if (isCheckable()) {
-      if (isChecked()) {
-//      if (! w->isEnabled()) {
-//        if (! w->testAttribute(Qt::WA_ForceDisabled))
-            w->setEnabled(true);
-//      }
+      if (isEnableChecked()) {
+        if (isChecked()) {
+//        if (! w->isEnabled()) {
+//          if (! w->testAttribute(Qt::WA_ForceDisabled))
+              w->setEnabled(true);
+//        }
+        }
+        else {
+//        if (w->isEnabled())
+            w->setEnabled(false);
+        }
       }
       else {
-//      if (w->isEnabled())
-          w->setEnabled(false);
+        w->setEnabled(enabled);
       }
     }
     else {
@@ -810,19 +841,19 @@ updateCollapsed()
 {
   //area_->setVisible(isCollapsed());
 
-  QObjectList childList = children();
+  auto childList = children();
 
   for (int i = 0; i < childList.size(); ++i) {
-    QObject *o = childList.at(i);
+    auto *o = childList.at(i);
 
     if (! o->isWidgetType()) continue;
 
-    QWidget *w = static_cast<QWidget *>(o);
+    auto *w = static_cast<QWidget *>(o);
 
     w->setVisible(! isCollapsed());
   }
 
-  QSize size = this->size();
+  auto size = this->size();
 
   size.setHeight(minimumSizeHint().height());
 
@@ -849,8 +880,8 @@ void
 CQGroupBoxArea::
 paintEvent(QPaintEvent *)
 {
-  //QPainter p(this);
+  //QPainter painter(this);
 
-  //p.fillRect(rect(), QBrush(QColor(255,0,0)));
+  //painter.fillRect(rect(), QBrush(QColor(255,0,0)));
 }
 #endif
