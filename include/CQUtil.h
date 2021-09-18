@@ -12,6 +12,8 @@
 #include <QVariant>
 #include <QTableWidget>
 #include <QButtonGroup>
+#include <QMenu>
+#include <QAction>
 #include <QPen>
 
 #ifdef CQUTIL_EVENT
@@ -445,6 +447,70 @@ namespace CQUtil {
       buttonGroup->addButton(button, ind++);
 
     return buttonGroup;
+  }
+
+  //---
+
+  inline QAction *addAction(QMenu *menu, const QString &name,
+                            QObject *receiver=nullptr, const char *slotName=nullptr) {
+    auto *action = new QAction(name, menu);
+
+    if (slotName)
+      QObject::connect(action, SIGNAL(triggered()), receiver, slotName);
+
+    menu->addAction(action);
+
+    return action;
+  };
+
+  inline QAction *addCheckedAction(QMenu *menu, const QString &name, bool checked,
+                                   QObject *receiver=nullptr, const char *slotName=nullptr) {
+    auto *action = new QAction(name, menu);
+
+    action->setCheckable(true);
+    action->setChecked(checked);
+
+    if (slotName)
+      QObject::connect(action, SIGNAL(triggered(bool)), receiver, slotName);
+
+    menu->addAction(action);
+
+    return action;
+  };
+
+  inline QActionGroup *createActionGroup(QMenu *menu, QObject *receiver=nullptr,
+                                         const char *slotName=nullptr) {
+    auto *actionGroup = new QActionGroup(menu);
+
+    if (slotName)
+       QObject::connect(actionGroup, SIGNAL(triggered(QAction *)), receiver, slotName);
+
+    return actionGroup;
+  };
+
+  inline QAction *addGroupCheckAction(QActionGroup *group, const QString &name, bool checked,
+                                      QObject *receiver=nullptr, const char *slotName=nullptr) {
+    auto *menu = qobject_cast<QMenu *>(group->parent());
+    assert(menu);
+
+    auto *action = new QAction(name, menu);
+
+    action->setCheckable(true);
+    action->setChecked(checked);
+
+    if (slotName)
+      QObject::connect(action, SIGNAL(triggered()), receiver, slotName);
+
+    group->addAction(action);
+
+    return action;
+  };
+
+  inline void addActionGroupToMenu(QActionGroup *group) {
+    auto *menu = qobject_cast<QMenu *>(group->parent());
+    assert(menu);
+
+    menu->addActions(group->actions());
   }
 }
 

@@ -2381,12 +2381,16 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
 //----------
 
+namespace {
+
 QDataStream::Version dataStreamVersion() {
 #if QT_VERSION >= 0x050000
   return QDataStream::Qt_5_0;
 #else
   return QDataStream::Qt_4_0;
 #endif
+}
+
 }
 
 bool
