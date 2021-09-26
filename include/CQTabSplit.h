@@ -22,6 +22,7 @@ class CQTabSplit : public QFrame {
   Q_PROPERTY(bool            grouped      READ isGrouped      WRITE setGrouped     )
   Q_PROPERTY(bool            tabsClosable READ isTabsClosable WRITE setTabsClosable)
   Q_PROPERTY(bool            autoFit      READ isAutoFit      WRITE setAutoFit     )
+  Q_PROPERTY(int             currentIndex READ currentIndex   WRITE setCurrentIndex)
 
   Q_ENUMS(State)
 
@@ -67,6 +68,11 @@ class CQTabSplit : public QFrame {
 
   //---
 
+  int currentIndex() const { return currentIndex_; }
+  void setCurrentIndex(int i);
+
+  //---
+
   //! get indexed widget
   QWidget *widget(int i) const;
 
@@ -97,6 +103,8 @@ class CQTabSplit : public QFrame {
   void widgetCloseRequested(int i);
 
  public slots:
+  void currentIndexSlot(int);
+
   //! close specified tab (if closable)
   void tabCloseSlot(int i);
 
@@ -125,6 +133,7 @@ class CQTabSplit : public QFrame {
   bool            grouped_      { false };          //!< is grouped (use group boxes)
   bool            tabsClosable_ { false };          //!< are tabs closable
   bool            autoFit_      { false };          //!< is auto fit
+  int             currentIndex_ { -1 };             //!< current index
   Widgets         widgets_;                         //!< widgets
   Sizes           hsizes_;                          //!< splitter sizes (horizontal)
   Sizes           vsizes_;                          //!< splitter sizes (vertical)

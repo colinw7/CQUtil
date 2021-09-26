@@ -44,6 +44,8 @@ init()
   splitter_->setOrientation(orientation());
 
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+  connect(tabWidget_, SIGNAL(currentChanged(int)), this, SLOT(currentIndexSlot(int)));
 }
 
 void
@@ -102,6 +104,23 @@ setTabsClosable(bool b)
 
 void
 CQTabSplit::
+setCurrentIndex(int i)
+{
+  if (i < 0 || i >= int(widgets_.size()))
+    return;
+
+  tabWidget_->setCurrentIndex(i);
+}
+
+void
+CQTabSplit::
+currentIndexSlot(int i)
+{
+  currentIndex_ = i;
+}
+
+void
+CQTabSplit::
 setSizes(const QList<int> &sizes)
 {
   if (orientation() == Qt::Horizontal)
@@ -129,6 +148,9 @@ addWidget(QWidget *w, const QString &name)
 
     data.layout->addWidget(w);
   }
+
+  if (widgets_.empty())
+    currentIndex_ = 0;
 
   widgets_.push_back(data);
 
@@ -161,6 +183,9 @@ removeWidget(QWidget *w, bool deleteWidget)
   if (i >= int(widgets_.size()))
     return;
 
+  if (i == currentIndex_)
+    i = currentIndex_ - 1;
+
   WidgetData data = widgets_[i];
 
   for (int j = i + 1; j < int(widgets_.size()); ++j)
@@ -175,6 +200,9 @@ removeWidget(QWidget *w, bool deleteWidget)
 
   if (deleteWidget)
     delete data.w;
+
+  if (widgets_.empty())
+    currentIndex_ = -1;
 }
 
 void
@@ -187,6 +215,8 @@ removeAllWidgets()
   }
 
   widgets_.clear();
+
+  currentIndex_ = -1;
 }
 
 bool
