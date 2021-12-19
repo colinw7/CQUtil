@@ -23,6 +23,7 @@
 #include <Qt>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QScreen>
 #include <QDockWidget>
 #include <QAction>
 #include <QMouseEvent>
@@ -542,7 +543,7 @@ fullName(const QObject *object)
 
   QString sep("|");
 
-  const QObject *o = object;
+  const auto *o = object;
 
   QString id;
 
@@ -572,22 +573,22 @@ nameToObject(const QString &name)
   if (name == "STYLE_MGR")
     return CQStyleMgrInst;
 
-  QStringList names = name.split("|");
+  auto names = name.split("|");
 
   int num_names = names.size();
 
   if (num_names == 0)
     return nullptr;
 
-  QString baseName = names[0];
+  auto baseName = names[0];
 
   QObject *current = nullptr;
 
-  QWidgetList wlist = QApplication::topLevelWidgets();
+  auto wlist = QApplication::topLevelWidgets();
 
-  for (QWidgetList::const_iterator pw = wlist.begin(); pw != wlist.end(); ++pw) {
-    if ((*pw)->objectName() == baseName) {
-      current = *pw;
+  for (auto *w : wlist) {
+    if (w->objectName() == baseName) {
+      current = w;
       break;
     }
   }
@@ -605,7 +606,7 @@ QObject *
 CQUtil::
 hierChildObject(QObject *object, int ind, const QStringList &names)
 {
-  QObject *child = childObject(object, names[ind]);
+  auto *child = childObject(object, names[ind]);
 
   if (child) {
     ++ind;
@@ -617,10 +618,10 @@ hierChildObject(QObject *object, int ind, const QStringList &names)
   }
 
   if (names[ind] == "*") {
-    const QObjectList &children = object->children();
+    const auto &children = object->children();
 
-    for (QObjectList::const_iterator po = children.begin(); po != children.end(); ++po) {
-      QObject *child1 = hierChildObject(*po, ind + 1, names);
+    for (auto *child : children) {
+      auto *child1 = hierChildObject(child, ind + 1, names);
 
       if (child1)
         return child1;
@@ -641,7 +642,7 @@ QWidget *
 CQUtil::
 getToplevelWidget(QWidget *widget)
 {
-  QWidget *parent = widget;
+  auto *parent = widget;
 
   QWidget *parent1;
 
@@ -658,7 +659,7 @@ getNumProperties(const QObject *object, bool inherited)
   if (! object)
     return 0;
 
-  const QMetaObject *metaObject = object->metaObject();
+  const auto *metaObject = object->metaObject();
 
   if (! metaObject)
     return 0;
@@ -672,7 +673,7 @@ QStringList
 CQUtil::
 getPropertyList(const QObject *object, bool inherited)
 {
-  const QMetaObject *metaObject = object->metaObject();
+  const auto *metaObject = object->metaObject();
 
   return getPropertyList(object, inherited, metaObject);
 }
@@ -689,7 +690,7 @@ getPropertyList(const QObject *object, bool inherited, const QMetaObject *metaOb
   int firstProp = (inherited ? 0 : metaObject->propertyOffset());
 
   for (int p = firstProp; p < metaObject->propertyCount(); ++p) {
-    QMetaProperty metaProperty = metaObject->property(p);
+    auto metaProperty = metaObject->property(p);
 
     names.push_back(metaProperty.name());
   }
@@ -794,7 +795,7 @@ getPropertyEnumValue(const QObject *object, int ind, bool inherited)
   if (! getMetaPropertyEnum(object, ind, inherited, metaProperty, metaEnum, isFlag))
     return QString();
 
-  QVariant value = object->property(metaProperty.name());
+  auto value = object->property(metaProperty.name());
 
   int eind = value.toInt();
 
@@ -907,7 +908,7 @@ getMetaProperty(const QObject *object, int ind, bool inherited, QMetaProperty &m
   if (! object)
     return false;
 
-  const QMetaObject *metaObject = object->metaObject();
+  const auto *metaObject = object->metaObject();
 
   if (! metaObject)
     return false;
@@ -979,9 +980,9 @@ getProperty(const QObject *object, const QString &propName, QVariant &v)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
@@ -1004,9 +1005,9 @@ getTclProperty(const QObject *object, const QString &propName, QVariant &v)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
@@ -1017,8 +1018,8 @@ getTclProperty(const QObject *object, const QString &propName, QVariant &v)
   auto metaProperty = meta->property(propIndex);
 
   if (metaProperty.isEnumType()) {
-    QMetaEnum metaEnum = metaProperty.enumerator();
-    bool      isFlag   = metaProperty.isFlagType();
+    auto metaEnum = metaProperty.enumerator();
+    bool isFlag   = metaProperty.isFlagType();
 
     int eind = v.toInt();
 
@@ -1063,22 +1064,23 @@ setProperty(const QObject *object, const QString &propName, const QString &str)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty metaProperty = meta->property(propIndex);
+  auto metaProperty = meta->property(propIndex);
   if (! metaProperty.isWritable()) return false;
 
   QVariant v;
 
   (void) getProperty(object, propName, v);
 
-  if (! stringToVariant(str, metaProperty.type(), metaProperty.typeName(), v))
+  if (! stringToVariant(str, metaProperty.type(), metaProperty.typeName(),
+                        metaProperty.userType(), v))
     return false;
 
   return obj->setProperty(propName.toLatin1().data(), v);
@@ -1094,23 +1096,23 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty metaProperty = meta->property(propIndex);
+  auto metaProperty = meta->property(propIndex);
   if (! metaProperty.isWritable()) return false;
 
-  QVariant v1 = v;
+  auto v1 = v;
 
-  QString typeName = v1.typeName();
+  auto typeName = QString(v1.typeName());
 
   if (typeName == "QString" && metaProperty.isEnumType()) {
-    QString v1Str = v1.toString().toLower();
+    auto v1Str = v1.toString().toLower();
 
     int value = 0;
 
@@ -1123,19 +1125,22 @@ setProperty(const QObject *object, const QString &propName, const QVariant &v)
   }
 
   if (typeName == "QString") {
-    QString v1Str = v1.toString();
+    auto v1Str = v1.toString();
 
     QVariant v2;
 
     (void) getProperty(object, propName, v2);
 
-    if (! stringToVariant(v1Str, metaProperty.type(), metaProperty.typeName(), v1, v2))
+    if (! stringToVariant(v1Str, metaProperty.type(), metaProperty.typeName(),
+                          metaProperty.userType(), v1, v2))
       return false;
+
+    typeName = metaProperty.typeName();
   }
 
   if (metaProperty.type() == QVariant::UserType) {
     if (typeName != metaProperty.typeName()) {
-      QString str = v.toString();
+      auto str = v.toString();
 
       QVariant v2;
 
@@ -1174,12 +1179,12 @@ bool
 CQUtil::
 stringToEnumValue(const QString &str, const QMetaProperty &metaProperty, int &value)
 {
-  QMetaEnum metaEnum = metaProperty.enumerator();
+  auto metaEnum = metaProperty.enumerator();
 
   if (metaProperty.isFlagType()) {
     bool found = false;
 
-    QStringList strs = str.split("|", QString::SkipEmptyParts);
+    auto strs = str.split("|", QString::SkipEmptyParts);
 
     for (int i = 0; i < strs.length(); ++i) {
       int value1;
@@ -1207,14 +1212,14 @@ stringToEnumSubValue(const QString &str, const QMetaEnum &metaEnum, int &value)
 {
   value = -1;
 
-  QString lstr = str.toLower();
+  auto lstr = str.toLower();
 
   int num_enums = metaEnum.keyCount();
 
   for (int i = 0; i < num_enums; ++i) {
     int value1 = metaEnum.value(i);
 
-    QString lstr1 = QString(metaEnum.valueToKey(value1)).toLower();
+    auto lstr1 = QString(metaEnum.valueToKey(value1)).toLower();
 
     if (lstr == lstr1) {
       value = value1;
@@ -1237,9 +1242,9 @@ getPropertyInfo(const QObject *object, int ind, PropInfo *propInfo, bool inherit
   if (! getMetaProperty(object, ind, inherited, metaProperty))
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
 
   if (! meta)
     return false;
@@ -1259,15 +1264,15 @@ getPropInfo(const QObject *object, const QString &propName, PropInfo *propInfo)
   if (propName.isEmpty())
     return false;
 
-  QObject *obj = const_cast<QObject *>(object);
+  auto *obj = const_cast<QObject *>(object);
 
-  const QMetaObject *meta = obj->metaObject();
+  const auto *meta = obj->metaObject();
   if (! meta) return false;
 
   int propIndex = meta->indexOfProperty(propName.toLatin1().data());
   if (propIndex < 0) return false;
 
-  QMetaProperty metaProperty = meta->property(propIndex);
+  auto metaProperty = meta->property(propIndex);
 
   propInfo->init(metaProperty);
 
@@ -1294,7 +1299,7 @@ QString
 CQUtil::
 className(const QObject *object)
 {
-  const QMetaObject *mo = object->metaObject();
+  const auto *mo = object->metaObject();
 
   if (! mo)
     return "";
@@ -1308,7 +1313,7 @@ hierClassNames(const QObject *object)
 {
   QStringList names;
 
-  const QMetaObject *mo = object->metaObject();
+  const auto *mo = object->metaObject();
 
   while (mo) {
     names.push_back(mo->className());
@@ -1323,7 +1328,7 @@ const QMetaObject *
 CQUtil::
 baseClass(QMetaObject *metaObject, const char *name)
 {
-  const QMetaObject *baseMetaObject = metaObject;
+  const auto *baseMetaObject = metaObject;
 
   QString str(name);
 
@@ -1344,14 +1349,14 @@ numSignals(const QObject *object, bool inherited)
   if (! object)
     return 0;
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1372,14 +1377,14 @@ signalName(const QObject *object, int ind, bool inherited)
   if (! object)
     return QString();
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1405,12 +1410,12 @@ signalNames(const QObject *object, bool inherited)
   if (! object)
     return names;
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1431,14 +1436,14 @@ numSlots(const QObject *object, bool inherited)
   if (! object)
     return 0;
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1459,14 +1464,14 @@ slotName(const QObject *object, int ind, bool inherited)
   if (! object)
     return QString();
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   int num = 0;
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1489,12 +1494,12 @@ slotNames(const QObject *object, bool inherited)
 {
   QStringList names;
 
-  const QMetaObject *meta = object->metaObject();
+  const auto *meta = object->metaObject();
 
   int start = (inherited ? 0 : meta->methodOffset());
 
   for (int pos = start; pos < meta->methodCount(); ++pos) {
-    QMetaMethod metaMethod = meta->method(pos);
+    auto metaMethod = meta->method(pos);
 
     if (metaMethod.attributes() & QMetaMethod::Compatibility)
       continue;
@@ -1536,7 +1541,7 @@ QString
 CQUtil::
 eventToString(QEvent *event)
 {
-  QString name = eventTypeToName(event->type());
+  auto name = eventTypeToName(event->type());
 
   return name;
 }
@@ -1545,7 +1550,7 @@ void
 CQUtil::
 setForeground(QWidget *widget, const QColor &color)
 {
-  QPalette palette = widget->palette();
+  auto palette = widget->palette();
 
   palette.setColor(widget->foregroundRole(), color);
 
@@ -1556,7 +1561,7 @@ QColor
 CQUtil::
 getForeground(QWidget *widget)
 {
-  QPalette palette = widget->palette();
+  auto palette = widget->palette();
 
   return palette.color(widget->foregroundRole());
 }
@@ -1565,7 +1570,7 @@ void
 CQUtil::
 setBackground(QWidget *widget, const QColor &color)
 {
-  QPalette palette = widget->palette();
+  auto palette = widget->palette();
 
   palette.setColor(widget->backgroundRole(), color);
 
@@ -1578,7 +1583,7 @@ QColor
 CQUtil::
 getBackground(QWidget *widget)
 {
-  QPalette palette = widget->palette();
+  auto palette = widget->palette();
 
   return palette.color(widget->backgroundRole());
 }
@@ -1600,46 +1605,46 @@ variantToString(const QVariant &var, QString &valueStr)
 {
   valueStr = "";
 
-  QVariant::Type type = var.type();
+  auto type = var.type();
 
   if      (type == QVariant::Palette) {
 #ifdef CQUTIL_PALETTE
-    QPalette palette = var.value<QPalette>();
+    auto palette = var.value<QPalette>();
 
     valueStr = CQUtil::paletteToString(palette);
 #endif
   }
   else if (type == QVariant::Point) {
-    QPoint point = var.value<QPoint>();
+    auto point = var.value<QPoint>();
 
     valueStr = QString("%1 %2").arg(point.x()).arg(point.y());
   }
   else if (type == QVariant::PointF) {
-    QPointF point = var.value<QPointF>();
+    auto point = var.value<QPointF>();
 
     valueStr = QString("%1 %2").arg(point.x()).arg(point.y());
   }
   else if (type == QVariant::Rect) {
-    QRect rect = var.value<QRect>();
+    auto rect = var.value<QRect>();
 
     valueStr = QString("{%1 %2} {%3 %4}").
                arg(rect.left ()).arg(rect.bottom()).
                arg(rect.right()).arg(rect.top   ());
   }
   else if (type == QVariant::RectF) {
-    QRectF rect = var.value<QRectF>();
+    auto rect = var.value<QRectF>();
 
     valueStr = QString("{%1 %2} {%3 %4}").
                arg(rect.left ()).arg(rect.bottom()).
                arg(rect.right()).arg(rect.top   ());
   }
   else if (type == QVariant::Size) {
-    QSize size = var.value<QSize>();
+    auto size = var.value<QSize>();
 
     valueStr = QString("%1 %2").arg(size.width()).arg(size.height());
   }
   else if (type == QVariant::SizeF) {
-    QSizeF size = var.value<QSizeF>();
+    auto size = var.value<QSizeF>();
 
     valueStr = QString("%1 %2").arg(size.width()).arg(size.height());
   }
@@ -1649,21 +1654,21 @@ variantToString(const QVariant &var, QString &valueStr)
     valueStr = (b ? "true" : "false");
   }
   else if (type == QVariant::Region) {
-    QRegion region = var.value<QRegion>();
+    auto region = var.value<QRegion>();
 
-    QRect r = region.boundingRect();
+    auto r = region.boundingRect();
 
     valueStr = QString("{%1 %2} {%3 %4}").
                arg(r.left ()).arg(r.bottom()).
                arg(r.right()).arg(r.top   ());
   }
   else if (type == QVariant::Locale) {
-    QLocale locale = var.value<QLocale>();
+    auto locale = var.value<QLocale>();
 
     valueStr = locale.name();
   }
   else if (type == QVariant::SizePolicy) {
-    QSizePolicy sp = var.value<QSizePolicy>();
+    auto sp = var.value<QSizePolicy>();
 
     valueStr = QString("%1 %2 %3 %4").arg(policyToString(sp.horizontalPolicy())).
                                       arg(policyToString(sp.verticalPolicy  ())).
@@ -1676,14 +1681,14 @@ variantToString(const QVariant &var, QString &valueStr)
     }
 #ifdef CQUTIL_LINE_DASH
     else if (strcmp(var.typeName(), "CLineDash") == 0) {
-      CLineDash lineDash = var.value<CLineDash>();
+      auto lineDash = var.value<CLineDash>();
 
       valueStr = lineDash.toString().c_str();
     }
 #endif
 #ifdef CQUTIL_ANGLE
     else if (strcmp(var.typeName(), "CAngle") == 0) {
-      CAngle angle = var.value<CAngle>();
+      auto angle = var.value<CAngle>();
 
       valueStr = angle.toString().c_str();
     }
@@ -1704,7 +1709,7 @@ variantToString(const QVariant &var, QString &valueStr)
 bool
 CQUtil::
 stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
-                QVariant &var, const QVariant &oldVar)
+                int userType, QVariant &var, const QVariant &oldVar)
 {
   // Qt supports QString ->
   //   QVariant::StringList, QVariant::ByteArray, QVariant::Int      , QVariant::UInt,
@@ -1713,7 +1718,7 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
   //   QVariant::Url       , QVariant::Uuid
 
   if      (type == QVariant::Bool) {
-    QString lstr = str.toLower();
+    auto lstr = str.toLower();
 
     if      (lstr == "0" || lstr == "false" || lstr == "no"  || lstr == "off")
       var = QVariant(false);
@@ -1910,10 +1915,10 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
   }
   else if (type == QVariant::Font) {
     if (str.length() && (str[0] == '+' || str[0] == '-')) {
-      QString str1 = str.mid(1);
+      auto str1 = str.mid(1);
 
       if (oldVar.type() == QVariant::Font) {
-        QFont oldFont = oldVar.value<QFont>();
+        auto oldFont = oldVar.value<QFont>();
 
         QFontInfo oldFontInfo(oldFont);
 
@@ -1922,7 +1927,7 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
         int delta = str1.toInt(&ok);
 
         if (ok) {
-          QFont newFont = oldFont;
+          auto newFont = oldFont;
 
           double oldSize = oldFontInfo.pixelSize();
 
@@ -1940,7 +1945,7 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
   }
   else if (type == QVariant::SizePolicy) {
     auto stringToPolicy = [](const QString &str) {
-      QString lstr = str.toLower();
+      auto lstr = str.toLower();
 
       if (lstr == "fixed"    ) return QSizePolicy::Fixed;
       if (lstr == "minimum"  ) return QSizePolicy::Minimum;
@@ -1951,7 +1956,7 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
       return QSizePolicy::Fixed;
     };
 
-    QStringList strs = str.split(" ", QString::SkipEmptyParts);
+    auto strs = str.split(" ", QString::SkipEmptyParts);
 
     QSizePolicy::Policy hpolicy  { QSizePolicy::Fixed }, vpolicy { QSizePolicy::Fixed };
     int                 hstretch { 0 }, vstretch { 0 };
@@ -1995,6 +2000,10 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
     }
 #endif
     else {
+      assert(oldVar.userType() == userType);
+
+      var = oldVar;
+
       if (userVariantFromString(var, str))
         return true;
     }
@@ -2036,8 +2045,8 @@ QString
 CQUtil::
 paletteToString(const QPalette &palette)
 {
-  QColor fg = palette.color(QPalette::WindowText);
-  QColor bg = palette.color(QPalette::Window    );
+  auto fg = palette.color(QPalette::WindowText);
+  auto bg = palette.color(QPalette::Window    );
 
   return QString("fg=\"%1\" bg=\"%2\"").arg(fg.name()).arg(bg.name());
 }
@@ -2054,12 +2063,12 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   procName = procName.trimmed();
 
-  QString sigCmd = "send_signal";
+  auto sigCmd = QString("send_signal");
 
   sigCmd += procName.mid(procName.find("("));
 
   // attach a temporary slotmachine
-  QtclSlotMachine *pSlotMachine = new QtclSlotMachine(0, "temporary");
+  auto *pSlotMachine = new QtclSlotMachine(0, "temporary");
 
   bool bOk = QtclSlotMachine::connectWidgets(pSlotMachine, sigCmd, receiver, procName,
                                              0, false, false);
@@ -2094,7 +2103,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
           v[iValue]->cast(QVariant::Int);
 
         if (procName.mid(idx, 11) == "Orientation") {
-          QString strVal = v[iValue]->asString();
+          auto strVal = v[iValue]->asString();
           v[iValue]->cast(QVariant::String);
           enumType = "Orientation";
         }
@@ -2151,9 +2160,9 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
   if (iOpen <= 0 || iClose <= iOpen)
     return false;
 
-  QString plainSlotName = slotNameStr.left(iOpen);
+  auto plainSlotName = slotNameStr.left(iOpen);
 
-  QString args = slotNameStr.mid(iOpen + 1, iClose - iOpen - 1);
+  auto args = slotNameStr.mid(iOpen + 1, iClose - iOpen - 1);
 
   //------
 
@@ -2161,9 +2170,9 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   bool found = false;
 
-  for (const QMetaObject *pM = receiver->metaObject(); pM && ! found; pM = pM->superClass()) {
+  for (const auto *pM = receiver->metaObject(); pM && ! found; pM = pM->superClass()) {
     for (int i = 0; i < pM->methodCount(); ++i) {
-      QMetaMethod metaMethod = pM->method(i);
+      auto metaMethod = pM->method(i);
 
       if (metaMethod.methodType() != QMetaMethod::Slot)
         continue;
@@ -2182,13 +2191,13 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  QStringList argTypeList = args.split(",", QString::SkipEmptyParts);
+  auto argTypeList = args.split(",", QString::SkipEmptyParts);
 
-  QStringList::size_type nArgs = argTypeList.count();
+  auto nArgs = argTypeList.count();
 
-  QStringList valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
+  auto valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
 
-  QStringList::size_type nValues = valueList.count();
+  auto nValues = valueList.count();
 
   if (nArgs != nValues)
     return false;
@@ -2200,7 +2209,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
     QString typeString(argTypeList[iArg]);
 
-    QVariant::Type type = QVariant::nameToType(typeString.toLatin1().data());
+    auto type = QVariant::nameToType(typeString.toLatin1().data());
 
     if (! v.canConvert(type)) {
       qDebug("cannot convert slot argument '%s' to type '%s'",
@@ -2272,9 +2281,9 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
   if (iOpen <= 0 || iClose <= iOpen)
     return false;
 
-  QString plainSignalName = signalNameStr.left(iOpen);
+  auto plainSignalName = signalNameStr.left(iOpen);
 
-  QString args = signalNameStr.mid(iOpen + 1, iClose - iOpen - 1);
+  auto args = signalNameStr.mid(iOpen + 1, iClose - iOpen - 1);
 
   //------
 
@@ -2282,9 +2291,9 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
   bool found = false;
 
-  for (const QMetaObject *pM = sender->metaObject(); pM && ! found; pM = pM->superClass()) {
+  for (const auto *pM = sender->metaObject(); pM && ! found; pM = pM->superClass()) {
     for (int i = 0; i < pM->methodCount(); ++i) {
-      QMetaMethod metaMethod = pM->method(i);
+      auto metaMethod = pM->method(i);
 
       if (metaMethod.methodType() != QMetaMethod::Signal)
         continue;
@@ -2303,13 +2312,13 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  QStringList argTypeList = args.split(",", QString::SkipEmptyParts);
+  auto argTypeList = args.split(",", QString::SkipEmptyParts);
 
-  QStringList::size_type nArgs = argTypeList.count();
+  auto nArgs = argTypeList.count();
 
-  QStringList valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
+  auto valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
 
-  QStringList::size_type nValues = valueList.count();
+  auto nValues = valueList.count();
 
   if (nArgs != nValues)
     return false;
@@ -2321,7 +2330,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
     QString typeString(argTypeList[iArg]);
 
-    QVariant::Type type = QVariant::nameToType(typeString.toLatin1().data());
+    auto type = QVariant::nameToType(typeString.toLatin1().data());
 
     if (! v.canConvert(type)) {
       qDebug("cannot convert signal argument '%s' to type '%s'",
@@ -2359,8 +2368,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
         break;
 
       default:
-        qDebug("signal argument of type '%s' not supported",
-               typeString.toLatin1().data());
+        qDebug("signal argument of type '%s' not supported", typeString.toLatin1().data());
         break;
     }
   }
@@ -2458,7 +2466,7 @@ userVariantFromString(QVariant &var, const QString &str)
 
   var = var1;
 #else
-  QVariant var1(var.userType(), 0);
+  //QVariant var1(var.userType(), 0);
 
   // const cast is safe since we operate on a newly constructed variant
   CQUtilMetaData::setResult(true);
@@ -2545,7 +2553,8 @@ void
 CQUtil::
 getScreenSize(uint *w, uint *h)
 {
-  QRect r = QApplication::desktop()->screenGeometry();
+  //auto r = QApplication::desktop()->screenGeometry();
+  auto r = qApp->primaryScreen()->geometry();
 
   *w = r.width();
   *h = r.height();
@@ -2555,7 +2564,7 @@ void
 CQUtil::
 setSelectText(const std::string &text)
 {
-  QClipboard *clipboard = QApplication::clipboard();
+  auto *clipboard = QApplication::clipboard();
 
   clipboard->setText(text.c_str(), QClipboard::Selection);
 }
@@ -2707,7 +2716,7 @@ void
 CQUtil::
 setDockVisible(QDockWidget *dock, bool visible)
 {
-  QAction *action = dock->toggleViewAction();
+  auto *action = dock->toggleViewAction();
 
   if (visible != ! dock->isHidden())
     action->trigger();
@@ -2793,10 +2802,10 @@ stringToAlign(const QString &str, Qt::Alignment &align)
 
   align = 0;
 
-  QStringList strs = str.split("|");
+  auto strs = str.split("|");
 
   for (int i = 0; i < strs.length(); ++i) {
-    QString str = strs[i].toLower();
+    auto str = strs[i].toLower();
 
     if (! stringAddAlign(str, align))
       rc = false;
@@ -2887,7 +2896,7 @@ nameWidgetTree(QWidget *widget)
 
   uint num = 0;
 
-  QString name = widget->objectName();
+  auto name = widget->objectName();
 
   if (name.isNull() || name.isEmpty()) {
     nameWidget(widget);
@@ -2895,10 +2904,10 @@ nameWidgetTree(QWidget *widget)
     ++num;
   }
 
-  const QObjectList &children = widget->children();
+  const auto &children = widget->children();
 
-  for (QObjectList::const_iterator po = children.begin(); po != children.end(); ++po) {
-    QWidget *widget1 = qobject_cast<QWidget *>(*po);
+  for (auto *child : children) {
+    auto *widget1 = qobject_cast<QWidget *>(child);
 
     if (widget1)
       num += nameWidgetTree(widget1);
@@ -2911,12 +2920,12 @@ void
 CQUtil::
 nameWidget(QWidget *widget)
 {
-  QAbstractButton *button = qobject_cast<QAbstractButton *>(widget);
+  auto *button = qobject_cast<QAbstractButton *>(widget);
 
   if (button)
     nameWidgetButton(button);
   else {
-    QLabel *label = qobject_cast<QLabel *>(widget);
+    auto *label = qobject_cast<QLabel *>(widget);
 
     if (label)
       nameWidgetLabel(label);
@@ -2929,7 +2938,7 @@ void
 CQUtil::
 nameWidgetButton(QAbstractButton *button)
 {
-  QString text = button->text();
+  auto text = button->text();
 
   if (text.isNull() || text.isEmpty())
     return CQUtil::nameWidgetGen(static_cast<QWidget*>(button));
@@ -2945,7 +2954,7 @@ void
 CQUtil::
 nameWidgetLabel(QLabel *label)
 {
-  QString text = label->text();
+  auto text = label->text();
 
   if (text.isNull() || text.isEmpty())
     return CQUtil::nameWidgetGen(static_cast<QWidget*>(label));
@@ -2961,13 +2970,13 @@ void
 CQUtil::
 nameWidgetGen(QWidget *widget)
 {
-  const QMetaObject *mo = widget->metaObject();
+  const auto *mo = widget->metaObject();
 
   const char *cname = mo->className();
 
   int num = 1;
 
-  QString name = QString("%1_%2").arg(cname).arg(num);
+  auto name = QString("%1_%2").arg(cname).arg(num);
 
   while (widget->parent() && widget->parent()->findChild<QWidget *>(name)) {
     ++num;
@@ -2997,7 +3006,7 @@ recolorImage(QImage &image, const QColor &fg, const QColor &bg)
   if      (image.format() == QImage::Format_ARGB32) {
     for (int y = 0; y < image.height(); ++y) {
       for (int x = 0; x < image.width(); ++x) {
-        QRgb rgb = image.pixel(x, y);
+        auto rgb = image.pixel(x, y);
 
         int fg_gray = 255 - qGray(rgb);
         int bg_gray = 255 - fg_gray;
@@ -3014,7 +3023,7 @@ recolorImage(QImage &image, const QColor &fg, const QColor &bg)
     int ncolors = image.colorCount();
 
     for (int i = 0; i < ncolors; ++i) {
-      QRgb rgb = image.color(i);
+      auto rgb = image.color(i);
 
       int fg_gray = 255 - qGray(rgb);
       int bg_gray = 255 - fg_gray;
@@ -3043,7 +3052,7 @@ drawHtmlText(QWidget *w, QPainter *painter, const QString &text,
 
   td.setHtml(text);
 
-  QRect trect = rect.translated(-rect.x(), -rect.y());
+  auto trect = rect.translated(-rect.x(), -rect.y());
 
   painter->translate(rect.x(), rect.y());
 
@@ -3056,7 +3065,7 @@ drawHtmlText(QWidget *w, QPainter *painter, const QString &text,
   else
     ctx.palette.setColor(QPalette::Text, palette.text().color());
 
-  QAbstractTextDocumentLayout *layout = td.documentLayout();
+  auto *layout = td.documentLayout();
 
   layout->setPaintDevice(w);
 
@@ -3124,14 +3133,14 @@ init(const QMetaProperty &mp)
   enumValueName_.clear();
 
   if (isEnumType_) {
-    QMetaEnum metaEnum = mp.enumerator();
+    auto metaEnum = mp.enumerator();
 
     int num_enums = metaEnum.keyCount();
 
     for (int i = 0; i < num_enums; ++i) {
       int value = metaEnum.value(i);
 
-      QString name = metaEnum.valueToKey(value);
+      auto name = metaEnum.valueToKey(value);
 
       enumNames_.push_back(name);
 
@@ -3198,13 +3207,16 @@ removeGridItem(QGridLayout *layout, int row, int column, bool deleteWidgets)
   // We avoid usage of QGridLayout::itemAtPosition() here to improve performance.
   for (int i = layout->count() - 1; i >= 0; i--) {
     int r, c, rs, cs;
+
     layout->getItemPosition(i, &r, &c, &rs, &cs);
+
     if ((r <= row && r + rs - 1 >= row) || (c <= column && c + cs - 1 >= column)) {
       // This layout item is subject to deletion.
-      QLayoutItem *item = layout->takeAt(i);
-      if (deleteWidgets) {
+      auto *item = layout->takeAt(i);
+
+      if (deleteWidgets)
         deleteLayoutChildWidgets(item);
-      }
+
       delete item;
     }
   }
@@ -3253,10 +3265,11 @@ removeGridItems(QGridLayout *layout, bool deleteWidgets)
   // We avoid usage of QGridLayout::itemAtPosition() here to improve performance.
   for (int i = layout->count() - 1; i >= 0; i--) {
     // This layout item is subject to deletion.
-    QLayoutItem *item = layout->takeAt(i);
-    if (deleteWidgets) {
+    auto *item = layout->takeAt(i);
+
+    if (deleteWidgets)
       deleteLayoutChildWidgets(item);
-    }
+
     delete item;
   }
 }

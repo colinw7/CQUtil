@@ -42,7 +42,7 @@ customContextMenuSlot(const QPoint &pos)
   // Map point to global from the viewport to account for the header.
   QPoint mpos = viewport()->mapToGlobal(pos);
 
-  QMenu *menu = new QMenu;
+  auto *menu = new QMenu;
 
   addMenuActions(menu);
 
@@ -57,9 +57,9 @@ void
 CQTreeView::
 addMenuActions(QMenu *menu)
 {
-  QAction *expandAction   = new QAction("Expand All"  , menu);
-  QAction *collapseAction = new QAction("Collapse All", menu);
-  QAction *setRootAction  = new QAction("Set Root"    , menu);
+  auto *expandAction   = new QAction("Expand All"  , menu);
+  auto *collapseAction = new QAction("Collapse All", menu);
+  auto *setRootAction  = new QAction("Set Root"    , menu);
 
   connect(expandAction  , SIGNAL(triggered()), this, SLOT(expandAll()));
   connect(collapseAction, SIGNAL(triggered()), this, SLOT(collapseAll()));

@@ -289,7 +289,7 @@ namespace CQUtil {
   bool variantToString(const QVariant &var, QString &str);
 
   bool stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
-                       QVariant &var, const QVariant &oldVar=QVariant());
+                       int userType, QVariant &var, const QVariant &oldVar=QVariant());
 
   bool paletteFromString(QPalette &palette, const QString &paletteDef);
   QString paletteToString(const QPalette &palette);
