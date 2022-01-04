@@ -58,6 +58,12 @@ QString metaMethodSignature(QMetaMethod &m) {
 #endif
 }
 
+using ObjectAlias = std::map<QObject *, QString>;
+using AliasObject = std::map<QString, QObject *>;
+
+static ObjectAlias s_objectAlias;
+static AliasObject s_aliasObject;
+
 }
 
 //------
@@ -529,6 +535,8 @@ decodeFont(const QFont &qfont, QString &family, CFontStyle &style, int &pixelSiz
   }
 }
 
+//---
+
 QString
 CQUtil::
 fullName(const QObject *object)
@@ -572,6 +580,11 @@ nameToObject(const QString &name)
 
   if (name == "STYLE_MGR")
     return CQStyleMgrInst;
+
+  auto po = s_aliasObject.find(name);
+
+  if (po != s_aliasObject.end())
+    return (*po).second;
 
   auto names = name.split("|");
 
@@ -637,6 +650,49 @@ childObject(QObject *parent, const QString &name)
 {
   return parent->findChild<QObject *>(name);
 }
+
+QString
+CQUtil::
+addObjectAlias(QObject *object)
+{
+  auto po = s_objectAlias.find(object);
+
+  if (po != s_objectAlias.end())
+    return (*po).second;
+
+  auto name = object->objectName();
+
+  if (name == "") {
+    nameObject(object);
+
+    name = object->objectName();
+  }
+
+  auto pn = s_aliasObject.find(name);
+
+  if (pn != s_aliasObject.end()) {
+    auto baseName = name;
+
+    int num = 1;
+
+    name = QString("%1_%2").arg(baseName).arg(num);
+
+    pn = s_aliasObject.find(name);
+
+    while (pn != s_aliasObject.end()) {
+      ++num;
+
+      name = QString("%1_%2").arg(baseName).arg(num);
+    }
+  }
+
+  s_objectAlias[object] = name;
+  s_aliasObject[name]   = object;
+
+  return name;
+}
+
+//---
 
 QWidget *
 CQUtil::
@@ -2920,17 +2976,24 @@ void
 CQUtil::
 nameWidget(QWidget *widget)
 {
-  auto *button = qobject_cast<QAbstractButton *>(widget);
+  nameObject(widget);
+}
+
+void
+CQUtil::
+nameObject(QObject *object)
+{
+  auto *button = qobject_cast<QAbstractButton *>(object);
 
   if (button)
     nameWidgetButton(button);
   else {
-    auto *label = qobject_cast<QLabel *>(widget);
+    auto *label = qobject_cast<QLabel *>(object);
 
     if (label)
       nameWidgetLabel(label);
     else
-      nameWidgetGen(widget);
+      nameObjectGen(object);
   }
 }
 
@@ -2941,7 +3004,7 @@ nameWidgetButton(QAbstractButton *button)
   auto text = button->text();
 
   if (text.isNull() || text.isEmpty())
-    return CQUtil::nameWidgetGen(static_cast<QWidget*>(button));
+    return nameObjectGen(static_cast<QWidget*>(button));
 
   text.replace(QChar(' '),QChar('_'));
   text.replace(QChar('&'),QString(""));
@@ -2957,7 +3020,7 @@ nameWidgetLabel(QLabel *label)
   auto text = label->text();
 
   if (text.isNull() || text.isEmpty())
-    return CQUtil::nameWidgetGen(static_cast<QWidget*>(label));
+    return nameObjectGen(static_cast<QWidget*>(label));
 
   text.replace(QChar(' '),QChar('_'));
   text.replace(QChar('&'),QString(""));
@@ -2968,9 +3031,9 @@ nameWidgetLabel(QLabel *label)
 
 void
 CQUtil::
-nameWidgetGen(QWidget *widget)
+nameObjectGen(QObject *object)
 {
-  const auto *mo = widget->metaObject();
+  const auto *mo = object->metaObject();
 
   const char *cname = mo->className();
 
@@ -2978,13 +3041,13 @@ nameWidgetGen(QWidget *widget)
 
   auto name = QString("%1_%2").arg(cname).arg(num);
 
-  while (widget->parent() && widget->parent()->findChild<QWidget *>(name)) {
+  while (object->parent() && object->parent()->findChild<QObject *>(name)) {
     ++num;
 
     name = QString("%1_%2").arg(cname).arg(num);
   }
 
-  widget->setObjectName(name);
+  object->setObjectName(name);
 }
 
 //------------

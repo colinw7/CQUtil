@@ -109,8 +109,8 @@ class CQMdiArea {
 
     QList<QMdiSubWindow *> widgets = area_->subWindowList();
 
-    QList<QWidget *>::iterator p1 = widgets.begin();
-    QList<QWidget *>::iterator p2 = widgets.end  ();
+    auto p1 = widgets.begin();
+    auto p2 = widgets.end  ();
 
     th->windows_.clear();
 

@@ -148,6 +148,8 @@ namespace CQUtil {
 
   void decodeFont(const QFont &font, QString &family, CFontStyle &style, int &pixelSize);
 
+  //---
+
   QString fullName(const QObject* object);
 
   QObject *nameToObject(const QString &name);
@@ -156,6 +158,10 @@ namespace CQUtil {
   QObject *hierChildObject(QObject *object, int ind, const QStringList &names);
 
   QObject *childObject(QObject *parent, const QString &name);
+
+  QString addObjectAlias(QObject *object);
+
+  //---
 
   QWidget *getToplevelWidget(QWidget *widget);
 
@@ -349,10 +355,11 @@ namespace CQUtil {
   uint nameWidgetTree(QWidget *widget);
 
   void nameWidget(QWidget *widget);
+  void nameObject(QObject *object);
 
   void nameWidgetButton(QAbstractButton *button);
   void nameWidgetLabel(QLabel *label);
-  void nameWidgetGen(QWidget *widget);
+  void nameObjectGen(QObject *object);
 
   //-----
 
