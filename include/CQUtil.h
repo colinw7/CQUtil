@@ -13,6 +13,7 @@
 #include <QTableWidget>
 #include <QButtonGroup>
 #include <QMenu>
+#include <QBoxLayout>
 #include <QAction>
 #include <QPen>
 
@@ -430,6 +431,18 @@ namespace CQUtil {
 
     t->setMargin (margin );
     t->setSpacing(spacing);
+
+    return t;
+  }
+
+  template<class T>
+  T *makeLayout(QBoxLayout *parent, int margin=2, int spacing=2) {
+    T *t = new T;
+
+    t->setMargin (margin );
+    t->setSpacing(spacing);
+
+    parent->addLayout(t);
 
     return t;
   }
