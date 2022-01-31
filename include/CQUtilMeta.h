@@ -127,4 +127,20 @@ CQUTIL_DEF_META_TYPE_REGISTER(TYPE, TYPE)
 
 #define CQUTIL_REGISTER_META_ID(ID) CQUtilMeta_##ID :: registerMetaType()
 
+//---
+
+// define type check, convert from and to QVariant functions
+#define CQUTIL_DEF_META_CONVERSIONS(TYPE, ID) \
+static bool isVariantType(const QVariant &var) { \
+  return (var.type() == QVariant::UserType && var.userType() == ID); \
+} \
+\
+static TYPE fromVariant(const QVariant &var) { \
+  return var.value<TYPE>(); \
+} \
+\
+static QVariant toVariant(const TYPE &value) { \
+  return QVariant::fromValue<TYPE>(value); \
+} \
+
 #endif

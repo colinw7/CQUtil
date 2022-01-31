@@ -185,7 +185,7 @@ class CQWinWidget : public QWidget {
 
   bool isHeaderVisible() const { return (decoration_.type & HeaderDecoration); }
   void setHeaderVisible(bool visible) {
-    decoration_.type = (DecorationType)
+    decoration_.type = static_cast<DecorationType>
       (visible ? decoration_.type |  HeaderDecoration : decoration_.type & ~HeaderDecoration);
     updateSize(); }
 

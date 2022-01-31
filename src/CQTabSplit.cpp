@@ -165,6 +165,8 @@ addWidget(QWidget *w, const QString &name)
   else {
     tabWidget_->addTab(data.w, name);
   }
+
+  w->setVisible(true); // has been reparented
 }
 
 void
@@ -194,7 +196,7 @@ removeWidget(QWidget *w, bool deleteWidget)
   widgets_.pop_back();
 
   if (! deleteWidget)
-    data.w->setParent(nullptr);
+    data.w->setParent(nullptr); // makes invisible
 
   delete data.group;
 

@@ -62,7 +62,7 @@ class CQDialog : public QDialog {
 
   template<typename WIDGET>
   WIDGET *addFieldT(const QString &name, WIDGET *w, bool stretch=false) {
-    return (WIDGET *) addField(name, w, stretch);
+    return dynamic_cast<WIDGET *>(addField(name, w, stretch));
   }
 
   QPushButton *addButton(const QString &name);
