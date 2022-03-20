@@ -19,7 +19,7 @@ class CQColorChooser : public QWidget {
   Q_PROPERTY(QColor  color     READ color       WRITE setColor    )
   Q_PROPERTY(QString colorName READ colorName   WRITE setColorName)
 
-  Q_ENUMS(Style);
+  Q_ENUMS(Style)
 
  public:
   enum Style {
@@ -46,8 +46,8 @@ class CQColorChooser : public QWidget {
   void setTextStyle(bool b) {
     uint styles = getStyles();
 
-    if (b) styles |=  Text;
-    else   styles &= ~Text;
+    if (b) styles |=  uint(Text);
+    else   styles &= ~uint(Text);
 
     setStyles(styles);
   }
@@ -59,8 +59,8 @@ class CQColorChooser : public QWidget {
   void setColorButtonStyle(bool b) {
     uint styles = getStyles();
 
-    if (b) styles |=  ColorButton;
-    else   styles &= ~ColorButton;
+    if (b) styles |=  uint(ColorButton);
+    else   styles &= ~uint(ColorButton);
 
     setStyles(styles);
   }
@@ -72,8 +72,8 @@ class CQColorChooser : public QWidget {
   void setColorLabelStyle(bool b) {
     uint styles = getStyles();
 
-    if (b) styles |=  ColorLabel;
-    else   styles &= ~ColorLabel;
+    if (b) styles |=  uint(ColorLabel);
+    else   styles &= ~uint(ColorLabel);
 
     setStyles(styles);
   }
@@ -85,8 +85,8 @@ class CQColorChooser : public QWidget {
   void setImageButtonStyle(bool b) {
     uint styles = getStyles();
 
-    if (b) styles |=  ImageButton;
-    else   styles &= ~ImageButton;
+    if (b) styles |=  uint(ImageButton);
+    else   styles &= ~uint(ImageButton);
 
     setStyles(styles);
   }
@@ -98,8 +98,8 @@ class CQColorChooser : public QWidget {
   void setAlphaButtonStyle(bool b) {
     uint styles = getStyles();
 
-    if (b) styles |=  AlphaButton;
-    else   styles &= ~AlphaButton;
+    if (b) styles |=  uint(AlphaButton);
+    else   styles &= ~uint(AlphaButton);
 
     setStyles(styles);
   }

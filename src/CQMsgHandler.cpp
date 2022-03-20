@@ -2,9 +2,10 @@
 
 #include <QApplication>
 
-namespace {
+namespace CQMsgHandler {
 
-bool checkEnv(const char *name) {
+bool
+checkEnv(const char *name) {
   const char *p = getenv(name);
   if (! p) return false;
 
@@ -13,9 +14,30 @@ bool checkEnv(const char *name) {
   return (s == "1" || s == "true" || s == "yes");
 }
 
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+bool
+isIgnoreMsg(const QString &msg)
 {
-  QByteArray localMsg = msg.toLocal8Bit();
+  static QStringList ignoreMessages;
+
+  if (ignoreMessages.empty()) {
+    ignoreMessages.push_back("QBasicTimer can only be used with threads started with QThread");
+  }
+
+  for (const auto &imsg : ignoreMessages) {
+    if (msg.indexOf(imsg) > 0)
+      return true;
+  }
+
+  return false;
+}
+
+void
+messageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+  auto localMsg = msg.toLocal8Bit();
+
+  if (isIgnoreMsg(localMsg))
+    return;
 
   switch (type) {
     case QtDebugMsg: {
@@ -59,7 +81,7 @@ namespace CQMsgHandler {
 void
 install()
 {
-  qInstallMessageHandler(myMessageOutput);
+  qInstallMessageHandler(messageOutput);
 }
 
 }

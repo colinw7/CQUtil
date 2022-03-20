@@ -124,13 +124,15 @@ CQTableWidget(QWidget* parent) :
 
   //---
 
-  registerType(CQTableWidgetColorItem::TYPE, new CQTableWidgetBoolItem (this, false));
+  registerType(CQTableWidgetBoolItem::TYPE , new CQTableWidgetBoolItem (this, false));
   registerType(CQTableWidgetColorItem::TYPE, new CQTableWidgetColorItem(this, QColor()));
 }
 
 CQTableWidget::
 ~CQTableWidget()
 {
+  for (auto &pt : types_)
+    delete pt.second;
 }
 
 void

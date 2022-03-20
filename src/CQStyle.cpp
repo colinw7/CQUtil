@@ -57,13 +57,13 @@ drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientStart,
 static QColor
 mergedColors(const QColor &colorA, const QColor &colorB, double factor = 50.0)
 {
-  const double maxFactor = 100.0;
+  const double mf = 100.0; // maxFactor
 
   QColor tmp = colorA;
 
-  tmp.setRed  ((tmp.red  ()*factor)/maxFactor + (colorB.red  ()*(maxFactor - factor))/maxFactor);
-  tmp.setGreen((tmp.green()*factor)/maxFactor + (colorB.green()*(maxFactor - factor))/maxFactor);
-  tmp.setBlue ((tmp.blue ()*factor)/maxFactor + (colorB.blue ()*(maxFactor - factor))/maxFactor);
+  tmp.setRed  (int((tmp.red  ()*factor)/mf + (colorB.red  ()*(mf - factor))/mf));
+  tmp.setGreen(int((tmp.green()*factor)/mf + (colorB.green()*(mf - factor))/mf));
+  tmp.setBlue (int((tmp.blue ()*factor)/mf + (colorB.blue ()*(mf - factor))/mf));
 
   return tmp;
 }
@@ -376,13 +376,14 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
           if (textColor.isValid())
             painter->setPen(textColor);
 
-          int alignment = int(groupBox->textAlignment);
+          uint alignment = uint(groupBox->textAlignment);
 
           if (! proxy()->styleHint(QStyle::SH_UnderlineShortcut, option, widget))
             alignment |= Qt::TextHideMnemonic;
 
           proxy()->drawItemText(painter, textRect,
-                                Qt::TextShowMnemonic | Qt::AlignHCenter | alignment,
+                                Qt::AlignmentFlag(uint(Qt::TextShowMnemonic) |
+                                                  uint(Qt::AlignHCenter) | alignment),
                                 groupBox->palette, groupBox->state & State_Enabled, groupBox->text,
                                 textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
 
@@ -419,20 +420,20 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
       QColor dark;
 
       dark.setHsv(button.hue(),
-                  qMin(255, (int)(button.saturation()*1.9)),
-                  qMin(255, (int)(button.value()*0.7)));
+                  qMin(255, static_cast<int>(button.saturation()*1.9)),
+                  qMin(255, static_cast<int>(button.value()*0.7)));
 
       QColor grooveColor;
 
       grooveColor.setHsv(button.hue(),
-                         qMin(255, (int)(button.saturation()*2.6)),
-                         qMin(255, (int)(button.value()*0.9)));
+                         qMin(255, static_cast<int>(button.saturation()*2.6)),
+                         qMin(255, static_cast<int>(button.value()*0.9)));
 
       QColor darkOutline;
 
       darkOutline.setHsv(button.hue(),
-                         qMin(255, (int)(button.saturation()*3.0)),
-                         qMin(255, (int)(button.value()*0.6)));
+                         qMin(255, static_cast<int>(button.saturation()*3.0)),
+                         qMin(255, static_cast<int>(button.value()*0.6)));
 
       QColor alphaCornerColor;
 
@@ -822,7 +823,7 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 {
   // TODO: PE_PanelButtonCommand for button (with arrow pixmap)
   auto rect  = option->rect;
-  int  state = option->state;
+  uint state = option->state;
 
   auto base          = option->palette.base().color();
   auto button        = option->palette.button().color();
@@ -872,8 +873,8 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
       break;
     }
     case PE_IndicatorRadioButton: {
-      double b = rect.width()*0.1;
-      double w = rect.width()/3.0;
+      int b = int(rect.width()*0.1);
+      int w = int(rect.width()/3.0);
 
       //---
 
@@ -921,8 +922,8 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
       break;
     }
     case PE_IndicatorCheckBox: {
-      double ob = rect.width()*0.1;
-      double ib = rect.width()*0.25;
+      int ob = int(rect.width()*0.10);
+      int ib = int(rect.width()*0.25);
 
       //---
 
@@ -1009,13 +1010,13 @@ drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *pa
 
       QColor dark;
       dark.setHsv(button.hue(),
-                  qMin(255, (int)(button.saturation()*1.9)),
-                  qMin(255, (int)(button.value     ()*0.4)));
+                  qMin(255, static_cast<int>(button.saturation()*1.9)),
+                  qMin(255, static_cast<int>(button.value     ()*0.4)));
 
       QColor darkOutline;
       darkOutline.setHsv(button.hue(),
-                         qMin(255, (int)(button.saturation()*3.0)),
-                         qMin(255, (int)(button.value     ()*0.6)));
+                         qMin(255, static_cast<int>(button.saturation()*3.0)),
+                         qMin(255, static_cast<int>(button.value     ()*0.6)));
 
       painter->fillPath(path, QBrush(dark));
 
@@ -1092,17 +1093,22 @@ int
 CQStyle::
 pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
+  int fh = (option ? option->fontMetrics.height() : 16);
+
   switch (metric) {
     case PM_SmallIconSize:
     case PM_ListViewIconSize:
     case PM_IconViewIconSize:
     case PM_TabBarIconSize:
     case PM_ButtonIconSize:
-      return 24;
+      return fh + 2;
     case PM_LargeIconSize:
     case PM_ToolBarIconSize:
     case PM_MessageBoxIconSize:
-      return 32;
+      return int(fh*1.5 + 2);
+    case PM_IndicatorWidth:
+    case PM_IndicatorHeight:
+      return fh;
     default:
       return QProxyStyle::pixelMetric(metric, option, widget);
   }

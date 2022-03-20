@@ -481,7 +481,7 @@ namespace CQUtil {
     menu->addAction(action);
 
     return action;
-  };
+  }
 
   inline QAction *addCheckedAction(QMenu *menu, const QString &name, bool checked,
                                    QObject *receiver=nullptr, const char *slotName=nullptr) {
@@ -496,7 +496,7 @@ namespace CQUtil {
     menu->addAction(action);
 
     return action;
-  };
+  }
 
   inline QActionGroup *createActionGroup(QMenu *menu, QObject *receiver=nullptr,
                                          const char *slotName=nullptr) {
@@ -506,7 +506,7 @@ namespace CQUtil {
        QObject::connect(actionGroup, SIGNAL(triggered(QAction *)), receiver, slotName);
 
     return actionGroup;
-  };
+  }
 
   inline QAction *addGroupCheckAction(QActionGroup *group, const QString &name, bool checked,
                                       QObject *receiver=nullptr, const char *slotName=nullptr) {
@@ -524,7 +524,7 @@ namespace CQUtil {
     group->addAction(action);
 
     return action;
-  };
+  }
 
   inline void addActionGroupToMenu(QActionGroup *group) {
     auto *menu = qobject_cast<QMenu *>(group->parent());

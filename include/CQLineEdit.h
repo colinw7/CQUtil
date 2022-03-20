@@ -55,10 +55,10 @@ class CQLineEdit : public QLineEdit {
   void changeEvent(QEvent *e) override;
 
  private:
-  QColor placeColor_;  //! placeholder text color
-  bool   placeItalic_; //! placeholder is italic
-  State  state_;       //! current placeholder style state
-  bool   ignore_;      //! ignore events
+  QColor placeColor_;  //!< placeholder text color
+  bool   placeItalic_; //!< placeholder is italic
+  State  state_;       //!< current placeholder style state
+  bool   ignore_;      //!< ignore events
 };
 
 #endif

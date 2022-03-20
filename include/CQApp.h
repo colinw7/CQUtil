@@ -20,7 +20,6 @@ class CQApp : public QApplication {
   static CQApp *getApp() { return app_; }
 
   CQApp(int &argc, char **argv);
-
  ~CQApp();
 
   CQStyle *style() const { return style_; }

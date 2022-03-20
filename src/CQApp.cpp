@@ -4,6 +4,7 @@
 #include <CQUtil.h>
 #include <CQFont.h>
 #include <CQImage.h>
+#include <CQMsgHandler.h>
 
 #define CQAPP_WINDOW 1
 
@@ -71,7 +72,7 @@ CQAppObjEditFilter::
 eventFilter(QObject *obj, QEvent *event)
 {
   if (event->type() == QEvent::KeyPress) {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    auto *keyEvent = static_cast<QKeyEvent *>(event);
 
     if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Home) {
       CQApp::showMetaEdit();
@@ -113,6 +114,10 @@ CQApp(int &argc, char **argv) :
 
   //---
 
+  CQMsgHandler::install();
+
+  //---
+
   if (! getenv("CQAPP_NO_STYLE"))
     CQStyleMgrInst->createStyle();
 
@@ -137,7 +142,7 @@ CQApp(int &argc, char **argv) :
   //---
 
   // TODO: handle application font change
-  QScreen *srn = QApplication::screens().at(0);
+  auto *srn = QApplication::screens().at(0);
 
   double dotsPerInch = srn->logicalDotsPerInch();
 
@@ -164,7 +169,7 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  QFont font(fontName.c_str(), fontSize);
+  QFont font(fontName.c_str(), int(fontSize));
 
   CQStyleMgrInst->setFont(font);
 
@@ -175,7 +180,7 @@ CQApp(int &argc, char **argv) :
 
   auto fixedFont = CQUtil::getMonospaceFont();
 
-  fixedFont.setPixelSize(fontSize);
+  fixedFont.setPixelSize(int(fontSize));
 
   CQStyleMgrInst->setFixedFont(fixedFont);
 
@@ -185,7 +190,8 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  QRect r = qApp->desktop()->availableGeometry();
+  //auto r = qApp->desktop()->availableGeometry();
+  auto r = srn->availableGeometry();
 
   CScreenUnitsMgrInst->setScreenWidth (r.width ());
   CScreenUnitsMgrInst->setScreenHeight(r.height());

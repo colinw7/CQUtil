@@ -30,7 +30,7 @@ createStyle()
   if (! style_) {
     style_ = new CQStyle;
 
-    style_->setTheme((CQStyle::Theme) theme_);
+    style_->setTheme(static_cast<CQStyle::Theme>(theme_));
   }
 
   qApp->setStyle(style_);
@@ -45,7 +45,7 @@ setTheme(const Theme &theme)
   theme_ = theme;
 
   if (style_)
-    style_->setTheme((CQStyle::Theme) theme_);
+    style_->setTheme(static_cast<CQStyle::Theme>(theme_));
 
   emit themeChanged();
 }

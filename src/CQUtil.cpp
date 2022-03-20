@@ -437,7 +437,7 @@ convertModifier(Qt::KeyboardModifiers modifiers)
   if (modifiers & Qt::MetaModifier   ) modifiers1 |= CMODIFIER_META;
   if (modifiers & Qt::KeypadModifier ) modifiers1 |= CMODIFIER_KEYPAD;
 
-  return (CEventModifier) modifiers1;
+  return static_cast<CEventModifier>(modifiers1);
 }
 #endif
 
@@ -447,14 +447,15 @@ QColor
 CQUtil::
 rgbToColor(const CRGB &rgb)
 {
-  return QColor(rgb.getRedI(), rgb.getGreenI(), rgb.getBlueI());
+  return QColor(int(rgb.getRedI()), int(rgb.getGreenI()), int(rgb.getBlueI()));
 }
 
 QColor
 CQUtil::
 rgbaToColor(const CRGBA &rgba)
 {
-  return QColor(rgba.getRedI(), rgba.getGreenI(), rgba.getBlueI(), rgba.getAlphaI());
+  return QColor(int(rgba.getRedI()), int(rgba.getGreenI()), int(rgba.getBlueI()),
+                int(rgba.getAlphaI()));
 }
 
 uint
@@ -1785,6 +1786,15 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
 
     return true;
   }
+  else if (type == QVariant::Int) {
+    bool ok;
+    int i = str.toInt(&ok);
+    if (! ok) return false;
+
+    var = QVariant(i);
+
+    return true;
+  }
   else if (type == QVariant::Point) {
     QRegExp rx("\\s*(\\S+)\\s+(\\S+)\\s*");
 
@@ -1988,9 +1998,9 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
           double oldSize = oldFontInfo.pixelSize();
 
           if (str[0] == '+')
-            newFont.setPixelSize(oldSize + delta);
+            newFont.setPixelSize(int(oldSize + delta));
           else
-            newFont.setPixelSize(oldSize - delta);
+            newFont.setPixelSize(int(oldSize - delta));
 
           var = newFont;
 
@@ -2069,10 +2079,10 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
 
   var = QVariant(str);
 
-  if (! var.canConvert(type))
+  if (! var.canConvert(int(type)))
     return false;
 
-  if (! var.convert(type))
+  if (! var.convert(int(type)))
     return false;
 
   return true;
@@ -2267,7 +2277,7 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
     auto type = QVariant::nameToType(typeString.toLatin1().data());
 
-    if (! v.canConvert(type)) {
+    if (! v.canConvert(int(type))) {
       qDebug("cannot convert slot argument '%s' to type '%s'",
              valueList[iArg].toLatin1().data(), typeString.toLatin1().data());
       return false;
@@ -2388,7 +2398,7 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
     auto type = QVariant::nameToType(typeString.toLatin1().data());
 
-    if (! v.canConvert(type)) {
+    if (! v.canConvert(int(type))) {
       qDebug("cannot convert signal argument '%s' to type '%s'",
              valueList[iArg].toLatin1().data(), typeString.toLatin1().data());
       return false;
@@ -2612,8 +2622,8 @@ getScreenSize(uint *w, uint *h)
   //auto r = QApplication::desktop()->screenGeometry();
   auto r = qApp->primaryScreen()->geometry();
 
-  *w = r.width();
-  *h = r.height();
+  *w = uint(r.width ());
+  *h = uint(r.height());
 }
 
 void
@@ -2657,7 +2667,7 @@ QPoint
 CQUtil::
 toQPointI(const CPoint2D &point)
 {
-  return QPoint(point.x, point.y);
+  return QPoint(int(point.x), int(point.y));
 }
 
 CPoint2D
@@ -2783,7 +2793,7 @@ void
 CQUtil::
 penSetLineDash(QPen &pen, const CLineDash &dash)
 {
-  int num = dash.getNumLengths();
+  auto num = dash.getNumLengths();
 
   if (num > 0) {
     pen.setStyle(Qt::CustomDashLine);
@@ -2796,7 +2806,7 @@ penSetLineDash(QPen &pen, const CLineDash &dash)
 
     if (w <= 0.0) w = 1.0;
 
-    for (int i = 0; i < num; ++i)
+    for (int i = 0; i < int(num); ++i)
       dashes << dash.getLength(i)*w;
 
     if (num & 1)

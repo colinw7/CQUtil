@@ -1,6 +1,25 @@
 #ifndef CQUtilMeta_H
 #define CQUtilMeta_H
 
+/*!
+ * Macros to help define custom data types supported by Qt variant
+ * code so can be used in Q_PROPERTY defines and get/set using tcl
+ *
+ * To defined an new type <TYPE>:
+ *  . Add the following to the end of the type's header file:
+ *     #include <CQUtilMeta.h>
+ *     CQUTIL_DCL_META_TYPE(<TYPE>)
+ *
+ *  . Add the following to the top of the type's C++ file:
+ *     CQUTIL_DEF_META_TYPE(<TYPE>, toString, fromString)
+ *    where
+ *     'QString toString() const' gets the string representation of <TYPE>.
+ *     'bool fromString(const QString &str) const' sets the instance of <TYPE> from a string.
+ *
+ *  . Add code to call at startup
+ *     CQUTIL_REGISTER_META(<TYPE>)
+ */
+
 #include <QMetaType>
 #include <QDataStream>
 #include <QDebug>
@@ -141,6 +160,6 @@ static TYPE fromVariant(const QVariant &var) { \
 \
 static QVariant toVariant(const TYPE &value) { \
   return QVariant::fromValue<TYPE>(value); \
-} \
+}
 
 #endif

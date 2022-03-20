@@ -40,7 +40,7 @@ init()
 
   //-----
 
-  QHBoxLayout *layout = new QHBoxLayout(this);
+  auto *layout = new QHBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(2);
 
   cedit_   = new QLineEdit    (this); cedit_  ->setObjectName("cedit"  ); // text color
@@ -240,7 +240,7 @@ void
 CQColorChooser::
 colorButtonClicked()
 {
-  QColor color = QColorDialog::getColor(color_, this);
+  auto color = QColorDialog::getColor(color_, this);
 
   setColor(color, alpha_);
 
@@ -284,7 +284,7 @@ void
 CQColorChooser::
 setWidgetBackground(QWidget *widget, const QColor &color)
 {
-  QPalette palette = widget->palette();
+  auto palette = widget->palette();
 
   palette.setColor(widget->backgroundRole(), color);
 

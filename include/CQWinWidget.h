@@ -31,7 +31,7 @@ class CQWinWidget : public QWidget {
   Q_ENUMS(EditMode)
 
  public:
-  enum GeometryOps {
+  enum GeometryOps : unsigned int {
     MoveOp     = (1<<0),
     ResizeOp   = (1<<1),
     RaiseOp    = (1<<2),
@@ -41,7 +41,7 @@ class CQWinWidget : public QWidget {
     CollapseOp = (1<<6)
   };
 
-  enum DecorationType {
+  enum DecorationType : unsigned int {
     NoDecoration           = 0,
     BorderDecoration       = (1<<0),
     HeaderDecoration       = (1<<1),

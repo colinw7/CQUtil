@@ -182,8 +182,10 @@ removeWidget(QWidget *w, bool deleteWidget)
     ++i;
   }
 
-  if (i >= int(widgets_.size()))
+  if (i >= int(widgets_.size())) {
+    assert(false);
     return;
+  }
 
   if (i == currentIndex_)
     i = currentIndex_ - 1;

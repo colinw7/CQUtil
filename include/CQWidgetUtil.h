@@ -37,14 +37,14 @@ namespace CQWidgetUtil {
     QSize s(0, 0);
 
     if (sizePolicy.horizontalPolicy() != QSizePolicy::Ignored) {
-      if (sizePolicy.horizontalPolicy() & QSizePolicy::ShrinkFlag)
+      if (uint(sizePolicy.horizontalPolicy()) & QSizePolicy::ShrinkFlag)
         s.setWidth(minSizeHint.width());
       else
         s.setWidth(qMax(sizeHint.width(), minSizeHint.width()));
     }
 
     if (sizePolicy.verticalPolicy() != QSizePolicy::Ignored) {
-      if (sizePolicy.verticalPolicy() & QSizePolicy::ShrinkFlag)
+      if (uint(sizePolicy.verticalPolicy()) & QSizePolicy::ShrinkFlag)
         s.setHeight(minSizeHint.height());
       else
         s.setHeight(qMax(sizeHint.height(), minSizeHint.height()));
