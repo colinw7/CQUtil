@@ -1137,7 +1137,7 @@ setProperty(const QObject *object, const QString &propName, const QString &str)
   (void) getProperty(object, propName, v);
 
   if (! stringToVariant(str, metaProperty.type(), metaProperty.typeName(),
-                        metaProperty.userType(), v))
+                        metaProperty.userType(), v, v))
     return false;
 
   return obj->setProperty(propName.toLatin1().data(), v);
@@ -2066,7 +2066,8 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
     }
 #endif
     else {
-      assert(oldVar.userType() == userType);
+      assert(userType != QVariant::UserType);
+      //assert(oldVar.userType() == userType);
 
       var = oldVar;
 

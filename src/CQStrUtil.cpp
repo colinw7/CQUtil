@@ -43,7 +43,7 @@ toReal(const char *c_str, bool &ok)
 #else
   errno = 0;
 
-  r = strtod(&c_str[i], (char **) &p);
+  r = strtod(&c_str[i], const_cast<char **>(&p));
 
   if (errno == ERANGE) {
     ok = false;
@@ -85,7 +85,7 @@ toInt(const char *c_str, bool &ok, const char **p)
 
   const char *p1;
 
-  integer = strtol(&c_str[i], (char **) &p1, 10);
+  integer = strtol(&c_str[i], const_cast<char **>(&p1), 10);
 
   if (errno == ERANGE) {
     ok = false;
