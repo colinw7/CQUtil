@@ -1,6 +1,7 @@
 #include <CQFontChooser.h>
 #include <CQFontDialog.h>
 #include <CQIconButton.h>
+#include <CQUtil.h>
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -26,17 +27,16 @@ CQFontChooser(QWidget *parent) :
 
   //-----
 
-  auto *layout = new QHBoxLayout(this);
-  layout->setMargin(0); layout->setSpacing(0);
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(this, 0, 0);
 
-  cedit_   = new QLineEdit   (this); cedit_  ->setObjectName("cedit");
-  cbutton_ = new QToolButton (this); cbutton_->setObjectName("cbutton");
-  clabel_  = new QLabel      (this); clabel_ ->setObjectName("clabel");
-  button_  = new CQIconButton(this); button_ ->setObjectName("button");
+  cedit_   = CQUtil::makeWidget<QLineEdit   >(this, "cedit");
+  cbutton_ = CQUtil::makeWidget<QToolButton >(this, "cbutton");
+  clabel_  = CQUtil::makeWidget<QLabel      >(this, "clabel");
+  button_  = CQUtil::makeWidget<CQIconButton>(this, "button");
 
-  ncombo_ = new QFontComboBox(this); ncombo_->setObjectName("ncombo");
-  scombo_ = new QComboBox    (this); scombo_->setObjectName("scombo");
-  zcombo_ = new QComboBox    (this); zcombo_->setObjectName("zcombo");
+  ncombo_ = CQUtil::makeWidget<QFontComboBox>(this, "ncombo");
+  scombo_ = CQUtil::makeWidget<QComboBox    >(this, "scombo");
+  zcombo_ = CQUtil::makeWidget<QComboBox    >(this, "zcombo");
 
   button_->setIcon("FONT_DIALOG");
 

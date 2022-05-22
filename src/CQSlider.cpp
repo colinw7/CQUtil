@@ -90,8 +90,8 @@ paintEvent(QPaintEvent *)
   QFontMetrics fm1(valFont_);
   QFontMetrics fm2(tickFont_);
 
-  QString minLabel = QString("%1").arg(minimum());
-  QString maxLabel = QString("%1").arg(maximum());
+  auto minLabel = QString("%1").arg(minimum());
+  auto maxLabel = QString("%1").arg(maximum());
 
   QString valLabel;
 
@@ -145,6 +145,10 @@ CQRealSlider(QWidget *parent) :
   valFont_  = font(); valFont_ .setPointSizeF(0.9*valFont_ .pointSizeF());
   tickFont_ = font(); tickFont_.setPointSizeF(0.8*tickFont_.pointSizeF());
 
+  QSlider::setMinimum(0);
+  QSlider::setMaximum(1000);
+  QSlider::setSingleStep(1);
+
   connect(this, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
 }
 
@@ -155,11 +159,57 @@ setValueLabel(const QString &label)
   valueLabel_ = label;
 }
 
+void
+CQRealSlider::
+setValue(double r)
+{
+  value_ = std::min(std::max(r, minimum()), maximum());
+
+  QSlider::setValue(int(1000.0*(value_ - minimum())/(maximum() - minimum())));
+}
+
+void
+CQRealSlider::
+setMinimum(double r)
+{
+  minimum_ = r;
+
+  emit rangeChanged(minimum_, maximum_);
+}
+
+void
+CQRealSlider::
+setMaximum(double r)
+{
+  maximum_ = r;
+
+  emit rangeChanged(minimum_, maximum_);
+}
+
+void
+CQRealSlider::
+setRange(double minimum, double maximum)
+{
+  minimum_ = minimum;
+  maximum_ = maximum;
+
+  emit rangeChanged(minimum_, maximum_);
+}
+
+void
+CQRealSlider::
+setSingleStep(double r)
+{
+  singleStep_ = r;
+
+  QSlider::setSingleStep(int(singleStep_*1000.0));
+}
+
 int
 CQRealSlider::
-valueToPos(int val) const
+valueToPos(double val) const
 {
-  double border = 2.0;
+  double border = 2.0; // pixels
 
   double w = width() - 2*border - 2*dx_;
 
@@ -168,7 +218,7 @@ valueToPos(int val) const
 
 int
 CQRealSlider::
-valueWidthToPos(int val, int w) const
+valueWidthToPos(double val, int w) const
 {
   int pos = valueToPos(val) - w/2;
 
@@ -216,7 +266,7 @@ paintEvent(QPaintEvent *)
   drawTick(&p, minimum(), y, 4);
   drawTick(&p, maximum(), y, 4);
 
-  for (int i = minimum(); i <= maximum(); i += pageStep())
+  for (double i = minimum(); i <= maximum(); i += pageStep())
     drawTick(&p, i, y, 2);
 
   // draw labels
@@ -249,7 +299,7 @@ paintEvent(QPaintEvent *)
 
 void
 CQRealSlider::
-drawTick(QPainter *p, int val, int y, int s)
+drawTick(QPainter *p, double val, int y, int s)
 {
   int x = valueToPos(val);
 
@@ -260,7 +310,9 @@ void
 CQRealSlider::
 valueChangedSlot(int v)
 {
-  emit valueChanged((double) v);
+  value_ = minimum() + (maximum() - minimum())*v/1000.0;
+
+  emit valueChanged(value_);
 }
 
 QSize

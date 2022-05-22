@@ -111,6 +111,9 @@ class CQToolTip : public QWidget {
   // show tooltip for interface at specified position
   bool show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent);
 
+  // show widget tip at position
+  bool showTip(QWidget *w, const QPoint &gpos);
+
  private:
   // show tip at position
   void showAtPos(const QPoint &pos);
@@ -136,8 +139,6 @@ class CQToolTip : public QWidget {
   // stop hide timer
   void stopTimer();
 
-  // show widget tip at position
-  bool showTip  (QWidget *w, const QPoint &gpos);
   // update widget tip at position
   bool updateTip(QWidget *w, const QPoint &gpos);
 

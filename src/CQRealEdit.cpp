@@ -9,14 +9,14 @@
 
 CQRealEdit::
 CQRealEdit(QWidget *parent, double value) :
- QLineEdit(parent), menu_(0)
+ QLineEdit(parent)
 {
   init("edit", value);
 }
 
 CQRealEdit::
 CQRealEdit(double value) :
- QLineEdit(0), menu_(0)
+ QLineEdit(nullptr)
 {
   init("edit", value);
 }

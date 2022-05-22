@@ -4,7 +4,11 @@
 #include <QFrame>
 #include <QSplitter>
 #include <QTabWidget>
+#include <QTabBar>
 #include <QPointer>
+
+class CQTabSplitSplitterTool;
+class CQTabSplitTabBar;
 
 class CQGroupBox;
 class QVBoxLayout;
@@ -95,6 +99,12 @@ class CQTabSplit : public QFrame {
   //! set splitter sizes
   void setSizes(const Sizes &sizes);
 
+  //---
+
+  CQTabSplitSplitterTool *getSplitterTool();
+
+  //---
+
   //! return size hint
   QSize sizeHint() const override;
 
@@ -116,10 +126,12 @@ class CQTabSplit : public QFrame {
   using WidgetP = QPointer<QWidget>;
 
   struct WidgetData {
-    WidgetP      w;                 //!< widget
-    QString      name;              //!< widget name (frou group)
-    CQGroupBox*  group { nullptr }; //!< group box (if grouped)
-    QVBoxLayout* layout;            //!< layout
+    WidgetP      w;                  //!< widget
+    QString      name;               //!< widget name (frou group)
+    CQGroupBox*  group  { nullptr }; //!< group box (if grouped)
+    QVBoxLayout* layout { nullptr }; //!< layout
+
+    WidgetData() { }
 
     WidgetData(QWidget *w, const QString &name) :
      w(w), name(name) {
@@ -139,93 +151,8 @@ class CQTabSplit : public QFrame {
   Sizes           vsizes_;                          //!< splitter sizes (vertical)
   QTabWidget*     tabWidget_    { nullptr };        //!< tab widget (if tabbed)
   QSplitter*      splitter_     { nullptr };        //!< splitter widget (if split)
-};
 
-//---
-
-class CQTabSplitSplitterHandle;
-
-/*!
- * \brief custom splitter widget for CQTabSplot
- */
-class CQTabSplitSplitter : public QSplitter {
-  Q_OBJECT
-
- public:
-  using Sizes = QList<int>;
-
- public:
-  CQTabSplitSplitter(CQTabSplit *split);
-
-  //! get parent tab split
-  CQTabSplit *split() const { return split_; }
-
-  //! create custom handle
-  QSplitterHandle *createHandle() override;
-
-  //! get index for handle
-  int handleIndex(CQTabSplitSplitterHandle *handle) const;
-
-  //! fit specified split widget to size hint
-  void autoFit(int ind);
-
-  //! fit all split widgets to size hint
-  void fitAll();
-
-  //! ensure sizes obey minimum size hint
-  void fixSizes();
-
-  //! handle resize
-  void resizeEvent(QResizeEvent *) override;
-
- private:
-  CQTabSplit *split_     { nullptr }; //!< parent tab split
-  Sizes       lastSizes_;             //!< last splitter sizes
-};
-
-//---
-
-/*!
- * \brief custom splitter handler for CQTabSplitSplitter
- */
-class CQTabSplitSplitterHandle : public QSplitterHandle {
-  Q_OBJECT
-
-  Q_PROPERTY(int barSize READ barSize WRITE setBarSize)
-
- public:
-  CQTabSplitSplitterHandle(Qt::Orientation orient, CQTabSplitSplitter *splitter);
-
-  CQTabSplitSplitter *splitter() const { return splitter_; }
-
-  //! get/set bar size
-  int barSize() const { return barSize_; }
-  void setBarSize(int i) { barSize_ = i; }
-
-  //! handle context menu event
-  void contextMenuEvent(QContextMenuEvent *e) override;
-
-  //! handle double click menu event (auto fit)
-  void mouseDoubleClickEvent(QMouseEvent *) override;
-
-  //! paint handle
-  void paintEvent(QPaintEvent *) override;
-
-  //! handle generic event (for hover)
-  bool event(QEvent *event) override;
-
-  //! return size hint
-  QSize sizeHint() const override;
-
- private slots:
-  void tabSlot();
-  void splitSlot();
-  void fitAllSlot();
-
- private:
-  CQTabSplitSplitter *splitter_ { nullptr }; //!< parent splitter
-  int                 barSize_  { 8 };       //!< bar size
-  bool                hover_    { false };   //!< is hover
+  CQTabSplitSplitterTool *splitterTool_ { nullptr };
 };
 
 //---
@@ -243,7 +170,12 @@ class CQTabSplitTabWidget : public QTabWidget {
   CQTabSplit *split() const { return split_; }
 
   //! handle context menu event
-  void contextMenuEvent(QContextMenuEvent *e);
+  void contextMenuEvent(QContextMenuEvent *e) override;
+
+  bool event(QEvent *event) override;
+
+ private:
+  void showTool(const QPoint &pos);
 
  private slots:
   //! set to horizontal split mode
@@ -256,7 +188,23 @@ class CQTabSplitTabWidget : public QTabWidget {
   void tabSlot();
 
  private:
-  CQTabSplit *split_ { nullptr }; //!< parent tab split
+  CQTabSplit*       split_  { nullptr }; //!< parent tab split
+  CQTabSplitTabBar* tabBar_ { nullptr }; //!< tab bar
+};
+
+//---
+
+/*!
+ * \brief custom tab tab for CQTabSplit
+ */
+class CQTabSplitTabBar : public QTabBar {
+  Q_OBJECT
+
+ public:
+  CQTabSplitTabBar(CQTabSplitTabWidget *tabWidget);
+
+ private:
+  CQTabSplitTabWidget* tabWidget_ { nullptr };
 };
 
 #endif

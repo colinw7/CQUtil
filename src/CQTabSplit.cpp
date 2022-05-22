@@ -1,12 +1,14 @@
 #include <CQTabSplit.h>
+#include <CQTabSplitSplitter.h>
+#include <CQTabSplitSplitterTool.h>
 #include <CQGroupBox.h>
 
+#include <QApplication>
 #include <QTabBar>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
-#include <QPainter>
 
 #include <cassert>
 
@@ -137,6 +139,8 @@ addWidget(QWidget *w, const QString &name)
 {
   assert(w);
 
+  w->setAutoFillBackground(true);
+
   WidgetData data(w, name);
 
   if (isGrouped(w)) {
@@ -190,9 +194,12 @@ removeWidget(QWidget *w, bool deleteWidget)
   if (i == currentIndex_)
     i = currentIndex_ - 1;
 
-  WidgetData data = widgets_[i];
+  WidgetData data;
 
-  for (int j = i + 1; j < int(widgets_.size()); ++j)
+  if (i >= 0)
+    data = widgets_[size_t(i)];
+
+  for (auto j = size_t(i + 1); j < widgets_.size(); ++j)
     widgets_[j - 1] = widgets_[j];
 
   widgets_.pop_back();
@@ -242,7 +249,7 @@ widget(int i) const
   if (i < 0 || i >= int(widgets_.size()))
     return nullptr;
 
-  return widgets_[i].w;
+  return widgets_[size_t(i)].w;
 }
 
 void
@@ -279,7 +286,7 @@ int
 CQTabSplit::
 count() const
 {
-  return widgets_.size();
+  return int(widgets_.size());
 }
 
 void
@@ -387,6 +394,20 @@ tabCloseSlot(int i)
   emit widgetCloseRequested(i);
 }
 
+//---
+
+CQTabSplitSplitterTool *
+CQTabSplit::
+getSplitterTool()
+{
+  if (! splitterTool_)
+    splitterTool_ = new CQTabSplitSplitterTool(this);
+
+  return splitterTool_;
+}
+
+//---
+
 QSize
 CQTabSplit::
 sizeHint() const
@@ -399,371 +420,6 @@ sizeHint() const
 
 //------
 
-CQTabSplitSplitter::
-CQTabSplitSplitter(CQTabSplit *split) :
- QSplitter(split), split_(split)
-{
-  setObjectName("splitter");
-}
-
-QSplitterHandle *
-CQTabSplitSplitter::
-createHandle()
-{
-  return new CQTabSplitSplitterHandle(orientation(), this);
-}
-
-int
-CQTabSplitSplitter::
-handleIndex(CQTabSplitSplitterHandle *handle) const
-{
-  for (int i = 0; i < count(); ++i) {
-    auto *ihandle = this->handle(i);
-
-    if (ihandle == handle)
-      return i;
-  }
-
-  return -1;
-}
-
-void
-CQTabSplitSplitter::
-autoFit(int ind)
-{
-  int ind1 = ind - 1; // fit widget above splitter
-
-  int n = count();
-  if (n <= 1) return;
-
-  if (ind1 < 0 || ind >= n - 1)
-    return;
-
-  auto sizes = this->sizes();
-
-  auto s1 = sizes[ind1];
-
-  auto *w = widget(ind1);
-
-  auto sh = w->sizeHint();
-
-  auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
-
-  auto ds = s2 - s1;
-
-  sizes[ind1 ] = s2;
-  sizes[n - 1] -= ds;
-
-  setSizes(sizes);
-
-  fixSizes();
-}
-
-void
-CQTabSplitSplitter::
-fitAll()
-{
-  auto sizes = this->sizes();
-
-  int n = count();
-  if (n <= 1) return;
-
-  int ds = 0;
-
-  for (int i = 0; i < n - 1; ++i) {
-    auto *w = widget(i);
-
-    auto sh = w->sizeHint();
-
-    auto s1 = sizes[i] - ds;
-    auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
-
-    ds = s2 - s1;
-
-    sizes[i] = s2;
-  }
-
-  sizes[n - 1] -= ds;
-
-  setSizes(sizes);
-
-  fixSizes();
-}
-
-void
-CQTabSplitSplitter::
-fixSizes()
-{
-  auto sizes = this->sizes();
-
-  int n = count();
-  if (n <= 1) return;
-
-  int ds = 0;
-
-  for (int i = 0; i < n - 1; ++i) {
-    auto *w = widget(i);
-
-    auto sh = w->minimumSizeHint();
-
-    auto s1 = sizes[i] - ds;
-    auto s2 = (orientation() == Qt::Vertical ? sh.height() : sh.width());
-
-    if (s1 < s2) {
-      ds = s2 - s1;
-
-      sizes[i] = s2;
-    }
-  }
-
-  sizes[n - 1] -= ds;
-
-  setSizes(sizes);
-}
-
-void
-CQTabSplitSplitter::
-resizeEvent(QResizeEvent *e)
-{
-  QSplitter::resizeEvent(e);
-
-  if (split()->isAutoFit()) {
-    if (lastSizes_.empty())
-      fitAll();
-
-    lastSizes_ = sizes();
-  }
-}
-
-//------
-
-CQTabSplitSplitterHandle::
-CQTabSplitSplitterHandle(Qt::Orientation orient, CQTabSplitSplitter *splitter) :
- QSplitterHandle(orient, splitter), splitter_(splitter)
-{
-  setObjectName("splitterHandle");
-
-  setContextMenuPolicy(Qt::DefaultContextMenu);
-}
-
-void
-CQTabSplitSplitterHandle::
-contextMenuEvent(QContextMenuEvent *e)
-{
-  auto *menu = new QMenu;
-
-  menu->setObjectName("menu");
-
-  //---
-
-  auto *tabAction = menu->addAction("Tabbed");
-
-  connect(tabAction, SIGNAL(triggered()), this, SLOT(tabSlot()));
-
-  if (splitter()->orientation() == Qt::Horizontal) {
-    auto *splitAction = menu->addAction("Horizontal Split");
-
-    connect(splitAction, SIGNAL(triggered()), this, SLOT(splitSlot()));
-  }
-  else {
-    auto *splitAction = menu->addAction("Vertical Split");
-
-    connect(splitAction, SIGNAL(triggered()), this, SLOT(splitSlot()));
-  }
-
-  auto *fitAllAction = menu->addAction("Fit All");
-
-  connect(fitAllAction, SIGNAL(triggered()), this, SLOT(fitAllSlot()));
-
-  //---
-
-  (void) menu->exec(e->globalPos());
-
-  delete menu;
-}
-
-void
-CQTabSplitSplitterHandle::
-mouseDoubleClickEvent(QMouseEvent *)
-{
-  int ind = splitter()->handleIndex(this);
-
-  splitter()->autoFit(ind);
-}
-
-void
-CQTabSplitSplitterHandle::
-paintEvent(QPaintEvent *)
-{
-  auto blendColors = [](const QColor &c1, const QColor &c2, double f) {
-    double f1 = 1.0 - f;
-
-    double r = c1.redF  ()*f + c2.redF  ()*f1;
-    double g = c1.greenF()*f + c2.greenF()*f1;
-    double b = c1.blueF ()*f + c2.blueF ()*f1;
-
-    return QColor(std::min(std::max(int(255*r), 0), 255),
-                  std::min(std::max(int(255*g), 0), 255),
-                  std::min(std::max(int(255*b), 0), 255));
-  };
-
-  //QSplitterHandle::paintEvent(e);
-
-  QPainter painter(this);
-
-  auto wc = palette().color(QPalette::Window);
-
-  auto fc = (hover_ ? blendColors(palette().color(QPalette::Highlight), wc, 0.3) :
-                      blendColors(palette().color(QPalette::Highlight), wc, 0.1));
-
-  painter.fillRect(rect(), fc);
-
-  //---
-
-  auto fg = palette().color(QPalette::Text);
-  auto bg = palette().color(QPalette::Base);
-
-  int ss = 2*barSize();
-
-  if (orientation() == Qt::Horizontal) {
-    int ym = rect().center().y();
-    int x1 = rect().left  () + 1;
-    int x2 = rect().right () - 1;
-
-    painter.fillRect(QRect(x1, ym - ss/2, x2 - x1 + 1, ss), bg);
-
-    //---
-
-    painter.setPen(fg);
-
-    painter.drawLine(x1 + 1, ym - 4, x2 - 1, ym - 4);
-    painter.drawLine(x1 + 1, ym    , x2 - 1, ym    );
-    painter.drawLine(x1 + 1, ym + 4, x2 - 1, ym + 4);
-
-    //---
-
-    if (hover_) {
-      painter.setRenderHints(QPainter::Antialiasing, true);
-
-      int th = barSize()/2;
-
-      QPainterPath path1;
-
-      int yt1 = ym + ss;
-
-      path1.moveTo(x1 - 1, yt1     );
-      path1.lineTo(x2    , yt1 + th);
-      path1.lineTo(x2    , yt1 - th);
-
-      painter.fillPath(path1, bg);
-
-      QPainterPath path2;
-
-      int yt2 = ym - ss;
-
-      path2.moveTo(x2 + 1, yt2     );
-      path2.lineTo(x1    , yt2 + th);
-      path2.lineTo(x1    , yt2 - th);
-
-      painter.fillPath(path2, bg);
-    }
-  }
-  else {
-    int xm = rect().center().x();
-    int y1 = rect().top   () + 1;
-    int y2 = rect().bottom() - 1;
-
-    painter.fillRect(QRect(xm - ss/2, y1, ss, y2 - y1 + 1), bg);
-
-    //---
-
-    painter.setPen(fg);
-
-    painter.drawLine(xm - 4, y1 + 1, xm - 4, y2 - 1);
-    painter.drawLine(xm    , y1 + 1, xm    , y2 - 1);
-    painter.drawLine(xm + 4, y1 + 1, xm + 4, y2 - 1);
-
-    //---
-
-    if (hover_) {
-      painter.setRenderHints(QPainter::Antialiasing, true);
-
-      int tw = barSize()/2;
-
-      QPainterPath path1;
-
-      int xt1 = xm + ss;
-
-      path1.moveTo(xt1     , y1 - 1);
-      path1.lineTo(xt1 + tw, y2    );
-      path1.lineTo(xt1 - tw, y2    );
-
-      painter.fillPath(path1, bg);
-
-      QPainterPath path2;
-
-      int xt2 = xm - ss;
-
-      path2.moveTo(xt2     , y2 + 1);
-      path2.lineTo(xt2 + tw, y1    );
-      path2.lineTo(xt2 - tw, y1    );
-
-      painter.fillPath(path2, bg);
-    }
-  }
-}
-
-bool
-CQTabSplitSplitterHandle::
-event(QEvent *event)
-{
-  switch (event->type()) {
-    case QEvent::HoverEnter: hover_ = true ; update(); break;
-    case QEvent::HoverLeave: hover_ = false; update(); break;
-    default:                 break;
-  }
-
-  return QSplitterHandle::event(event);
-}
-
-void
-CQTabSplitSplitterHandle::
-tabSlot()
-{
-  splitter()->split()->setState(CQTabSplit::State::TAB);
-}
-
-void
-CQTabSplitSplitterHandle::
-splitSlot()
-{
-  if (splitter()->orientation() == Qt::Horizontal)
-    splitter()->setOrientation(Qt::Vertical);
-  else
-    splitter()->setOrientation(Qt::Horizontal);
-}
-
-void
-CQTabSplitSplitterHandle::
-fitAllSlot()
-{
-  splitter()->fitAll();
-}
-
-QSize
-CQTabSplitSplitterHandle::
-sizeHint() const
-{
-  auto s = QSplitterHandle::sizeHint();
-
-  if (splitter()->orientation() == Qt::Horizontal)
-    return QSize(barSize(), s.height());
-  else
-    return QSize(s.width(), barSize());
-}
-
-//---
-
 CQTabSplitTabWidget::
 CQTabSplitTabWidget(CQTabSplit *split) :
  split_(split)
@@ -773,6 +429,12 @@ CQTabSplitTabWidget(CQTabSplit *split) :
   setContextMenuPolicy(Qt::DefaultContextMenu);
 
   connect(this, SIGNAL(tabCloseRequested(int)), split_, SLOT(tabCloseSlot(int)));
+
+  //---
+
+  tabBar_ = new CQTabSplitTabBar(this);
+
+  setTabBar(tabBar_);
 }
 
 void
@@ -788,7 +450,7 @@ contextMenuEvent(QContextMenuEvent *e)
   if (p.y() >= r.height())
     return;
 
-  auto *menu = new QMenu;
+  auto *menu = new QMenu(this);
 
   menu->setObjectName("menu");
 
@@ -849,4 +511,52 @@ tabSlot()
   int i = action->data().toInt();
 
   setCurrentIndex(i);
+}
+
+bool
+CQTabSplitTabWidget::
+event(QEvent *event)
+{
+  switch (event->type()) {
+    case QEvent::ToolTip: {
+      auto *he = static_cast<QHelpEvent*>(event);
+
+      auto gpos = mapToGlobal(he->pos());
+
+      auto *widget = qApp->widgetAt(gpos);
+
+      if (widget == this)
+        showTool(gpos);
+
+      break;
+    }
+
+    default: break;
+  }
+
+  return QTabWidget::event(event);
+}
+
+void
+CQTabSplitTabWidget::
+showTool(const QPoint &pos)
+{
+  auto *splitterTool = split()->getSplitterTool();
+
+  splitterTool->setSplitter(nullptr);
+  splitterTool->showSlot();
+
+  auto w = splitterTool->sizeHint().width();
+  auto h = splitterTool->sizeHint().height();
+
+  splitterTool->move(pos.x() - w/2, pos.y() - h/2);
+}
+
+//---
+
+CQTabSplitTabBar::
+CQTabSplitTabBar(CQTabSplitTabWidget *tabWidget) :
+ QTabBar(tabWidget), tabWidget_(tabWidget)
+{
+  setObjectName("tabBar");
 }

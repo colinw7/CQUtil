@@ -78,9 +78,15 @@ CQFloatEdit.cpp \
 CQAutoHide.cpp \
 CQAngleSpinBox.cpp \
 CQToolTip.cpp \
-CQTabWidget.cpp \
 CQCheckBox.cpp \
+\
+CQTabWidget.cpp \
+CQTabWidgetTabBar.cpp \
+\
 CQTabSplit.cpp \
+CQTabSplitSplitter.cpp \
+CQTabSplitSplitterHandle.cpp \
+CQTabSplitSplitterTool.cpp \
 \
 CQScrollArea.cpp \
 \
@@ -170,9 +176,16 @@ HEADERS += \
 ../include/CQAutoHide.h \
 ../include/CQAngleSpinBox.h \
 ../include/CQToolTip.h \
-../include/CQTabWidget.h \
 ../include/CQCheckBox.h \
+\
+../include/CQTabWidget.h \
+../include/CQTabWidgetTabBar.h \
+\
 ../include/CQTabSplit.h \
+../include/CQTabSplit.h \
+../include/CQTabSplitSplitter.h \
+../include/CQTabSplitSplitterHandle.h \
+../include/CQTabSplitSplitterTool.h \
 \
 ../include/CQScrollArea.h \
 \

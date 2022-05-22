@@ -42,10 +42,12 @@ class CQRealEdit : public QLineEdit {
   bool widgetToValue();
 
  private:
-  double            value_;
-  QDoubleValidator *validator_;
-  QMenu            *menu_;
+  double            value_     { 0.0 };
+  QDoubleValidator *validator_ { nullptr };
+  QMenu            *menu_      { nullptr };
 };
+
+//---
 
 class CQRealEditAction : public QAction {
  public:
@@ -54,7 +56,7 @@ class CQRealEditAction : public QAction {
   double getValue() const { return value_; }
 
  private:
-  double value_;
+  double value_ { 0.0 };
 };
 
 #endif
