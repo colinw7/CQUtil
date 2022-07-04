@@ -79,7 +79,7 @@ posToStep(int pos) const
 
   int d = text().length() - pos;
 
-  return pow(10, d);
+  return int(pow(10, d));
 }
 
 void

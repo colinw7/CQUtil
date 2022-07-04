@@ -85,7 +85,7 @@ updateSlider()
   if (maxValue_ > minValue_)
     val = (value_ - minValue_)/(maxValue_ - minValue_);
 
-  slider_->setValue(val*100000);
+  slider_->setValue(int(val*100000));
 
   slider_->blockSignals(false);
 }

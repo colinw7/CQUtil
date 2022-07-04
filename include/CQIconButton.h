@@ -28,6 +28,8 @@ class CQIconButton : public QToolButton {
   const QString &icon() const { return iconName_; }
   void setIcon(const QString &iconName);
 
+  QIcon qicon() const;
+
  private slots:
   void init();
 

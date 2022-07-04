@@ -76,7 +76,7 @@ bool
 CQIntegerEdit::
 widgetToValue()
 {
-  int value = CStrUtil::toInteger(text().toStdString());
+  int value = int(CStrUtil::toInteger(text().toStdString()));
 
   bool changed = (value != value_);
 

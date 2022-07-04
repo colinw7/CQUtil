@@ -62,3 +62,10 @@ updateIcon()
 
   setIconSize(QSize(is, is));
 }
+
+QIcon
+CQIconButton::
+qicon() const
+{
+  return QToolButton::icon();
+}
