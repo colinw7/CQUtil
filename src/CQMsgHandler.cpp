@@ -21,6 +21,7 @@ isIgnoreMsg(const QString &msg)
 
   if (ignoreMessages.empty()) {
     ignoreMessages.push_back("QBasicTimer can only be used with threads started with QThread");
+    ignoreMessages.push_back("Timers can only be used with threads started with QThread");
   }
 
   for (const auto &imsg : ignoreMessages) {
