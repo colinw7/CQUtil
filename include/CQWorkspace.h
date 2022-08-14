@@ -19,6 +19,8 @@ class CQWorkspaceBase {
  public:
   CQWorkspaceBase() { }
 
+  virtual ~CQWorkspaceBase() { }
+
   virtual void setActiveWidget(QWidget *w) = 0;
 };
 

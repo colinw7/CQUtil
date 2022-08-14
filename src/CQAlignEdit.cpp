@@ -10,10 +10,10 @@ namespace {
 
 QColor blendColors(const QColor &c1, const QColor &c2, double f)
 {
-  auto iclamp = [](int val, int low, int high) -> double{
+  auto iclamp = [](double val, int low, int high) {
     if (val < low ) return low;
     if (val > high) return high;
-    return val;
+    return int(val);
   };
 
   double f1 = 1.0 - f;

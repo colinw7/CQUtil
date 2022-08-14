@@ -313,7 +313,7 @@ getStringImage(const std::string &str)
 
   CImagePtr image = CImageMgrInst->createImage(src);
 
-  image->setDataSize(w, h);
+  image->setDataSize(int(w), int(h));
 
   CQImage *qimage = image.cast<CQImage>();
 
@@ -330,7 +330,7 @@ getStringImage(const std::string &str)
 
   brush.setStyle(Qt::NoBrush);
 
-  painter.fillRect(0, 0, w, h, brush);
+  painter.fillRect(0, 0, int(w), int(h), brush);
 
   qimage->updateCImage();
 
@@ -341,7 +341,7 @@ getStringImage(const std::string &str)
 
   painter.setFont(*qfont_);
 
-  int ascent = getICharAscent();
+  int ascent = int(getICharAscent());
 
   painter.drawText(0, ascent, QString(str.c_str()));
 

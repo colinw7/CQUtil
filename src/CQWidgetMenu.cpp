@@ -20,7 +20,7 @@ CQWidgetMenu::
 getAction() const
 {
   if (! action_) {
-    CQWidgetMenu *th = const_cast<CQWidgetMenu *>(this);
+    auto *th = const_cast<CQWidgetMenu *>(this);
 
     // create menu action widget
     th->action_ = th->createAction();
@@ -28,7 +28,7 @@ getAction() const
     th->addAction(th->action_);
 
     // connect to menu action widget contents area signals
-    CQWidgetMenuArea *area = th->action_->getArea();
+    auto *area = th->action_->getArea();
 
     connect(this, SIGNAL(aboutToShow()), area, SLOT(menuShowSlot()));
     connect(this, SIGNAL(aboutToHide()), area, SLOT(menuHideSlot()));
@@ -75,14 +75,14 @@ void
 CQWidgetMenu::
 updateAreaSize()
 {
-  //QRect ar = actionGeometry(getAction());
+  //auto ar = actionGeometry(getAction());
 
   //int dx = ar.x();
   //int dy = ar.y();
 
-  CQWidgetMenuArea *area = getAction()->getArea();
+  auto *area = getAction()->getArea();
 
-  QSize s = area->size();
+  auto s = area->size();
 
   area->getWidget()->resize(s);
 
@@ -94,13 +94,13 @@ void
 CQWidgetMenu::
 paintEvent(QPaintEvent *e)
 {
-  CQWidgetMenuArea *area = getAction()->getArea();
+  auto *area = getAction()->getArea();
 
-  QWidget *w = area->getWidget();
+  auto *w = area->getWidget();
 
-  QSize s1 = this->size();
-//QSize s2 = area->size();
-  QSize s3 = w   ->size();
+  auto s1 = this->size();
+//auto s2 = area->size();
+  auto s3 = w   ->size();
 
 //int dx12 = s1.width () - s2.width ();
 //int dy12 = s1.height() - s2.height();
@@ -118,6 +118,17 @@ paintEvent(QPaintEvent *e)
   }
 
   QMenu::paintEvent(e);
+}
+
+QSize
+CQWidgetMenu::
+sizeHint() const
+{
+  auto *area = getAction()->getArea();
+
+  auto *w = area->getWidget();
+
+  return w->sizeHint();
 }
 
 //---------
@@ -148,7 +159,7 @@ CQWidgetMenuAction::
 getArea() const
 {
   if (! area_) {
-    CQWidgetMenuAction *th = const_cast<CQWidgetMenuAction *>(this);
+    auto *th = const_cast<CQWidgetMenuAction *>(this);
 
     th->area_ = menu_->createArea();
   }
@@ -161,7 +172,7 @@ QWidget *
 CQWidgetMenuAction::
 createWidget(QWidget *parent)
 {
-  CQWidgetMenuArea *area = getArea();
+  auto *area = getArea();
 
   area->setParent(parent);
 
@@ -242,12 +253,12 @@ setSize(int w, int h)
     h_ = std::min(h_, ah);
   }
 
-  QRect ar = qobject_cast<QMenu *>(parentWidget())->actionGeometry(action_);
+  auto ar = qobject_cast<QMenu *>(parentWidget())->actionGeometry(action_);
 
   int dx = ar.x();
   int dy = ar.y();
 
-  QWidget *parent = parentWidget();
+  auto *parent = parentWidget();
 
   parent->resize(w_ + 2*dx, h_ + 2*dy);
 }
@@ -281,18 +292,18 @@ menuShow()
   // NOTE: extra show/hide code is necessary if content widget geometry
   // has changed so we update the menu size properly
 
-  QMenu *menu = action_->getMenu();
+  auto *menu = action_->getMenu();
 
 #if 0
   menu->blockSignals(true);
 #endif
 
-  QRect ar = menu->actionGeometry(action_);
+  auto ar = menu->actionGeometry(action_);
 
   int dx = ar.x();
   int dy = ar.y();
 
-  QSize s = areaWidget_->sizeHint();
+  auto s = areaWidget_->sizeHint();
 
   // ensure contents is in menu
   areaWidget_->setParent(area_);
@@ -348,7 +359,7 @@ sizeHint() const
     hh = areaWidget_->sizeHint().height();
   }
 
-  CQWidgetMenuArea *th = const_cast<CQWidgetMenuArea *>(this);
+  auto *th = const_cast<CQWidgetMenuArea *>(this);
 
   th->w_ = hw;
   th->h_ = hh;

@@ -531,7 +531,7 @@ startHideTimer()
   if (tooltip && tooltip->hideSecs() > 0)
     hideSecs = tooltip->hideSecs();
 
-  hideTimer_ = startTimer(hideSecs*1000);
+  hideTimer_ = startTimer(int(hideSecs*1000));
 }
 
 void
@@ -612,7 +612,7 @@ void
 CQToolTip::
 unsetToolTip(QWidget *parent)
 {
-  setToolTip(parent, (CQToolTipIFace *) 0);
+  setToolTip(parent, static_cast<CQToolTipIFace *>(nullptr));
 }
 
 int

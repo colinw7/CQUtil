@@ -262,7 +262,7 @@ changeColor()
 {
   QColor color(color_);
 
-  color_.setAlpha(255*alpha_);
+  color_.setAlpha(int(255*alpha_));
 
   emit colorChanged(color);
   emit colorChanged(colorName_);
@@ -274,7 +274,7 @@ applyColor()
 {
   QColor color(color_);
 
-  color_.setAlpha(255*alpha_);
+  color_.setAlpha(int(255*alpha_));
 
   emit colorApplied(color);
   emit colorApplied(colorName_);

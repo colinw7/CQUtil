@@ -21,13 +21,13 @@
 namespace {
 
 QColor mergedColors(const QColor &colorA, const QColor &colorB, double factor = 50.0) {
-  const double maxFactor = 100.0;
+  const double maxF = 100.0;
 
   auto tmp = colorA;
 
-  tmp.setRed  ((tmp.red  ()*factor)/maxFactor + (colorB.red  ()*(maxFactor - factor))/maxFactor);
-  tmp.setGreen((tmp.green()*factor)/maxFactor + (colorB.green()*(maxFactor - factor))/maxFactor);
-  tmp.setBlue ((tmp.blue ()*factor)/maxFactor + (colorB.blue ()*(maxFactor - factor))/maxFactor);
+  tmp.setRed  (int((tmp.red  ()*factor)/maxF + (colorB.red  ()*(maxF - factor))/maxF));
+  tmp.setGreen(int((tmp.green()*factor)/maxF + (colorB.green()*(maxF - factor))/maxF));
+  tmp.setBlue (int((tmp.blue ()*factor)/maxF + (colorB.blue ()*(maxF - factor))/maxF));
 
   return tmp;
 }
@@ -345,8 +345,8 @@ paintEvent(QPaintEvent *)
     QColor dark;
 
     dark.setHsv(barColor.hue(),
-                qMin(255, (int)(barColor.saturation()*1.9)),
-                qMin(255, (int)(barColor.value()*0.7)));
+                qMin(255, int(barColor.saturation()*1.9)),
+                qMin(255, int(barColor.value()*0.7)));
 
     auto gradientStartColor = barColor.lighter(108);
     auto gradientStopColor  = mergedColors(barColor.darker(108), dark.lighter(150), 70);

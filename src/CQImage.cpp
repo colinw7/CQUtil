@@ -49,13 +49,11 @@ initQImage()
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint width  = x2 - x1 + 1;
-  uint height = y2 - y1 + 1;
+  uint width  = uint(x2 - x1 + 1);
+  uint height = uint(y2 - y1 + 1);
 
-  if (qimage_.isNull() ||
-      qimage_.width () != (int) width ||
-      qimage_.height() != (int) height)
-    qimage_ = QImage(width, height, QImage::Format_ARGB32);
+  if (qimage_.isNull() || qimage_.width () != int(width) || qimage_.height() != int(height))
+    qimage_ = QImage(int(width), int(height), QImage::Format_ARGB32);
 
   CRGBA rgba;
 
@@ -78,19 +76,19 @@ updateCImage()
   if (! initialized_)
     return;
 
-  uint width  = qimage_.width ();
-  uint height = qimage_.height();
+  uint width  = uint(qimage_.width ());
+  uint height = uint(qimage_.height());
 
   if (getWidth() != width || getHeight() != height)
-    CImage::setDataSizeV(width, height);
+    CImage::setDataSizeV(int(width), int(height));
 
   CRGBA rgba;
 
   for (uint y = 0; y < height; ++y) {
     for (uint x = 0; x < width; ++x) {
-      rgba = CQUtil::colorToRGBA(QColor::fromRgba(qimage_.pixel(x, y)));
+      rgba = CQUtil::colorToRGBA(QColor::fromRgba(qimage_.pixel(int(x), int(y))));
 
-      setRGBAPixel(x, y, rgba);
+      setRGBAPixel(int(x), int(y), rgba);
     }
   }
 }
@@ -205,7 +203,7 @@ bool
 CQImage::
 setColorIndexPixel(int pos, uint pixel)
 {
-  int w = getWidth();
+  int w = int(getWidth());
 
   setColorIndexPixel(pos % w, pos / w, pixel);
 
@@ -216,7 +214,7 @@ bool
 CQImage::
 setColorIndexPixel(int x, int y, uint pixel)
 {
-  int w = getWidth();
+  int w = int(getWidth());
 
   if (initialized_)
     qimage_.setPixel(QPoint(x, y), pixel);
@@ -230,7 +228,7 @@ bool
 CQImage::
 setRGBAPixel(int pos, const CRGBA &rgba)
 {
-  int w = getWidth();
+  int w = int(getWidth());
 
   setRGBAPixel(pos % w, pos / w, rgba);
 
@@ -241,7 +239,7 @@ bool
 CQImage::
 setRGBAPixel(int x, int y, const CRGBA &rgba)
 {
-  int w = getWidth();
+  int w = int(getWidth());
 
   if (initialized_)
     qimage_.setPixel(QPoint(x, y), CQUtil::rgbaToColor(rgba).rgba());

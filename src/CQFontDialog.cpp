@@ -353,7 +353,7 @@ CQFontDialog::
 eventFilter(QObject *o , QEvent *e)
 {
   if (e->type() == QEvent::KeyPress) {
-    QKeyEvent *k = (QKeyEvent *)e;
+    auto *k = reinterpret_cast<QKeyEvent *>(e);
 
     if      (o == sizeEdit_ &&
              (k->key() == Qt::Key_Up     || k->key() == Qt::Key_Down ||
@@ -513,7 +513,7 @@ updateStyles()
       QString cstyle = style_;
 
     redo:
-      for (int i = 0; i < (int)styleList_->count(); i++) {
+      for (int i = 0; i < int(styleList_->count()); i++) {
         if (cstyle == styleList_->text(i)) {
           styleList_->setCurrentItem(i);
           found = true;

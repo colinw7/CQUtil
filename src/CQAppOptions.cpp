@@ -3,6 +3,7 @@
 #include <CQStyleMgr.h>
 #include <CQFontChooser.h>
 #include <CQIntegerSpin.h>
+#include <QCheckBox>
 
 void
 CQAppOptions::
@@ -47,7 +48,9 @@ CQAppOptions(QWidget *parent) :
   connect(largeIconSizeSpin, SIGNAL(valueChanged(int)), this, SLOT(largeIconSizeChanged(int)));
   connect(smallIconSizeSpin, SIGNAL(valueChanged(int)), this, SLOT(smallIconSizeChanged(int)));
 
-  addCheckBox("Dark", this, SLOT(darkSlot(bool)));
+  auto *check = addCheckBox("Dark", this, SLOT(darkSlot(bool)));
+
+  check->setChecked(CQStyleMgrInst->theme() == CQStyleMgr::Theme::DARK);
 
   addStretch();
 }

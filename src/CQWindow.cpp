@@ -21,7 +21,7 @@ namespace CQWindowUtil {
       size_hints1.flags = 0;
 
     *size_hints = &size_hints1;
-    *supplied   = supplied1;
+    *supplied   = int(supplied1);
   }
 
   bool setWMNormalHints(Window xwin, XSizeHints *size_hints) {
@@ -114,8 +114,8 @@ void
 CQWindow::
 getSize(uint *w, uint *h) const
 {
-  *w = QWidget::size().width();
-  *h = QWidget::size().height();
+  *w = uint(QWidget::size().width ());
+  *h = uint(QWidget::size().height());
 }
 
 void
@@ -147,7 +147,7 @@ void
 CQWindow::
 resize(uint width, uint height)
 {
-  QWidget::resize(width, height);
+  QWidget::resize(int(width), int(height));
 }
 
 void
@@ -247,7 +247,7 @@ void
 CQWindow::
 getWindowTitle(std::string &title) const
 {
-  auto *parent = CQUtil::getToplevelWidget((QWidget *) this);
+  auto *parent = CQUtil::getToplevelWidget(const_cast<CQWindow *>(this));
 
   title = parent->windowTitle().toStdString();
 }
@@ -256,7 +256,7 @@ void
 CQWindow::
 getIconTitle(std::string &title) const
 {
-  auto *parent = CQUtil::getToplevelWidget((QWidget *) this);
+  auto *parent = CQUtil::getToplevelWidget(const_cast<CQWindow *>(this));
 
   title = parent->windowIconText().toStdString();
 }
@@ -287,7 +287,9 @@ setProperty(const std::string &name, const std::string &value)
   Atom xatom = XInternAtom(QX11Info::display(), name.c_str(), False);
 
   XChangeProperty(QX11Info::display(), xwin, xatom, XA_STRING,
-                  8, PropModeReplace, (uchar *) value.c_str(), (int) value.size());
+                  8, PropModeReplace,
+                  reinterpret_cast<uchar *>(const_cast<char *>(value.c_str())),
+                  int(value.size()));
 
   return true;
 #else

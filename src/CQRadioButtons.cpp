@@ -158,7 +158,7 @@ addWidget(QWidget *widget)
     l->addWidget(titleLabel, 0, 0);
   }
 
-  int pos = buttons_.size();
+  int pos = int(buttons_.size());
 
   l->addWidget(widget, 1, pos);
 }
@@ -242,7 +242,7 @@ valueChangedI(bool value)
 
   emit valueChanged(id);
 
-  emit valueChanged(buttons_[id]->text());
+  emit valueChanged(buttons_[size_t(id)]->text());
 }
 
 int

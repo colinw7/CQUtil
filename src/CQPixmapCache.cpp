@@ -186,7 +186,7 @@ getPixmap(const QString &id)
   if (! data.pixmap) {
     data.pixmap = new QPixmap;
 
-    bool rc = data.pixmap->loadFromData(data.data, data.len);
+    bool rc = data.pixmap->loadFromData(data.data, uint(data.len));
 
     if (! rc) {
       std::cerr << "Pixmap '" << id.toStdString() << "' failed to load\n";

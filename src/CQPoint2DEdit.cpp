@@ -102,7 +102,7 @@ init(const CPoint2D &value)
 {
   setObjectName("edit");
 
-  setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+  setFrameStyle(uint(QFrame::NoFrame) | uint(QFrame::Plain));
 
   //---
 

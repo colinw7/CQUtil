@@ -629,7 +629,7 @@ readNumber(double &real, int &integer, bool &is_real)
   if (! readNumber(real, linteger, is_real))
     return false;
 
-  integer = (int) linteger;
+  integer = int(linteger);
 
   return true;
 }
@@ -747,7 +747,7 @@ toRealI(const QString &str, double *real)
   else {
     errno = 0;
 
-    *real = strtod(&c_str[i], (char **) &p);
+    *real = strtod(&c_str[i], const_cast<char **>(&p));
 
     if (errno == ERANGE) {
       //error_msg_ = "Out of Range";
@@ -757,7 +757,7 @@ toRealI(const QString &str, double *real)
 #else
   errno = 0;
 
-  *real = strtod(&c_str[i], (char **) &p);
+  *real = strtod(&c_str[i], const_cast<char **>(&p));
 
   if (errno == ERANGE) {
     //error_msg_ = "Out of Range";
@@ -798,7 +798,7 @@ toIntegerI(const QString &str, long *integer)
 
   errno = 0;
 
-  *integer = strtol(&c_str[i], (char **) &p, 10);
+  *integer = strtol(&c_str[i], const_cast<char **>(&p), 10);
 
   if (errno == ERANGE) {
     //error_msg_ = "Out of Range";
@@ -825,7 +825,7 @@ readInteger(int *integer)
   if (! readInteger(&linteger))
     return false;
 
-  *integer = (int) linteger;
+  *integer = int(linteger);
 
   return true;
 }
@@ -877,7 +877,7 @@ readBaseInteger(int base, int *integer)
   if (! readBaseInteger(base, &linteger))
     return false;
 
-  *integer = (int) linteger;
+  *integer = int(linteger);
 
   return true;
 }
@@ -948,7 +948,7 @@ toBaseIntegerI(const QString &str, int base, long *integer)
 
     long integer1 = base*(*integer) + value;
 
-    if (long((integer1 - (long) value)/base) != *integer) {
+    if (long((integer1 - long(value))/base) != *integer) {
       //error_msg_ = "Overflow.";
       return false;
     }
@@ -1065,7 +1065,7 @@ readRealI(const QString &str, int *pos, double *real)
   if (is_real)
     *real = r;
   else
-    *real = i;
+    *real = double(i);
 
   return true;
 }

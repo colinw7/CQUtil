@@ -186,6 +186,8 @@ addCheckBox(const QString &name, const QObject *receiver, const char *member)
 
   addField(name, check);
 
+  check->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
   if (receiver)
     connect(check, SIGNAL(clicked(bool)), receiver, member);
 
