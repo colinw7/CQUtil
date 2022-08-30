@@ -4,6 +4,7 @@
 #include <QChildEvent>
 #include <QLayout>
 #include <QPainter>
+#include <QPainterPath>
 #include <QStylePainter>
 #include <QStyleOption>
 #include <QMouseEvent>
@@ -450,7 +451,7 @@ paintEvent(QPaintEvent *)
 
   painter.setRenderHints(QPainter::Antialiasing);
 
-  painter.fillRect(rect(), QBrush(palette().color(QPalette::Background)));
+  painter.fillRect(rect(), QBrush(palette().color(QPalette::Window)));
 
   QFontMetrics fm(titleFont_);
 
@@ -463,7 +464,7 @@ paintEvent(QPaintEvent *)
   // set text position
   int textX = 0;
 
-  int tw = (title_ != "" ? fm.width(title_) : 0);
+  int tw = (title_ != "" ? fm.horizontalAdvance(title_) : 0);
 
   if      (titleAlignment_ & Qt::AlignRight)
     textX = width() - dx_ - tw - collapseSize;
@@ -515,7 +516,7 @@ paintEvent(QPaintEvent *)
 
     titleRect_ = QRect(textX - dx_, textY - fm.ascent() + fm.descent(), tw2 + dx_, fm.height());
 
-    painter.fillRect(titleRect_, QBrush(palette().color(QPalette::Background)));
+    painter.fillRect(titleRect_, QBrush(palette().color(QPalette::Window)));
 
     QColor titleColor;
 
@@ -564,7 +565,7 @@ paintEvent(QPaintEvent *)
     checkRect_ = QRect(checkX1, checkY1, checkSize1, checkSize1);
 
     painter.fillRect(QRect(checkX1 - 2, checkY1 - 2, checkSize1 + 4, checkSize1 + 4),
-                     QBrush(palette().color(QPalette::Background)));
+                     QBrush(palette().color(QPalette::Window)));
 
     QStyleOptionButton opt;
 
@@ -603,7 +604,7 @@ paintEvent(QPaintEvent *)
     collapseRect_ = QRect(int(collapseX1), int(collapseY1), int(collapseSize1), int(collapseSize1));
 
     painter.fillRect(QRectF(collapseX1 - 2, collapseY1 - 2, collapseSize1 + 4, collapseSize1 + 4),
-                            QBrush(palette().color(QPalette::Background)));
+                            QBrush(palette().color(QPalette::Window)));
 
     double collapseXM = (collapseX1 + collapseX2)/2.0;
     double collapseYM = (collapseY1 + collapseY2)/2.0;
@@ -758,7 +759,7 @@ minimumSizeHint() const
 {
   QFontMetrics fm(titleFont_);
 
-  int baseWidth  = fm.width(title_) + 4;
+  int baseWidth  = fm.horizontalAdvance(title_) + 4;
   int baseHeight = fm.height();
 
   if (isCheckable())

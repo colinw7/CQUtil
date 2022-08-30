@@ -4,6 +4,7 @@
 
 #include <QContextMenuEvent>
 #include <QPainter>
+#include <QPainterPath>
 
 CQTabSplitSplitterHandle::
 CQTabSplitSplitterHandle(Qt::Orientation orient, CQTabSplitSplitter *splitter) :

@@ -9,10 +9,10 @@ QT += widgets
 CONFIG += staticlib
 
 #QMAKE_CXXFLAGS += \
--std=c++14
+-std=c++17
 
 QMAKE_CXXFLAGS += \
--std=c++14 \
+-std=c++17 \
 -DCQUTIL_PALETTE \
 -DCQUTIL_PEN \
 -DCQUTIL_BRUSH \

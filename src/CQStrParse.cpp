@@ -1,4 +1,5 @@
 #include <CQStrParse.h>
+#include <limits>
 #include <cassert>
 
 namespace {
