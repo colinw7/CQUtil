@@ -35,7 +35,7 @@ init()
 
   setRange(-360.0, 360.0);
 
-  setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+  setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 
   setDecimals(1);
 

@@ -13,7 +13,7 @@ class CQPoint2DEdit : public QFrame {
   Q_PROPERTY(int  decimals READ decimals WRITE setDecimals)
 
  public:
-  CQPoint2DEdit(QWidget *parent, const CPoint2D &value=CPoint2D(0,0), bool spin=false);
+  CQPoint2DEdit(QWidget *parent, const CPoint2D &value=CPoint2D(0, 0), bool spin=false);
   CQPoint2DEdit(const CPoint2D &value=CPoint2D(0, 0), bool spin=false);
 
   CQPoint2DEdit(QWidget *parent, const QPointF &value, bool spin=false);

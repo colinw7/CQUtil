@@ -166,7 +166,7 @@ class CQToolTip : public QWidget {
 
  private:
   using QWidgetP  = QPointer<QWidget>;
-  using WidgetMap = QMap<QWidgetP,CQToolTipIFace *>;
+  using WidgetMap = QMap<QWidgetP, CQToolTipIFace *>;
 
   static CQToolTip *s_instance;
 

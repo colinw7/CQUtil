@@ -58,7 +58,7 @@ paintEvent(QPaintEvent *)
 
   QRect r = rect();
 
-  //painter.fillRect(r, QBrush(QColor(100,100,200)));
+  //painter.fillRect(r, QBrush(QColor(100, 100, 200)));
 
   if (orientation() == Qt::Vertical) {
     painter.translate(0, r.height());
@@ -77,9 +77,9 @@ paintEvent(QPaintEvent *)
     if      (alignment() & Qt::AlignLeft)
       dx = r.left();
     else if (alignment() & Qt::AlignRight)
-      dx = r.width() - fm.width(str);
+      dx = r.width() - fm.horizontalAdvance(str);
     else
-      dx = (r.width() - fm.width(str))/2;
+      dx = (r.width() - fm.horizontalAdvance(str))/2;
 
     if      (alignment() & Qt::AlignTop)
       dy = r.top() + fm.ascent();
@@ -89,7 +89,7 @@ paintEvent(QPaintEvent *)
       dy = r.height()/2 + (fm.height() - fm.descent())/2;
   }
   else {
-    dx = r.height() - fm.width(str);
+    dx = r.height() - fm.horizontalAdvance(str);
     dy = r.width () - fm.height();
   }
 
@@ -104,8 +104,8 @@ sizeHint() const
 
   QFontMetrics fm(font());
 
-  int w = fm.width (str) + 2*margin();
-  int h = fm.height()    + 2*margin();
+  int w = fm.horizontalAdvance(str) + 2*margin();
+  int h = fm.height()               + 2*margin();
 
   if (orientation() == Qt::Horizontal)
     return QSize(w, h);

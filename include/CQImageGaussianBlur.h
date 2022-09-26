@@ -72,7 +72,7 @@ class CQImageGaussianBlur {
 
       dst = QImage(iw, ih, QImage::Format_ARGB32);
 
-      dst.fill(qRgba(0,0,0,0));
+      dst.fill(qRgba(0, 0, 0, 0));
     }
 
     CGaussianBlur<CQImageWrapper> blur;

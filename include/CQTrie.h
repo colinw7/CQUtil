@@ -16,7 +16,7 @@ class CQTriePatterns;
  */
 class CQTrieNode {
  public:
-  using CharNodeMap = std::map<QChar,CQTrieNode *>;
+  using CharNodeMap = std::map<QChar, CQTrieNode *>;
   using String      = QString;
 
  public:
@@ -158,7 +158,7 @@ class CQTriePatterns {
  public:
   using String     = QString;
   using Strings    = std::vector<String>;
-  using NodeIndMap = std::map<const CQTrieNode *,int>;
+  using NodeIndMap = std::map<const CQTrieNode *, int>;
 
  public:
   CQTriePatterns();

@@ -8,8 +8,7 @@
 
 namespace {
 
-QColor blendColors(const QColor &c1, const QColor &c2, double f)
-{
+QColor blendColors(const QColor &c1, const QColor &c2, double f) {
   auto iclamp = [](double val, int low, int high) {
     if (val < low ) return low;
     if (val > high) return high;
@@ -62,7 +61,7 @@ mousePressEvent(QMouseEvent *e)
   initStyleOption(opt);
 
 #if 0
-  QRect popupRect =
+  auto popupRect =
     style()->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxArrow, this);
 
   if (! popupRect.contains(p))
@@ -142,10 +141,10 @@ Qt::Alignment
 CQAlignEdit::
 fromString(const QString &str)
 {
-  Qt::Alignment align = 0;
+  Qt::Alignment align;
 
   if (! CQUtil::stringToAlign(str, align))
-    return 0;
+    return Qt::Alignment();
 
   return align;
 }
@@ -158,13 +157,13 @@ sizeHint() const
 
   QFontMetrics fm(font());
 
-  QSize fs(fm.width(str) + 4, fm.height() + 4);
+  QSize fs(fm.horizontalAdvance(str) + 4, fm.height() + 4);
 
   QStyleOptionComboBox opt;
 
   initStyleOption(opt);
 
-  QRect popupRect =
+  auto popupRect =
     style()->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxArrow, this);
 
   return QSize(fs.width() + popupRect.width(), fs.height());
@@ -244,7 +243,7 @@ void
 CQAlignEditMenuWidget::
 mousePressEvent(QMouseEvent *me)
 {
-  Qt::Alignment align = 0;
+  Qt::Alignment align;
 
   for (auto &rect : alignRect_) {
     if (rect.second.r.contains(me->pos()))

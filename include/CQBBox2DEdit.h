@@ -10,8 +10,8 @@ class CQBBox2DEdit : public QFrame {
   Q_OBJECT
 
  public:
-  CQBBox2DEdit(QWidget *parent, const CBBox2D &value=CBBox2D(0,0,1,1));
-  CQBBox2DEdit(const CBBox2D &value=CBBox2D(0,0,1,1));
+  CQBBox2DEdit(QWidget *parent, const CBBox2D &value=CBBox2D(0, 0, 1, 1));
+  CQBBox2DEdit(const CBBox2D &value=CBBox2D(0, 0, 1, 1));
 
   CQBBox2DEdit(QWidget *parent, const QRectF &value);
   CQBBox2DEdit(const QRectF &value);

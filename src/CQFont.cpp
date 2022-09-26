@@ -292,7 +292,7 @@ getStringWidth(const std::string &str) const
   QFontMetricsF fm(*qfont_);
 
   //return fm.size(0, qstr).width();
-  return fm.width(qstr);
+  return fm.horizontalAdvance(qstr);
 }
 
 bool
@@ -334,7 +334,7 @@ getStringImage(const std::string &str)
 
   qimage->updateCImage();
 
-  pen.setColor(QColor(0,0,0));
+  pen.setColor(QColor(0, 0, 0));
 
   painter.setPen  (pen);
   painter.setBrush(brush);

@@ -42,9 +42,9 @@ CQFontChooser(QWidget *parent) :
 
   ncombo_->setWritingSystem(QFontDatabase::Latin);
 
-//cbutton_->setFixedSize(QSize(24,24));
-//clabel_ ->setFixedSize(QSize(24,24));
-//button_ ->setFixedSize(QSize(24,24));
+//cbutton_->setFixedSize(QSize(24, 24));
+//clabel_ ->setFixedSize(QSize(24, 24));
+//button_ ->setFixedSize(QSize(24, 24));
 
   cbutton_->setText(exampleText_);
   clabel_ ->setText(exampleText_);

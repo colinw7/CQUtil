@@ -72,6 +72,7 @@ class CQTabSplit : public QFrame {
 
   //---
 
+  //! get/set current index
   int currentIndex() const { return currentIndex_; }
   void setCurrentIndex(int i);
 

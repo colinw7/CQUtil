@@ -34,7 +34,7 @@ init()
 
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-  color_     = QColor(1,2,3);
+  color_     = QColor(1, 2, 3);
   alpha_     = 0.456;
   colorName_ = "abcdef";
 
@@ -49,9 +49,9 @@ init()
   button_  = new CQIconButton (this); button_ ->setObjectName("button" ); // image click button
   alphab_  = new CQAlphaButton(this); alphab_ ->setObjectName("alphab" ); // alpha button
 
-  //cbutton_->setFixedSize(QSize(24,24));
-  //clabel_ ->setFixedSize(QSize(24,24));
-  //button_ ->setFixedSize(QSize(24,24));
+  //cbutton_->setFixedSize(QSize(24, 24));
+  //clabel_ ->setFixedSize(QSize(24, 24));
+  //button_ ->setFixedSize(QSize(24, 24));
 
   button_->setIcon("COLOR_DIALOG");
 

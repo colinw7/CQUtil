@@ -34,7 +34,7 @@ CQTabWidget(QWidget *parent) :
   connect(tabBar_, SIGNAL(tabMoveRequested(int, int)), this, SLOT(moveTab(int, int)));
 
 #ifndef CQTAB_WIDGET_MOVABLE
-  connect(tabBar_, SIGNAL(tabMoved(int,int)), this, SIGNAL(swapTabs(int,int)));
+  connect(tabBar_, SIGNAL(tabMoved(int, int)), this, SIGNAL(swapTabs(int, int)));
 #endif
 
   auto *leftButton  = new CQIconButton; leftButton ->setIcon("LEFT" );

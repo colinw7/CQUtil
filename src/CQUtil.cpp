@@ -1,6 +1,9 @@
 #include <CQUtil.h>
 #include <CQStyleMgr.h>
 
+//#include <CQImageUtil.h>
+//#include <CQUtilMeta.h>
+
 #ifdef CQUTIL_EVENT
 #include <CEvent.h>
 #endif
@@ -115,13 +118,13 @@ CQUtil::
 convertButton(Qt::MouseButton button)
 {
   switch (button) {
-    case Qt::NoButton:    return CBUTTON_NONE;
-    case Qt::LeftButton:  return CBUTTON_LEFT;
-    case Qt::MidButton:   return CBUTTON_MIDDLE;
-    case Qt::RightButton: return CBUTTON_RIGHT;
-    case Qt::XButton1:    return CBUTTON_NONE;
-    case Qt::XButton2:    return CBUTTON_NONE;
-    default:              return CBUTTON_NONE;
+    case Qt::NoButton:     return CBUTTON_NONE;
+    case Qt::LeftButton:   return CBUTTON_LEFT;
+    case Qt::MiddleButton: return CBUTTON_MIDDLE;
+    case Qt::RightButton:  return CBUTTON_RIGHT;
+    case Qt::XButton1:     return CBUTTON_NONE;
+    case Qt::XButton2:     return CBUTTON_NONE;
+    default:               return CBUTTON_NONE;
   }
 }
 
@@ -1241,7 +1244,7 @@ stringToEnumValue(const QString &str, const QMetaProperty &metaProperty, int &va
   if (metaProperty.isFlagType()) {
     bool found = false;
 
-    auto strs = str.split("|", QString::SkipEmptyParts);
+    auto strs = str.split("|", Qt::SkipEmptyParts);
 
     for (int i = 0; i < strs.length(); ++i) {
       int value1;
@@ -2022,7 +2025,7 @@ stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
       return QSizePolicy::Fixed;
     };
 
-    auto strs = str.split(" ", QString::SkipEmptyParts);
+    auto strs = str.split(" ", Qt::SkipEmptyParts);
 
     QSizePolicy::Policy hpolicy  { QSizePolicy::Fixed }, vpolicy { QSizePolicy::Fixed };
     int                 hstretch { 0 }, vstretch { 0 };
@@ -2258,11 +2261,11 @@ activateSlot(QObject *receiver, const char *slotName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  auto argTypeList = args.split(",", QString::SkipEmptyParts);
+  auto argTypeList = args.split(",", Qt::SkipEmptyParts);
 
   auto nArgs = argTypeList.count();
 
-  auto valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
+  auto valueList = QString(valuesStr).split(",", Qt::SkipEmptyParts);
 
   auto nValues = valueList.count();
 
@@ -2379,11 +2382,11 @@ activateSignal(QObject *sender, const char *signalName, const char *valuesStr)
 
   QGenericArgument qArgs[10];
 
-  auto argTypeList = args.split(",", QString::SkipEmptyParts);
+  auto argTypeList = args.split(",", Qt::SkipEmptyParts);
 
   auto nArgs = argTypeList.count();
 
-  auto valueList = QString(valuesStr).split(",", QString::SkipEmptyParts);
+  auto valueList = QString(valuesStr).split(",", Qt::SkipEmptyParts);
 
   auto nValues = valueList.count();
 
@@ -2867,7 +2870,7 @@ stringToAlign(const QString &str, Qt::Alignment &align)
 
   bool rc = true;
 
-  align = 0;
+  align = Qt::Alignment();
 
   auto strs = str.split("|");
 
@@ -3017,9 +3020,9 @@ nameWidgetButton(QAbstractButton *button)
   if (text.isNull() || text.isEmpty())
     return nameObjectGen(static_cast<QWidget*>(button));
 
-  text.replace(QChar(' '),QChar('_'));
-  text.replace(QChar('&'),QString(""));
-  text.replace(QChar('$'),QString(""));
+  text.replace(QChar(' '), QChar('_'));
+  text.replace(QChar('&'), QString(""));
+  text.replace(QChar('$'), QString(""));
 
   button->setObjectName(text);
 }
@@ -3033,9 +3036,9 @@ nameWidgetLabel(QLabel *label)
   if (text.isNull() || text.isEmpty())
     return nameObjectGen(static_cast<QWidget*>(label));
 
-  text.replace(QChar(' '),QChar('_'));
-  text.replace(QChar('&'),QString(""));
-  text.replace(QChar('$'),QString(""));
+  text.replace(QChar(' '), QChar('_'));
+  text.replace(QChar('&'), QString(""));
+  text.replace(QChar('$'), QString(""));
 
   label->setObjectName(text);
 }

@@ -62,7 +62,7 @@ class CQHeaderView : public QHeaderView {
   void sortDecreasingSlot();
 
  private:
-  typedef std::map<int,int> ColumnWidths;
+  typedef std::map<int, int> ColumnWidths;
 
   void calcTableWidths(QTableView *table, ColumnWidths &columnWidths);
 

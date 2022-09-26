@@ -883,6 +883,6 @@ paintEvent(QPaintEvent *)
 {
   //QPainter painter(this);
 
-  //painter.fillRect(rect(), QBrush(QColor(255,0,0)));
+  //painter.fillRect(rect(), QBrush(QColor(255, 0, 0)));
 }
 #endif

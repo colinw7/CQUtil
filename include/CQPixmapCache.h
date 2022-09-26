@@ -59,7 +59,7 @@ class CQPixmapCache : public QObject {
     }
   };
 
-  typedef std::map<QString,Data> IdData;
+  typedef std::map<QString, Data> IdData;
 
   IdData idData_;
   bool   dark_ { false };

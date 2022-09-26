@@ -106,8 +106,8 @@ namespace CQUtil {
     }
 
    private:
-    using NameValueMap = std::map<QString,int>;
-    using ValueNameMap = std::map<int,QString>;
+    using NameValueMap = std::map<QString, int>;
+    using ValueNameMap = std::map<int, QString>;
 
     QString        name_;
     QVariant::Type type_       { QVariant::Invalid };

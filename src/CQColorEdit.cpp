@@ -290,7 +290,7 @@ paintEvent(QPaintEvent *e)
   auto bwColor = [](const QColor &c) {
     int g = qGray(c.red(), c.green(), c.blue());
 
-    return (g > 128 ? QColor(0,0,0) : QColor(255, 255, 255));
+    return (g > 128 ? QColor(0, 0, 0) : QColor(255, 255, 255));
   };
 
   if (edit_->isEditable())

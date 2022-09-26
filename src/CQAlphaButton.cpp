@@ -5,7 +5,7 @@
 
 CQAlphaButton::
 CQAlphaButton(QWidget *parent) :
- QWidget(parent), alpha_(1.0), fg_(0,0,0), bg_(196,196,196)
+ QWidget(parent), alpha_(1.0), fg_(0, 0, 0), bg_(196, 196, 196)
 {
   setFixedWidth(8);
 

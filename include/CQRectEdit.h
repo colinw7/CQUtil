@@ -9,8 +9,8 @@ class CQRectEdit : public QFrame {
   Q_OBJECT
 
  public:
-  CQRectEdit(QWidget *parent, const QRectF &value=QRectF(0,0,1,1));
-  CQRectEdit(const QRectF &value=QRectF(0,0,1,1));
+  CQRectEdit(QWidget *parent, const QRectF &value=QRectF(0, 0, 1, 1));
+  CQRectEdit(const QRectF &value=QRectF(0, 0, 1, 1));
 
   virtual ~CQRectEdit() { }
 

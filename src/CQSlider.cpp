@@ -74,7 +74,7 @@ paintEvent(QPaintEvent *)
   // draw ticks
   int y = height()/2 + sliderHeight_/2 + 2;
 
-  p.setPen(QColor(0,0,0));
+  p.setPen(QColor(0, 0, 0));
 
   drawTick(&p, minimum(), y, 4);
   drawTick(&p, maximum(), y, 4);
@@ -102,12 +102,15 @@ paintEvent(QPaintEvent *)
 
   p.setFont(tickFont_);
 
-  p.drawText(valueWidthToPos(minimum(), fm2.width(minLabel)), height() - fm2.descent(), minLabel);
-  p.drawText(valueWidthToPos(maximum(), fm2.width(maxLabel)), height() - fm2.descent(), maxLabel);
+  p.drawText(valueWidthToPos(minimum(), fm2.horizontalAdvance(minLabel)),
+             height() - fm2.descent(), minLabel);
+  p.drawText(valueWidthToPos(maximum(), fm2.horizontalAdvance(maxLabel)),
+             height() - fm2.descent(), maxLabel);
 
   p.setFont(valFont_);
 
-  p.drawText(valueWidthToPos(value(), fm1.width(valLabel)), fm1.ascent() + 4, valLabel);
+  p.drawText(valueWidthToPos(value(), fm1.horizontalAdvance(valLabel)),
+             fm1.ascent() + 4, valLabel);
 }
 
 void
@@ -127,7 +130,7 @@ sizeHint() const
 
   QSize s = QSlider::sizeHint();
 
-  dx_ = fm.width("X")/2;
+  dx_ = fm.horizontalAdvance("X")/2;
   dy_ = fm.height() + 4;
 
   sliderHeight_ = s.height();
@@ -261,7 +264,7 @@ paintEvent(QPaintEvent *)
   // draw ticks
   int y = height()/2 + sliderHeight_/2 + 2;
 
-  p.setPen(QColor(0,0,0));
+  p.setPen(QColor(0, 0, 0));
 
   drawTick(&p, minimum(), y, 4);
   drawTick(&p, maximum(), y, 4);
@@ -289,12 +292,15 @@ paintEvent(QPaintEvent *)
 
   p.setFont(tickFont_);
 
-  p.drawText(valueWidthToPos(minimum(), fm2.width(minLabel)), height() - fm2.descent(), minLabel);
-  p.drawText(valueWidthToPos(maximum(), fm2.width(maxLabel)), height() - fm2.descent(), maxLabel);
+  p.drawText(valueWidthToPos(minimum(), fm2.horizontalAdvance(minLabel)),
+             height() - fm2.descent(), minLabel);
+  p.drawText(valueWidthToPos(maximum(), fm2.horizontalAdvance(maxLabel)),
+             height() - fm2.descent(), maxLabel);
 
   p.setFont(valFont_);
 
-  p.drawText(valueWidthToPos(value(), fm1.width(valLabel)), fm1.ascent() + 4, valLabel);
+  p.drawText(valueWidthToPos(value(), fm1.horizontalAdvance(valLabel)),
+             fm1.ascent() + 4, valLabel);
 }
 
 void
@@ -323,7 +329,7 @@ sizeHint() const
 
   QSize s = QSlider::sizeHint();
 
-  dx_ = fm.width("X")/2;
+  dx_ = fm.horizontalAdvance("X")/2;
   dy_ = fm.height() + 4;
 
   sliderHeight_ = s.height();

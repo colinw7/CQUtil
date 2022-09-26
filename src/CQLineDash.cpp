@@ -322,15 +322,15 @@ paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state
 
   if      (state == QIcon::On) {
     bg = qApp->palette().highlight().color();
-    fg = QColor(255,255,255);
+    fg = QColor(255, 255, 255);
   }
   else if (mode == QIcon::Active || mode == QIcon::Selected) {
     bg = qApp->palette().highlight().color();
-    fg = QColor(255,255,255);
+    fg = QColor(255, 255, 255);
   }
   else {
-    bg = QColor(255,255,255); //qApp->palette().base().color();
-    fg = QColor(0,0,0);
+    bg = QColor(255, 255, 255); //qApp->palette().base().color();
+    fg = QColor(0, 0, 0);
   }
 
   painter->fillRect(rect, bg);

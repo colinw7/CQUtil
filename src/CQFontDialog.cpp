@@ -72,7 +72,7 @@ getFont(bool *ok, QWidget *parent)
 {
   QFont initial;
 
-  return getFont(ok, initial, parent, QString(), 0);
+  return getFont(ok, initial, parent, QString(), FontDialogOptions());
 }
 
 QFont

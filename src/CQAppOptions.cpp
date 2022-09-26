@@ -3,6 +3,7 @@
 #include <CQStyleMgr.h>
 #include <CQFontChooser.h>
 #include <CQIntegerSpin.h>
+
 #include <QCheckBox>
 
 void

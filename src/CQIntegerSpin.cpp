@@ -28,7 +28,7 @@ init(int value)
 
   connect(this, SIGNAL(valueChanged(int)), this, SLOT(updateStep()));
 
-  connect(lineEdit(), SIGNAL(cursorPositionChanged(int,int)), this, SLOT(updateStep()));
+  connect(lineEdit(), SIGNAL(cursorPositionChanged(int, int)), this, SLOT(updateStep()));
 
   updateStep();
 }

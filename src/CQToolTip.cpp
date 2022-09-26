@@ -1,7 +1,9 @@
 #include <CQToolTip.h>
+#include <CQWidgetUtil.h>
 
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QScreen>
 #include <QVBoxLayout>
 #include <QCursor>
 #include <QKeyEvent>
@@ -71,6 +73,7 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
   if (! tooltip->canTip(pos))
     return false;
 
+#if 0
   auto *desktop = QApplication::desktop();
 
   int snum;
@@ -81,6 +84,11 @@ show(const QPoint &pos, CQToolTipIFace *tooltip, QWidget *parent)
     snum = desktop->screenNumber(this);
 
   setParent(desktop->screen(snum));
+#else
+  //auto *screen = qApp->primaryScreen();
+
+  setParent(nullptr);
+#endif
 
   setWindowFlags(Qt::ToolTip);
 
@@ -648,14 +656,5 @@ QRect
 CQToolTip::
 desktopRect(const QPoint &pos) const
 {
-  auto *desktop = QApplication::desktop();
-
-  int snum;
-
-  if (desktop->isVirtualDesktop())
-    snum = desktop->screenNumber(pos);
-  else
-    snum = desktop->screenNumber(this);
-
-  return desktop->availableGeometry(snum);
+  return CQWidgetUtil::desktopAvailableGeometry(this, pos);
 }

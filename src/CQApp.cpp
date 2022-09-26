@@ -5,6 +5,7 @@
 #include <CQFont.h>
 #include <CQImage.h>
 #include <CQMsgHandler.h>
+#include <CQWidgetUtil.h>
 
 #define CQAPP_WINDOW 1
 
@@ -176,7 +177,7 @@ CQApp(int &argc, char **argv) :
   QFontMetrics fm(CQStyleMgrInst->font());
 
   CScreenUnitsMgrInst->setEmSize(fm.height());
-  CScreenUnitsMgrInst->setExSize(fm.width("x"));
+  CScreenUnitsMgrInst->setExSize(fm.horizontalAdvance("x"));
 
   auto fixedFont = CQUtil::getMonospaceFont();
 
@@ -190,8 +191,7 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  //auto r = qApp->desktop()->availableGeometry();
-  auto r = srn->availableGeometry();
+  auto r = CQWidgetUtil::desktopAvailableGeometry();
 
   CScreenUnitsMgrInst->setScreenWidth (r.width ());
   CScreenUnitsMgrInst->setScreenHeight(r.height());

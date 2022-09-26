@@ -49,7 +49,7 @@ void drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientSt
 
   QLinearGradient *gradient;
 
-  switch(direction) {
+  switch (direction) {
     case DiagDown:
       gradient = new QLinearGradient(rect.left(), rect.top(), rect.right(), rect.bottom());
       break;
@@ -90,7 +90,7 @@ void drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientSt
 CQWinWidget::
 CQWinWidget(QWidget *parent, const char *name) :
  QWidget(parent), decoration_(HeaderBorderDecoration, SideTop, 10, 1,
-                              QColor(80,80,100), QColor(200,200,240))
+                              QColor(80, 80, 100), QColor(200, 200, 240))
 {
   if (name)
     setObjectName(name);
@@ -416,7 +416,7 @@ paintEvent(QPaintEvent *)
 
       QFontMetrics fm(font());
 
-      int tw = fm.width(text);
+      int tw = fm.horizontalAdvance(text);
 
       painter.save();
 
@@ -600,7 +600,7 @@ mousePressEvent(QMouseEvent *event)
     if (editMode() == EDIT_MODE_CLICK)
       grabMouse();
   }
-  else if (event->button() == Qt::MidButton) {
+  else if (event->button() == Qt::MiddleButton) {
     state_.moving   = false;
     state_.resizing = false;
 
@@ -855,8 +855,8 @@ void
 CQWinWidget::
 setCursor(const uchar *bits, const uchar *mask, int xo, int yo)
 {
-  QCursor cursor(QBitmap::fromData(QSize(16,16), bits),
-                 QBitmap::fromData(QSize(16,16), mask),
+  QCursor cursor(QBitmap::fromData(QSize(16, 16), bits),
+                 QBitmap::fromData(QSize(16, 16), mask),
                  xo, yo);
 
   QWidget::setCursor(cursor);

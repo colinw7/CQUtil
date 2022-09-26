@@ -441,7 +441,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         // ### backgroundrole/foregroundrole should be part of the style option
         alphaCornerColor = mergedColors(palette.color(widget->backgroundRole()), darkOutline);
       } else {
-        alphaCornerColor = mergedColors(palette.background().color(), darkOutline);
+        alphaCornerColor = mergedColors(palette.window().color(), darkOutline);
       }
 
       auto gripShadow         = grooveColor.darker(110);
@@ -462,7 +462,7 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
         bool horizontal = scrollBar->orientation == Qt::Horizontal;
         bool sunken     = scrollBar->state & State_Sunken;
 
-        painter->fillRect(option->rect, palette.background());
+        painter->fillRect(option->rect, palette.window());
 
         QRect scrollBarSubLine =
           proxy()->subControlRect(control, scrollBar, SC_ScrollBarSubLine, widget);

@@ -2,11 +2,16 @@
 #include <CQHeaderView.h>
 
 #include <CQColorChooser.h>
+#include <CQFontChooser.h>
+#include <CQAlignEdit.h>
+#include <CQUtil.h>
 
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QItemDelegate>
 #include <QHeaderView>
+#include <QLineEdit>
+#include <QCheckBox>
 #include <QStringList>
 #include <QFont>
 #include <QFontMetrics>
@@ -124,8 +129,10 @@ CQTableWidget(QWidget* parent) :
 
   //---
 
-  registerType(CQTableWidgetBoolItem::TYPE , new CQTableWidgetBoolItem (this, false));
-  registerType(CQTableWidgetColorItem::TYPE, new CQTableWidgetColorItem(this, QColor()));
+  registerType(CQTableWidgetBoolItem::TYPE  , new CQTableWidgetBoolItem  (this, false));
+  registerType(CQTableWidgetStringItem::TYPE, new CQTableWidgetStringItem(this, QString()));
+  registerType(CQTableWidgetColorItem::TYPE , new CQTableWidgetColorItem (this, QColor()));
+  registerType(CQTableWidgetFontItem::TYPE  , new CQTableWidgetFontItem  (this, QFont()));
 }
 
 CQTableWidget::
@@ -242,6 +249,17 @@ setItem(int row, int column, const QString &str)
 
 void
 CQTableWidget::
+setItem(int row, int column, const QVariant &var)
+{
+  auto *item = new QTableWidgetItem(var.toString());
+
+  item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+
+  QTableWidget::setItem(row, column, item);
+}
+
+void
+CQTableWidget::
 setItem(int row, int column, QWidget *w)
 {
   QTableWidget::setCellWidget(row, column, w);
@@ -270,7 +288,7 @@ itemClickedSlot(const QModelIndex &index)
   if (boolItem) {
     boolItem->click();
 
-    emit boolClicked(row, column, boolItem->value());
+    Q_EMIT boolClicked(row, column, boolItem->value());
   }
 }
 
@@ -314,7 +332,7 @@ fixTableColumnWidths(QTableWidget *table, int max_len, bool init)
         auto str = var.toString();
 
         if (str.length() <= max_len)
-          width = qMax(width, fm.width(str) + 10);
+          width = qMax(width, fm.horizontalAdvance(str) + 10);
       }
     }
 
@@ -329,7 +347,7 @@ fixTableColumnWidths(QTableWidget *table, int max_len, bool init)
         auto str = var.toString();
 
         if (str.length() <= max_len)
-          width = qMax(width, fm.width(str) + 28);
+          width = qMax(width, fm.horizontalAdvance(str) + 28);
 
         auto *w = table->cellWidget(r, c);
 
@@ -346,7 +364,7 @@ void
 CQTableWidget::
 emitValueChanged(int row, int col)
 {
-  emit valueChanged(row, col);
+  Q_EMIT valueChanged(row, col);
 }
 
 //---
@@ -363,7 +381,7 @@ createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIn
     auto *w = item1->createEditor(parent);
 
     if (w)
-      w->installEventFilter(const_cast<CQTableWidgetDelegate*>(this));
+      w->installEventFilter(const_cast<CQTableWidgetDelegate *>(this));
 
     return w;
   }
@@ -378,9 +396,9 @@ setEditorData(QWidget *, const QModelIndex &index) const
   auto *item = table_->item(index.row(), index.column());
 
   auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  if (! item1) return;
 
-  if (item1)
-    item1->setEditorData();
+  item1->setEditorData();
 }
 
 void
@@ -390,16 +408,17 @@ setModelData(QWidget *, QAbstractItemModel *model, const QModelIndex &index) con
   auto *item = table_->item(index.row(), index.column());
 
   auto *item1 = dynamic_cast<CQTableWidgetItem *>(item);
+  if (! item1) return;
 
-  if (item1) {
-    QString str;
+  QString str;
 
-    item1->getEditorData(str);
+  item1->getEditorData(str);
 
-    model->setData(index, str);
+  model->setData(index, str);
 
-    table_->emitValueChanged(index.row(), index.column());
-  }
+  Q_EMIT item1->valueChanged();
+
+  table_->emitValueChanged(index.row(), index.column());
 }
 
 QSize
@@ -510,12 +529,14 @@ createEditor(QWidget *) const
   return nullptr;
 }
 
+// set editor for table widget item
 void
 CQTableWidgetBoolItem::
 setEditorData()
 {
 }
 
+// set table widget item from editor
 void
 CQTableWidgetBoolItem::
 getEditorData(QString &str)
@@ -551,33 +572,93 @@ paint(QPainter *painter, const QStyleOptionViewItem &option) const
 //---
 
 QWidget *
-CQTableWidgetColorItem::
+CQTableWidgetStringItem::
 createEditor(QWidget *parent) const
 {
-  uint styles = CQColorChooser::Text | CQColorChooser::ColorButton | CQColorChooser::AlphaButton;
-
-  edit_ = new CQColorChooser(styles, parent);
+  edit_ = new QLineEdit(parent);
 
   return edit_;
 }
 
+// set editor for table widget item
 void
-CQTableWidgetColorItem::
+CQTableWidgetStringItem::
 setEditorData()
 {
   if (edit_.isNull())
     return;
 
-  edit_->setColor(c_);
+  edit_->setText(s_);
 }
 
+// set table widget item from editor
+void
+CQTableWidgetStringItem::
+getEditorData(QString &str)
+{
+  if (edit_.isNull()) return;
+
+  s_ = edit_->text();
+
+  str = getString();
+}
+
+bool
+CQTableWidgetStringItem::
+paint(QPainter *, const QStyleOptionViewItem &) const
+{
+  return false;
+}
+
+//---
+
+QWidget *
+CQTableWidgetColorItem::
+createEditor(QWidget *parent) const
+{
+  auto *frame  = CQUtil::makeWidget<QFrame>(parent, "frame");
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(frame, 0, 0);
+
+  uint styles = CQColorChooser::Text | CQColorChooser::ColorButton | CQColorChooser::AlphaButton;
+
+  edit_ = new CQColorChooser(styles);
+
+  layout->addWidget(edit_);
+
+  if (isOptional()) {
+    check_ = CQUtil::makeWidget<QCheckBox>("check");
+
+    layout->addWidget(check_);
+  }
+
+  return frame;
+}
+
+// set editor for table widget item
+void
+CQTableWidgetColorItem::
+setEditorData()
+{
+  if (edit_.isNull()) return;
+
+  if (isOptional())
+    check_->setChecked(hasValue());
+
+  if (hasValue())
+    edit_->setColor(value());
+}
+
+// set table widget item from editor
 void
 CQTableWidgetColorItem::
 getEditorData(QString &str)
 {
   if (edit_.isNull()) return;
 
-  c_ = edit_->color();
+  if (check_->isChecked())
+    setValue(edit_->color());
+  else
+    set_ = false;
 
   str = getString();
 }
@@ -586,12 +667,15 @@ bool
 CQTableWidgetColorItem::
 paint(QPainter *painter, const QStyleOptionViewItem &option) const
 {
+  if (! hasValue())
+    return true;
+
   if (edit_.isNull()) {
     paintBackground(painter, option);
 
     auto rect = option.rect.adjusted(2, 2, -4, -2);
 
-    painter->fillRect(rect, QBrush(c_));
+    painter->fillRect(rect, QBrush(value()));
 
     setTextPen(painter, option);
 
@@ -600,4 +684,133 @@ paint(QPainter *painter, const QStyleOptionViewItem &option) const
   }
 
   return true;
+}
+
+//---
+
+QWidget *
+CQTableWidgetFontItem::
+createEditor(QWidget *parent) const
+{
+  auto *frame  = CQUtil::makeWidget<QFrame>(parent, "frame");
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(frame, 0, 0);
+
+  edit_ = new CQFontChooser;
+
+  layout->addWidget(edit_);
+
+  if (isOptional()) {
+    check_ = CQUtil::makeWidget<QCheckBox>("check");
+
+    layout->addWidget(check_);
+  }
+
+  return frame;
+}
+
+// set editor for table widget item
+void
+CQTableWidgetFontItem::
+setEditorData()
+{
+  if (edit_.isNull()) return;
+
+  if (isOptional())
+    check_->setChecked(hasValue());
+
+  if (hasValue())
+    edit_->setFont(value());
+}
+
+// set table widget item from editor
+void
+CQTableWidgetFontItem::
+getEditorData(QString &str)
+{
+  if (edit_.isNull()) return;
+
+  if (check_->isChecked())
+    setValue(edit_->font());
+  else
+    set_ = false;
+
+  str = getString();
+}
+
+bool
+CQTableWidgetFontItem::
+paint(QPainter *, const QStyleOptionViewItem &) const
+{
+  if (! hasValue())
+    return true;
+
+  return false;
+}
+
+//---
+
+QWidget *
+CQTableWidgetAlignItem::
+createEditor(QWidget *parent) const
+{
+  auto *frame  = CQUtil::makeWidget<QFrame>(parent, "frame");
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(frame, 0, 0);
+
+  edit_ = new CQAlignEdit;
+
+  layout->addWidget(edit_);
+
+  if (isOptional()) {
+    check_ = CQUtil::makeWidget<QCheckBox>("check");
+
+    layout->addWidget(check_);
+  }
+
+  return frame;
+}
+
+QString
+CQTableWidgetAlignItem::
+getString() const
+{
+  return CQAlignEdit::toString(align_);
+}
+
+// set editor for table widget item
+void
+CQTableWidgetAlignItem::
+setEditorData()
+{
+  if (edit_.isNull()) return;
+
+  if (isOptional())
+    check_->setChecked(hasValue());
+
+  if (hasValue())
+    edit_->setAlign(align_);
+}
+
+// set table widget item from editor
+void
+CQTableWidgetAlignItem::
+getEditorData(QString &str)
+{
+  if (edit_.isNull()) return;
+
+  if (check_->isChecked())
+    setValue(edit_->align());
+  else
+    set_ = false;
+
+  str = getString();
+}
+
+bool
+CQTableWidgetAlignItem::
+paint(QPainter *, const QStyleOptionViewItem &) const
+{
+  if (! hasValue())
+    return true;
+
+  return false;
 }

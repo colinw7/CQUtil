@@ -31,8 +31,8 @@ init(const QString &name, double value)
 
   setValidator(validator_);
 
-  //setMinimumSize(QSize(60,0));
-  //setMaximumSize(QSize(60,22));
+  //setMinimumSize(QSize(60, 0));
+  //setMaximumSize(QSize(60, 22));
 
   //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 

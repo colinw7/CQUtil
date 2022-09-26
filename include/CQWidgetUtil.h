@@ -1,6 +1,10 @@
 #ifndef CQWidgetUtil_H
 #define CQWidgetUtil_H
 
+#include <QWheelEvent>
+#include <QApplication>
+#include <QScreen>
+
 namespace CQWidgetUtil {
   inline void resetWidgetMinMaxWidth(QWidget *w) {
     w->setMinimumWidth(0); w->setMaximumWidth(QWIDGETSIZE_MAX);
@@ -58,13 +62,58 @@ namespace CQWidgetUtil {
     if (minSize.height() > 0)
       s.setHeight(minSize.height());
 
-    return s.expandedTo(QSize(0,0));
+    return s.expandedTo(QSize(0, 0));
   }
 
   inline QSize SmartMinSize(const QWidget *w) {
     return SmartMinSize(w->sizeHint(), w->minimumSizeHint(),
                         w->minimumSize(), w->maximumSize(),
                         w->sizePolicy());
+  }
+
+  inline void getContentsMargins(const QWidget *w, int *l, int *t, int *r, int *b) {
+    auto m = w->contentsMargins();
+
+    if (l) *l = m.left  ();
+    if (t) *t = m.top   ();
+    if (r) *r = m.right ();
+    if (b) *b = m.bottom();
+  }
+
+  inline int wheelDelta(QWheelEvent *e) {
+    return e->angleDelta().y();
+  }
+
+  inline QRect desktopAvailableGeometry(QWidget * /*w*/ =nullptr) {
+#if 0
+    if (w)
+      return qApp->desktop()->availableGeometry(w);
+    else
+      return qApp->desktop()->availableGeometry();
+#else
+    auto *screen = QApplication::screens().at(0);
+
+    return screen->availableGeometry();
+#endif
+  }
+
+  inline QRect desktopAvailableGeometry(const QWidget * /*w*/, const QPoint &pos) {
+#if 0
+    auto *desktop = QApplication::desktop();
+
+    int snum;
+
+    if (desktop->isVirtualDesktop())
+      snum = desktop->screenNumber(pos);
+    else
+      snum = desktop->screenNumber(this);
+
+    return desktop->availableGeometry(snum);
+#else
+    auto *screen = qApp->screenAt(pos);
+
+    return screen->availableGeometry();
+#endif
   }
 }
 

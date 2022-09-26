@@ -98,7 +98,7 @@ paintEvent(QPaintEvent *)
 
   painter.setRenderHint(QPainter::Antialiasing, true);
 
-  QColor fc  = palette().color(QPalette::Background);
+  QColor fc  = palette().color(QPalette::Window);
   QColor hc  = palette().color(QPalette::Highlight);
   QColor tc  = palette().color(QPalette::Text);
   QColor htc = palette().color(QPalette::HighlightedText);
@@ -113,7 +113,7 @@ paintEvent(QPaintEvent *)
 
   QFontMetrics fm(painter.font());
 
-//int tw = fm.width(text);
+//int tw = fm.horizontalAdvance(text);
   int ta = fm.ascent();
   int td = fm.descent();
   int th = ta + td;
@@ -172,8 +172,8 @@ sizeHint() const
 {
   QFontMetrics fm(font());
 
-  int tw1 = fm.width(onLabel ());
-  int tw2 = fm.width(offLabel());
+  int tw1 = fm.horizontalAdvance(onLabel ());
+  int tw2 = fm.horizontalAdvance(offLabel());
 
   int th = fm.height();
 

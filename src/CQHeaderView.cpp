@@ -249,7 +249,7 @@ calcTreeWidths(QTreeView *tree, const QModelIndex &ind, int depth, ColumnWidths 
       if (! s.isValid()) {
         auto str = model->data(ind1, Qt::DisplayRole).toString();
 
-        s = QSize(fm.width(str), fm.height());
+        s = QSize(fm.horizontalAdvance(str), fm.height());
       }
 
       columnWidths[c] = std::max(columnWidths[c], s.width() + indent);
@@ -289,7 +289,7 @@ calcTableWidths(QTableView *table, ColumnWidths &columnWidths)
       if (! s.isValid()) {
         auto str = model->data(ind, Qt::DisplayRole).toString();
 
-        s = QSize(fm.width(str), fm.height());
+        s = QSize(fm.horizontalAdvance(str), fm.height());
       }
 
       columnWidths[c] = std::max(columnWidths[c], s.width());

@@ -8,9 +8,6 @@ QT += widgets
 
 CONFIG += staticlib
 
-#QMAKE_CXXFLAGS += \
--std=c++17
-
 QMAKE_CXXFLAGS += \
 -std=c++17 \
 -DCQUTIL_PALETTE \
@@ -181,7 +178,6 @@ HEADERS += \
 ../include/CQTabWidget.h \
 ../include/CQTabWidgetTabBar.h \
 \
-../include/CQTabSplit.h \
 ../include/CQTabSplit.h \
 ../include/CQTabSplitSplitter.h \
 ../include/CQTabSplitSplitterHandle.h \

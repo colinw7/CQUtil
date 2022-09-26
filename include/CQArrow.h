@@ -57,7 +57,7 @@ class CQArrow : public QObject {
   };
 
  public:
-  CQArrow(const QPointF &from=QPointF(0,0), const QPointF &to=QPointF(1,1));
+  CQArrow(const QPointF &from=QPointF(0, 0), const QPointF &to=QPointF(1, 1));
 
   ACCESSOR(QPointF, from_     , from      , setFrom);
   ACCESSOR(QPointF, to_       , to        , setTo);

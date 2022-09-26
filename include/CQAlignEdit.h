@@ -67,7 +67,7 @@ class CQAlignEditMenuWidget : public QFrame {
     }
   };
 
-  typedef std::map<Qt::Alignment,Rect> AlignRect;
+  typedef std::map<Qt::Alignment, Rect> AlignRect;
 
   CQAlignEdit *edit_ { nullptr };
   AlignRect    alignRect_;

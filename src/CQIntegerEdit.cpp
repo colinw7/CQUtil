@@ -25,8 +25,8 @@ init(const QString &name, int value)
 
   QValidator *validator = new QIntValidator(this);
 
-  //setMinimumSize(QSize(60,0));
-  //setMaximumSize(QSize(60,22));
+  //setMinimumSize(QSize(60, 0));
+  //setMaximumSize(QSize(60, 22));
 
   //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 

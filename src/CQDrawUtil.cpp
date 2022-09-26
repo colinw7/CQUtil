@@ -34,7 +34,6 @@
     QApplication::style().  Use the drawing functions in QStyle to
     make widgets that follow the current GUI style.
 
-
     Alternatively you can use a QFrame widget and apply the
     QFrame::setFrameStyle() function to display a shaded line:
 
@@ -193,7 +192,7 @@ void qDrawShadeRect(QPainter *p, int x, int y, int w, int h,
     QLineF lines[4] = { QLineF(x1+1, y1+1, x2-2, y1+1),
                         QLineF(x1+1, y1+2, x1+1, y2-2),
                         QLineF(x1, y2, x2, y2),
-                        QLineF(x2,y1, x2,y2-1) };
+                        QLineF(x2, y1, x2, y2-1) };
     p->drawLines(lines, 4);              // draw bottom/right lines
   } else {                                        // more complicated
     int m = lineWidth+midLineWidth;
@@ -522,7 +521,6 @@ Overloaded functions.
   QApplication::style().  Use the drawing functions in QStyle to
   make widgets that follow the current GUI style.
 
-
   Alternatively you can use a QFrame widget and apply the
   QFrame::setFrameStyle() function to display a shaded line:
 
@@ -672,7 +670,8 @@ void qDrawWinPanel(QPainter *p, const QRect &r,
 }
 
 /*!
-  \fn void qDrawPlainRect(QPainter *painter, const QRect &rect, const QColor &lineColor, int lineWidth, const QBrush *fill)
+  \fn void qDrawPlainRect(QPainter *painter, const QRect &rect, const QColor &lineColor,
+                          int lineWidth, const QBrush *fill)
   \relates <qdrawutil.h>
   \overload
 
@@ -707,16 +706,16 @@ static void qDrawWinArrow(QPainter *p, Qt::ArrowType type, bool down,
 
   switch (type) {
     case Qt::UpArrow:
-      a.setPoints(7, -3,1, 3,1, -2,0, 2,0, -1,-1, 1,-1, 0,-2);
+      a.setPoints(7, -3, 1, 3, 1, -2, 0, 2, 0, -1, -1, 1, -1, 0, -2);
       break;
     case Qt::DownArrow:
-      a.setPoints(7, -3,-1, 3,-1, -2,0, 2,0, -1,1, 1,1, 0,2);
+      a.setPoints(7, -3, -1, 3, -1, -2, 0, 2, 0, -1, 1, 1, 1, 0, 2);
       break;
     case Qt::LeftArrow:
-      a.setPoints(7, 1,-3, 1,3, 0,-2, 0,2, -1,-1, -1,1, -2,0);
+      a.setPoints(7, 1, -3, 1, 3, 0, -2, 0, 2, -1, -1, -1, 1, -2, 0);
       break;
     case Qt::RightArrow:
-      a.setPoints(7, -1,-3, -1,3, 0,-2, 0,2, 1,-1, 1,1, 2,0);
+      a.setPoints(7, -1, -3, -1, 3, 0, -2, 0, 2, 1, -1, 1, 1, 2, 0);
       break;
     default:
       break;
@@ -733,12 +732,12 @@ static void qDrawWinArrow(QPainter *p, Qt::ArrowType type, bool down,
   QPen savePen = p->pen();                        // save current pen
 
   if (down)
-    p->setBrushOrigin(p->brushOrigin() + QPoint(1,1));
+    p->setBrushOrigin(p->brushOrigin() + QPoint(1, 1));
 
   p->fillRect(x, y, w, h, pal.brush(QPalette::Button));
 
   if (down)
-    p->setBrushOrigin(p->brushOrigin() - QPoint(1,1));
+    p->setBrushOrigin(p->brushOrigin() - QPoint(1, 1));
 
   if (enabled) {
     a.translate(x+w/2, y+h/2);
@@ -791,37 +790,37 @@ static void qDrawMotifArrow(QPainter *p, Qt::ArrowType type, bool down,
     bTop.resize((dim/2)*2);
     bBot.resize(dim & 1 ? dim + 1 : dim);
     bLeft.resize(dim > 4 ? 4 : 2);
-    bLeft.putPoints(0, 2, 0,0, 0,dim-1);
+    bLeft.putPoints(0, 2, 0, 0, 0, dim-1);
     if (dim > 4)
-      bLeft.putPoints(2, 2, 1,2, 1,dim-3);
-    bTop.putPoints(0, 4, 1,0, 1,1, 2,1, 3,1);
-    bBot.putPoints(0, 4, 1,dim-1, 1,dim-2, 2,dim-2, 3,dim-2);
+      bLeft.putPoints(2, 2, 1, 2, 1, dim-3);
+    bTop.putPoints(0, 4, 1, 0, 1, 1, 2, 1, 3, 1);
+    bBot.putPoints(0, 4, 1, dim-1, 1, dim-2, 2, dim-2, 3, dim-2);
 
     for (int i=0; i<dim/2-2 ; i++) {
-      bTop.putPoints(i*2+4, 2, 2+i*2,2+i, 5+i*2, 2+i);
-      bBot.putPoints(i*2+4, 2, 2+i*2,dim-3-i, 5+i*2,dim-3-i);
+      bTop.putPoints(i*2+4, 2, 2+i*2, 2+i, 5+i*2, 2+i);
+      bBot.putPoints(i*2+4, 2, 2+i*2, dim-3-i, 5+i*2, dim-3-i);
     }
     if (dim & 1)                                // odd number size: extra line
-      bBot.putPoints(dim-1, 2, dim-3,dim/2, dim-1,dim/2);
+      bBot.putPoints(dim-1, 2, dim-3, dim/2, dim-1, dim/2);
 
     if (dim > 6) {                        // dim>6: must fill interior
-      bFill.putPoints(0, 2, 1,dim-3, 1,2);
+      bFill.putPoints(0, 2, 1, dim-3, 1, 2);
       if (dim & 1)                        // if size is an odd number
         bFill.setPoint(2, dim - 3, dim / 2);
       else
-        bFill.putPoints(2, 2, dim-4,dim/2-1, dim-4,dim/2);
+        bFill.putPoints(2, 2, dim-4, dim/2-1, dim-4, dim/2);
     }
   }
   else {
     if (dim == 3) {                        // 3x3 arrow pattern
-      bLeft.setPoints(4, 0,0, 0,2, 1,1, 1,1);
-      bTop .setPoints(2, 1,0, 1,0);
-      bBot .setPoints(2, 1,2, 2,1);
+      bLeft.setPoints(4, 0, 0, 0, 2, 1, 1, 1, 1);
+      bTop .setPoints(2, 1, 0, 1, 0);
+      bBot .setPoints(2, 1, 2, 2, 1);
     }
     else {                                        // 2x2 arrow pattern
-      bLeft.setPoints(2, 0,0, 0,1);
-      bTop .setPoints(2, 1,0, 1,0);
-      bBot .setPoints(2, 1,1, 1,1);
+      bLeft.setPoints(2, 0, 0, 0, 1);
+      bTop .setPoints(2, 1, 0, 1, 0);
+      bBot .setPoints(2, 1, 1, 1, 1);
     }
   }
 
@@ -1070,8 +1069,9 @@ typedef QVarLengthArray<QRectF, 16> QRectFArray;
 */
 
 void qDrawBorderPixmap(QPainter *painter, const QRect &targetRect, const QMargins &targetMargins,
-                       const QPixmap &pixmap, const QRect &sourceRect,const QMargins &sourceMargins,
-                       const QTileRules &rules, QDrawBorderPixmap::DrawingHints hints)
+                       const QPixmap &pixmap, const QRect &sourceRect,
+                       const QMargins &sourceMargins, const QTileRules &rules,
+                       QDrawBorderPixmap::DrawingHints hints)
 {
   if (!painter->isActive()) {
     qWarning("qDrawBorderPixmap: Painter not active");
