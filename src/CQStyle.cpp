@@ -641,16 +641,14 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
             if ((scrollBar->activeSubControls & SC_ScrollBarSubLine) && sunken) {
               drawGradient(painter,
                            QRect(fillRect),
-                           gradientStopColor.darker(120),
-                           gradientStopColor.darker(120),
+                           gradientStopColor.darker(120), gradientStopColor.darker(120),
                            horizontal ? TopDown : FromLeft,
                            palette.button());
             }
             else {
               drawGradient(painter,
                            QRect(fillRect),
-                           gradientStartColor.lighter(105),
-                           gradientStopColor,
+                           gradientStartColor.lighter(105), gradientStopColor,
                            horizontal ? TopDown : FromLeft,
                            palette.button());
             }
@@ -720,15 +718,13 @@ drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
             if ((scrollBar->activeSubControls & SC_ScrollBarAddLine) && sunken) {
               drawGradient(painter,
                            fillRect,
-                           gradientStopColor.darker(120),
-                           gradientStopColor.darker(120),
+                           gradientStopColor.darker(120), gradientStopColor.darker(120),
                            horizontal ? TopDown: FromLeft,
                            palette.button());
             } else {
               drawGradient(painter,
                            fillRect,
-                           gradientStartColor.lighter(105),
-                           gradientStopColor,
+                           gradientStartColor.lighter(105), gradientStopColor,
                            horizontal ? TopDown : FromLeft,
                            palette.button());
             }

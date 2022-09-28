@@ -183,10 +183,10 @@ showAtPos(const QPoint &pos)
   // cursor size and hotspot
   QSize size(16, 16);
 
-  const auto *bm = c.bitmap();
+  auto bm = c.bitmap(Qt::ReturnByValue);
 
-  if (bm)
-    size = bm->size();
+  if (! bm.isNull())
+    size = bm.size();
 
   int cw = size.width ();
   int ch = size.height();
