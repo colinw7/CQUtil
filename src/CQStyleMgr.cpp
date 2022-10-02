@@ -19,6 +19,8 @@ instance()
 CQStyleMgr::
 CQStyleMgr()
 {
+  setObjectName("styleMgr");
+
   lightBaseColor_ = QColor("#4444aa");
   darkBaseColor_  = QColor("#aaaa44");
 };

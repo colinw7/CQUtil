@@ -1,6 +1,41 @@
 #include <CQBBox2DEdit.h>
-#include <CQUtil.h>
-#include <CStrUtil.h>
+
+namespace CQBBox2DEditUtil {
+
+bool toReal(const std::string &s, double *r) {
+  bool ok = true;
+
+  *r = 0.0;
+
+  try {
+    *r = std::stod(s);
+  }
+  catch (...) {
+    ok = false;
+  }
+
+  return ok;
+}
+
+CPoint2D fromQPoint(const QPointF &point) {
+  return CPoint2D(point.x(), point.y());
+}
+
+CBBox2D fromQRect(const QRectF &rect) {
+  return CBBox2D(fromQPoint(rect.bottomLeft()), fromQPoint(rect.topRight()));
+}
+
+QPointF toQPoint(const CPoint2D &point) {
+  return QPointF(point.x, point.y);
+}
+
+QRectF toQRect(const CBBox2D &rect) {
+  return QRectF(toQPoint(rect.getLL()), toQPoint(rect.getUR())).normalized();
+}
+
+}
+
+//---
 
 CQBBox2DEdit::
 CQBBox2DEdit(QWidget *parent, const CBBox2D &value) :
@@ -20,14 +55,14 @@ CQBBox2DEdit::
 CQBBox2DEdit(QWidget *parent, const QRectF &value) :
  QFrame(parent)
 {
-  init(CQUtil::fromQRect(value));
+  init(CQBBox2DEditUtil::fromQRect(value));
 }
 
 CQBBox2DEdit::
 CQBBox2DEdit(const QRectF &value) :
  QFrame(0)
 {
-  init(CQUtil::fromQRect(value));
+  init(CQBBox2DEditUtil::fromQRect(value));
 }
 
 void
@@ -36,7 +71,7 @@ init(const CBBox2D &value)
 {
   setObjectName("edit");
 
-  setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+  setFrameStyle(uint(QFrame::NoFrame) | uint(QFrame::Plain));
 
   //---
 
@@ -72,7 +107,7 @@ void
 CQBBox2DEdit::
 setValue(const QRectF &rect)
 {
-  setValue(CQUtil::fromQRect(rect));
+  setValue(CQBBox2DEditUtil::fromQRect(rect));
 }
 
 const CBBox2D &
@@ -86,7 +121,7 @@ QRectF
 CQBBox2DEdit::
 getQValue() const
 {
-  return CQUtil::toQRect(rect_);
+  return CQBBox2DEditUtil::toQRect(rect_);
 }
 
 void
@@ -118,17 +153,17 @@ bool
 CQBBox2DEdit::
 widgetToPoint()
 {
-  QStringList strs = edit_->text().split(" ", QString::SkipEmptyParts);
+  QStringList strs = edit_->text().split(" ", Qt::SkipEmptyParts);
 
   if (strs.length() != 4)
     return false;
 
   double x1, y1, x2, y2;
 
-  if (! CStrUtil::toReal(strs[0].toStdString(), &x1)) return false;
-  if (! CStrUtil::toReal(strs[1].toStdString(), &y1)) return false;
-  if (! CStrUtil::toReal(strs[2].toStdString(), &x2)) return false;
-  if (! CStrUtil::toReal(strs[3].toStdString(), &y2)) return false;
+  if (! CQBBox2DEditUtil::toReal(strs[0].toStdString(), &x1)) return false;
+  if (! CQBBox2DEditUtil::toReal(strs[1].toStdString(), &y1)) return false;
+  if (! CQBBox2DEditUtil::toReal(strs[2].toStdString(), &x2)) return false;
+  if (! CQBBox2DEditUtil::toReal(strs[3].toStdString(), &y2)) return false;
 
   rect_ = CBBox2D(x1, y1, x2, y2);
 
