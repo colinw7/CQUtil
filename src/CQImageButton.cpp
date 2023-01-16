@@ -11,7 +11,7 @@ CQImageButton(const QString &fileName)
   CImageFileSrc src(fileName.toStdString());
 
 #ifdef CQUTIL_IMAGE
-  CImagePtr image = CImageMgrInst->lookupImage(src);
+  auto image = CImageMgrInst->lookupImage(src);
 
   init(image);
 #else

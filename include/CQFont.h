@@ -1,8 +1,6 @@
 #ifndef CQFONT_H
 #define CQFONT_H
 
-#ifdef CQUTIL_FONT
-
 #include <CFont.h>
 
 #include <QFont>
@@ -50,10 +48,11 @@ class CQFont : public CFont {
 
   explicit CQFont(const std::string &full_name);
 
-  virtual ~CQFont();
-
   CFontPtr dup(const std::string &family, CFontStyle style, double size, double angle=0,
-               double char_angle=0, int x_res=100, int y_res=100) const;
+               double char_angle=0, int x_res=100, int y_res=100) const override;
+
+ public:
+  virtual ~CQFont();
 
  private:
   CQFont(const CFont &qfont);
@@ -66,23 +65,21 @@ class CQFont : public CFont {
  public:
   const QFont &getQFont() const { return *qfont_; }
 
-  double getCharWidth () const;
-  double getCharAscent() const;
-  double getCharDescent() const;
-  double getCharHeight() const;
+  double getCharWidth () const override;
+  double getCharAscent() const override;
+  double getCharDescent() const override;
+  double getCharHeight() const override;
 
-  double getStringWidth(const std::string &str) const;
+  double getStringWidth(const std::string &str) const override;
 
-  bool isProportional() const;
+  bool isProportional() const override;
 
-  CImagePtr getStringImage(const std::string &str);
+  CImagePtr getStringImage(const std::string &str) override;
 
  private:
   friend class CQFontMgr;
 
-  QFont *qfont_ { 0 };
+  QFont *qfont_ { nullptr };
 };
-
-#endif
 
 #endif

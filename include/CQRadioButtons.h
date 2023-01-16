@@ -51,9 +51,9 @@ class CQHRadioButtons : public CQRadioButtons {
   CQHRadioButtons(QWidget *parent=0);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 };
 
 //------
@@ -64,9 +64,9 @@ class CQVRadioButtons : public CQRadioButtons {
   CQVRadioButtons(QWidget *parent=0);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 };
 
 //------
@@ -77,9 +77,9 @@ class CQToolbarRadioButtons : public CQRadioButtons {
   CQToolbarRadioButtons(QWidget *parent, const char *title);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 
  protected:
   QString title_;

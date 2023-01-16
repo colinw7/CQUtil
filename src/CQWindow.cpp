@@ -1,14 +1,16 @@
 #include <CQWindow.h>
 #include <CQUtil.h>
+#include <CQUtilEvent.h>
 
 #include <QApplication>
 
-//#include <QX11Info>
-#define QT_NO_X11 1
+#ifndef QT_NO_X11
+#include <QX11Info>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
+#endif
 
 #ifndef QT_NO_X11
 namespace CQWindowUtil {

@@ -9,7 +9,7 @@ QFont
 CQFontUtil::
 toQFont(CFontPtr font)
 {
-  CQFont *cqfont = font.cast<CQFont>();
+  auto *cqfont = dynamic_cast<CQFont *>(font.get());
 
   if (cqfont)
     return cqfont->getQFont();

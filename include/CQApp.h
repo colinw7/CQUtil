@@ -1,8 +1,6 @@
 #ifndef CQApp_H
 #define CQApp_H
 
-//#define USE_OBJEDIT 1
-
 #include <QApplication>
 
 class CQStyle;
@@ -27,7 +25,7 @@ class CQApp : public QApplication {
   bool isDarkTheme() const;
   void setDarkTheme(bool b);
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
   void addObjEditFilter(QObject *o);
 #endif
 
@@ -44,7 +42,7 @@ class CQApp : public QApplication {
 
 //---
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 class CQAppObjEditFilter : public QObject {
   Q_OBJECT
 

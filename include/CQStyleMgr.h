@@ -80,7 +80,7 @@ class CQStyleMgr : public QObject {
  protected:
   CQStyleMgr();
 
- signals:
+ Q_SIGNALS:
   void themeChanged();
   void colorsChanged();
 

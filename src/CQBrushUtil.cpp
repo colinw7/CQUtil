@@ -1,6 +1,8 @@
 #include <CQBrushUtil.h>
 #include <CQImageUtil.h>
 #include <CQUtil.h>
+#include <CQUtilRGBA.h>
+#include <CQUtilGradient.h>
 #include <CImageLib.h>
 #include <CAlignType.h>
 #include <CLinearGradient.h>

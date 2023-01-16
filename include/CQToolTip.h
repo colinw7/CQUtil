@@ -69,7 +69,7 @@ class CQToolTipWidgetIFace : public CQToolTipIFace {
     w_(w) {
   }
 
-  virtual QWidget *showWidget(const QPoint &) { return w_; }
+  QWidget *showWidget(const QPoint &) override { return w_; }
 
  private:
   using QWidgetP = QPointer<QWidget>;

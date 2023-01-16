@@ -27,7 +27,7 @@ class CQRealSpin : public QDoubleSpinBox {
   double step() const { return step_; }
 
   //! step by n
-  void stepBy(int n);
+  void stepBy(int n) override;
 
   //! get/set cursor position
   int cursorPosition() const;

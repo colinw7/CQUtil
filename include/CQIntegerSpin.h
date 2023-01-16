@@ -23,7 +23,7 @@ class CQIntegerSpin : public QSpinBox {
 
   int step() const { return step_; }
 
-  void stepBy(int n);
+  void stepBy(int n) override;
 
  signals:
   void stepChanged(int);

@@ -1,6 +1,7 @@
 #include <CQLineDash.h>
 #include <CQIconCombo.h>
 #include <CQUtil.h>
+#include <CQUtilLineDash.h>
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -48,13 +49,13 @@ class CQLineDashIconEngine : public QIconEngine {
    dash_(dash) {
   }
 
-  QSize actualSize(const QSize & size, QIcon::Mode mode, QIcon::State state);
+  QSize actualSize(const QSize & size, QIcon::Mode mode, QIcon::State state) override;
 
-  QPixmap pixmap(const QSize & size, QIcon::Mode mode, QIcon::State state);
+  QPixmap pixmap(const QSize & size, QIcon::Mode mode, QIcon::State state) override;
 
-  void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state);
+  void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state) override;
 
-  QIconEngine *clone() const { return new CQLineDashIconEngine(dash_); }
+  QIconEngine *clone() const override { return new CQLineDashIconEngine(dash_); }
 
  private:
   CLineDash dash_;
@@ -68,7 +69,7 @@ CQLineDash(QWidget *parent) :
 {
   setObjectName("line_dash");
 
-  setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+  setFrameStyle(uint(QFrame::NoFrame) | uint(QFrame::Plain));
 
   //---
 

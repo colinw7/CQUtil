@@ -119,6 +119,8 @@ CQTabSplit::
 currentIndexSlot(int i)
 {
   currentIndex_ = i;
+
+  Q_EMIT currentIndexChanged(currentIndex_);
 }
 
 void
@@ -153,8 +155,11 @@ addWidget(QWidget *w, const QString &name)
     data.layout->addWidget(w);
   }
 
-  if (widgets_.empty())
+  if (widgets_.empty()) {
     currentIndex_ = 0;
+
+    Q_EMIT currentIndexChanged(currentIndex_);
+  }
 
   widgets_.push_back(data);
 
@@ -191,8 +196,11 @@ removeWidget(QWidget *w, bool deleteWidget)
     return;
   }
 
-  if (i == currentIndex_)
+  if (i == currentIndex_) {
     i = currentIndex_ - 1;
+
+    Q_EMIT currentIndexChanged(currentIndex_);
+  }
 
   WidgetData data;
 
@@ -212,8 +220,11 @@ removeWidget(QWidget *w, bool deleteWidget)
   if (deleteWidget)
     delete data.w;
 
-  if (widgets_.empty())
+  if (widgets_.empty()) {
     currentIndex_ = -1;
+
+    Q_EMIT currentIndexChanged(currentIndex_);
+  }
 }
 
 void
@@ -228,6 +239,8 @@ removeAllWidgets()
   widgets_.clear();
 
   currentIndex_ = -1;
+
+  Q_EMIT currentIndexChanged(currentIndex_);
 }
 
 bool

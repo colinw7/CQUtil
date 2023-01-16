@@ -1,5 +1,9 @@
 #include <CQPenUtil.h>
 #include <CQUtil.h>
+#include <CQUtilRGBA.h>
+#include <CQUtilLineDash.h>
+#include <CQUtilLineCap.h>
+#include <CQUtilLineJoin.h>
 
 #ifdef CQUTIL_PEN
 QPen

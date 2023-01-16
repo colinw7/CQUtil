@@ -33,7 +33,7 @@ class CQWidgetFactoryT : public CQWidgetFactory {
  public:
   CQWidgetFactoryT() { }
 
-  QWidget *createWidget(QWidget *parent, const QStringList &) {
+  QWidget *createWidget(QWidget *parent, const QStringList &) override {
     auto *w = new T(parent);
 
     // TODO: set object name
@@ -47,7 +47,7 @@ class CQWidgetFactoryNoArgsT : public CQWidgetFactory {
  public:
   CQWidgetFactoryNoArgsT() { }
 
-  QWidget *createWidget(QWidget *, const QStringList &) {
+  QWidget *createWidget(QWidget *, const QStringList &) override {
     auto *w = new T();
 
     // TODO: set object name
@@ -61,7 +61,7 @@ class CQLayoutFactoryT : public CQLayoutFactory {
  public:
   CQLayoutFactoryT() { }
 
-  QLayout *createLayout(QWidget *parent, const QStringList &) {
+  QLayout *createLayout(QWidget *parent, const QStringList &) override {
     auto *w = new T(parent);
 
     // TODO: set object name

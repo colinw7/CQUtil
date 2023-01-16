@@ -109,11 +109,14 @@ class CQTabSplit : public QFrame {
   //! return size hint
   QSize sizeHint() const override;
 
- signals:
+ Q_SIGNALS:
   //! emitted when close of tab/splitter requested (if closable)
   void widgetCloseRequested(int i);
 
- public slots:
+  //! emitted when current index changes
+  void currentIndexChanged(int i);
+
+ public Q_SLOTS:
   void currentIndexSlot(int);
 
   //! close specified tab (if closable)
@@ -178,7 +181,7 @@ class CQTabSplitTabWidget : public QTabWidget {
  private:
   void showTool(const QPoint &pos);
 
- private slots:
+ private Q_SLOTS:
   //! set to horizontal split mode
   void hsplitSlot();
 

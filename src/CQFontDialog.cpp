@@ -461,8 +461,10 @@ updateFamilies()
 //and try some fall backs
     match_t type = MATCH_NONE;
 
+#if 0
     if (bestFamilyType <= MATCH_NONE && familyName2 == f.lastResortFamily())
       type = MATCH_LAST_RESORT;
+#endif
 
     if (bestFamilyType <= MATCH_LAST_RESORT && familyName2 == f.family())
       type = MATCH_APP;

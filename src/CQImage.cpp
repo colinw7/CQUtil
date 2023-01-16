@@ -1,9 +1,8 @@
 #include <CQImage.h>
 
-#ifdef CQUTIL_IMAGE
-
 #include <CQImageGaussianBlur.h>
 #include <CQUtil.h>
+#include <CQUtilRGBA.h>
 #include <CImageLib.h>
 #include <QImage>
 
@@ -274,5 +273,3 @@ gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny)
 
   return blur.blur(*image2, bx, by, nx, ny);
 }
-
-#endif

@@ -50,7 +50,7 @@ class CQDialog : public QDialog {
 
   void init();
 
-  int exec();
+  int exec() override;
 
   QCheckBox *addCheckBox(const QString &name, const QObject *receiver=nullptr,
                          const char *member=nullptr);
@@ -77,8 +77,8 @@ class CQDialog : public QDialog {
  protected:
   virtual void createWidgets(QWidget *) { }
 
-  virtual void accept() { }
-  virtual void reject() { }
+  virtual void accept() override { }
+  virtual void reject() override { }
 
  protected slots:
   void acceptSlot();

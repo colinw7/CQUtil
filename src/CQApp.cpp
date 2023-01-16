@@ -7,41 +7,31 @@
 #include <CQMsgHandler.h>
 #include <CQWidgetUtil.h>
 
-#define CQAPP_WINDOW 1
-
 #ifdef CQAPP_WINDOW
 #include <CQWindow.h>
 #endif
 
-#ifdef CQUTIL_PIXMAP_CACHE
 #include <CQPixmapCache.h>
-#endif
 
-#ifdef CQUTIL_TOOLTIP
 #include <CQToolTip.h>
-#endif
 
-#ifdef CQUTIL_PERF_GRAPH
+#ifdef CQPERF_GRAPH
 #include <CQPerfGraph.h>
 #endif
 
 #include <CConfig.h>
 
-#ifdef CQUTIL_IMAGE
 #include <CImageMgr.h>
-#endif
-#ifdef CQUTIL_FONT
 #include <CFontMgr.h>
-#endif
 
 #include <CScreenUnits.h>
 
-//#define USE_OBJEDIT 1
-
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
+#  ifdef CQAPP_USE_OBJEDIT_OBJEDIT
 #include <CQObjEdit.h>
-#else
-//#include <CQMetaEdit.h>
+#  else
+#include <CQMetaEdit.h>
+#  endif
 #endif
 
 #include <QScreen>
@@ -50,11 +40,11 @@
 
 CQApp *CQApp::app_;
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 extern bool CQAppXIsObjEditKey(void *);
 #endif
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 bool
 CQAppEventFilter(void *message, long *)
 {
@@ -67,7 +57,7 @@ CQAppEventFilter(void *message, long *)
 }
 #endif
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 bool
 CQAppObjEditFilter::
 eventFilter(QObject *obj, QEvent *event)
@@ -80,12 +70,10 @@ eventFilter(QObject *obj, QEvent *event)
       return true;
     }
 
-#ifdef CQUTIL_PERF_GRAPH
     if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_End) {
       CQApp::showPerfDialog();
       return true;
     }
-#endif
 
     if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_PageDown) {
       CQAppOptions::show();
@@ -125,20 +113,18 @@ CQApp(int &argc, char **argv) :
   if (getenv("CQAPP_DARK_THEME"))
     setDarkTheme(true);
 
-#ifdef CQUTIL_IMAGE
   CQImage::setPrototype();
-#endif
 
-#ifdef CQUTIL_FONT
   CQFontMgrInst->setPrototype();
-#endif
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
   addObjEditFilter(this);
   //setEventFilter(CQAppEventFilter);
 #endif
 
+#ifdef CQAPP_WINDOW
   CQWindow::setFactory();
+#endif
 
   //---
 
@@ -200,42 +186,34 @@ CQApp(int &argc, char **argv) :
 CQApp::
 ~CQApp()
 {
-#ifdef CQUTIL_IMAGE
   CQImage::resetPrototype();
-#endif
 
-#ifdef CQUTIL_FONT
   CQFontMgrInst->resetPrototype();
   CQFontMgrInst->clear();
-#endif
 
+#ifdef CQAPP_WINDOW
   CQWindow::resetFactory();
+#endif
 
   delete config_;
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
   delete objEditFilter_;
 #endif
 
-//CQToolTip::release();
+  CQToolTip::release();
 
-#ifdef CQUTIL_FONT
   CQFontMgr::release();
-#endif
 
-#ifdef CQUTIL_PIXMAP_CACHE
   CQPixmapCache::release();
-#endif
 
-#ifdef CQUTIL_FONT
   CFontMgr::release();
-#endif
 
-#ifdef CQUTIL_IMAGE
   CImageMgr::release();
-#endif
 
+#ifdef CQAPP_WINDOW
   CWindowMgr::release();
+#endif
 
   CScreenUnitsMgr::release();
 }
@@ -244,7 +222,8 @@ void
 CQApp::
 showMetaEdit(QObject *obj)
 {
-#ifdef USE_OBJEDIT_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
+#  ifdef CQAPP_USE_OBJEDIT_OBJEDIT
   auto *objEdit = CQObjEdit::createInstance();
 
   if (obj)
@@ -253,10 +232,7 @@ showMetaEdit(QObject *obj)
   objEdit->show();
 
   objEdit->raise();
-#else
-  assert(obj);
-
-/*
+#  else
   auto *metaEdit = new CQMetaEdit;
 
   if (obj)
@@ -265,7 +241,7 @@ showMetaEdit(QObject *obj)
   metaEdit->show();
 
   metaEdit->raise();
-*/
+#  endif
 #endif
 }
 
@@ -273,7 +249,7 @@ void
 CQApp::
 showPerfDialog()
 {
-#ifdef CQUTIL_PERF_GRAPH
+#ifdef CQPERF_GRAPH
   auto *dialog = CQPerfDialog::instance();
 
   dialog->show();
@@ -294,7 +270,7 @@ setDarkTheme(bool b)
   CQStyleMgrInst->setTheme(b ? CQStyleMgr::Theme::DARK : CQStyleMgr::Theme::LIGHT);
 }
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 void
 CQApp::
 addObjEditFilter(QObject *o)

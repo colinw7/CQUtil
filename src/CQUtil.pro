@@ -16,11 +16,13 @@ QMAKE_CXXFLAGS += \
 -DCQUTIL_FONT \
 -DCQUTIL_IMAGE \
 -DCBRUSH_IMAGE \
+-DQT_NO_X11 \
 
 MOC_DIR = .moc
 
 SOURCES += \
 CQUtil.cpp \
+CQUtilRGBA.cpp \
 CQMsgHandler.cpp \
 \
 CQApp.cpp \

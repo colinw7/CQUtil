@@ -28,7 +28,7 @@ class CQRealEdit : public QLineEdit {
  private:
   void init(const QString &name, double value);
 
-  void contextMenuEvent(QContextMenuEvent *);
+  void contextMenuEvent(QContextMenuEvent *) override;
 
  private slots:
   void editingFinishedI();

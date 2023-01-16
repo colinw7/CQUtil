@@ -44,7 +44,7 @@ class CQTableWidgetItem : public QObject, public QTableWidgetItem {
   //---
 
   // clone new item
-  virtual CQTableWidgetItem *clone() const = 0;
+  CQTableWidgetItem *clone() const override = 0;
 
   // create edit widget for item
   virtual QWidget *createEditor(QWidget *parent) const = 0;
@@ -292,6 +292,9 @@ class CQTableWidgetColorItem : public CQTableWidgetItem {
   }
 
   bool paint(QPainter *painter, const QStyleOptionViewItem &option) const override;
+
+ private Q_SLOTS:
+  void checkSlot(int);
 
  private:
   using ColorChooserP = QPointer<CQColorChooser>;

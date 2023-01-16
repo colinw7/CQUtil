@@ -171,7 +171,7 @@ class CQWidgetMenuAction : public QWidgetAction {
 
  private:
   //! create menu widget (required implementation for QWidgetAction)
-  QWidget *createWidget(QWidget *parent);
+  QWidget *createWidget(QWidget *parent) override;
 
  protected:
   CQWidgetMenu     *menu_ { nullptr }; //! parent menu

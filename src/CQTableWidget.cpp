@@ -623,15 +623,27 @@ createEditor(QWidget *parent) const
 
   edit_ = new CQColorChooser(styles);
 
+  frame->setFocusProxy(edit_);
+
   layout->addWidget(edit_);
 
   if (isOptional()) {
     check_ = CQUtil::makeWidget<QCheckBox>("check");
 
+    connect(check_, SIGNAL(stateChanged(int)), this, SLOT(checkSlot(int)));
+
     layout->addWidget(check_);
   }
 
   return frame;
+}
+
+void
+CQTableWidgetColorItem::
+checkSlot(int state)
+{
+  if (! state)
+    edit_->getTextWidget()->setText("");
 }
 
 // set editor for table widget item
@@ -642,7 +654,7 @@ setEditorData()
   if (edit_.isNull()) return;
 
   if (isOptional())
-    check_->setChecked(hasValue());
+    check_->setChecked(true);
 
   if (hasValue())
     edit_->setColor(value());
@@ -655,7 +667,7 @@ getEditorData(QString &str)
 {
   if (edit_.isNull()) return;
 
-  if (check_->isChecked())
+  if (check_->isChecked() && edit_->getTextWidget()->text() != "")
     setValue(edit_->color());
   else
     set_ = false;
@@ -696,6 +708,8 @@ createEditor(QWidget *parent) const
   auto *layout = CQUtil::makeLayout<QHBoxLayout>(frame, 0, 0);
 
   edit_ = new CQFontChooser;
+
+  frame->setFocusProxy(edit_);
 
   layout->addWidget(edit_);
 
@@ -757,6 +771,8 @@ createEditor(QWidget *parent) const
   auto *layout = CQUtil::makeLayout<QHBoxLayout>(frame, 0, 0);
 
   edit_ = new CQAlignEdit;
+
+  frame->setFocusProxy(edit_);
 
   layout->addWidget(edit_);
 

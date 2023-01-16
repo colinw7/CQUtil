@@ -1,6 +1,7 @@
 #include <CQColorChooser.h>
 #include <CQAlphaButton.h>
 #include <CQIconButton.h>
+#include <CQUtil.h>
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -43,11 +44,11 @@ init()
   auto *layout = new QHBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(2);
 
-  cedit_   = new QLineEdit    (this); cedit_  ->setObjectName("cedit"  ); // text color
-  cbutton_ = new QToolButton  (this); cbutton_->setObjectName("cbutton"); // click color button
-  clabel_  = new QLabel       (this); clabel_ ->setObjectName("clabel" ); // static color button
-  button_  = new CQIconButton (this); button_ ->setObjectName("button" ); // image click button
-  alphab_  = new CQAlphaButton(this); alphab_ ->setObjectName("alphab" ); // alpha button
+  cedit_   = CQUtil::makeWidget<QLineEdit    >(this, "cedit"  ); // text color
+  cbutton_ = CQUtil::makeWidget<QToolButton  >(this, "cbutton"); // click color button
+  clabel_  = CQUtil::makeWidget<QLabel       >(this, "clabel" ); // static color button
+  button_  = CQUtil::makeWidget<CQIconButton >(this, "button" ); // image click button
+  alphab_  = CQUtil::makeWidget<CQAlphaButton>(this, "alphab" ); // alpha button
 
   //cbutton_->setFixedSize(QSize(24, 24));
   //clabel_ ->setFixedSize(QSize(24, 24));

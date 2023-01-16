@@ -1,11 +1,6 @@
 #ifndef CQUTIL_H
 #define CQUTIL_H
 
-#define CQUTIL_EVENT     1
-#define CQUTIL_LINE_DASH 1
-#define CQUTIL_ANGLE     1
-#define CQUTIL_GRADIENT  1
-
 #include <Qt>
 #include <QColor>
 #include <QEvent>
@@ -17,43 +12,11 @@
 #include <QAction>
 #include <QPen>
 
-#ifdef CQUTIL_EVENT
-#include <CEvent.h>
-#endif
-
-#include <CRGBA.h>
-
-#ifdef CQUTIL_LINE_DASH
-#include <CLineDash.h>
-#endif
-
-#ifdef CQUTIL_ANGLE
-#include <CAngle.h>
-#endif
-
-#include <CFontStyle.h>
-#include <CLineCapType.h>
-#include <CLineJoinType.h>
-#include <CIBBox2D.h>
-
-#include <CPoint2D.h>
-#include <CBBox2D.h>
-#include <CMatrix2D.h>
-#include <CAlignType.h>
-
 #include <map>
 
 //---
 
 #include <CQUtilMeta.h>
-
-#ifdef CQUTIL_LINE_DASH
-CQUTIL_DCL_META_TYPE(CLineDash)
-#endif
-
-#ifdef CQUTIL_ANGLE
-CQUTIL_DCL_META_TYPE(CAngle)
-#endif
 
 //---
 
@@ -64,11 +27,6 @@ class QDockWidget;
 class QLabel;
 
 struct QMetaObject;
-
-#ifdef CQUTIL_GRADIENT
-class CLinearGradient;
-class CRadialGradient;
-#endif
 
 namespace CQUtil {
   class PropInfo {
@@ -121,33 +79,6 @@ namespace CQUtil {
   };
 
   void initProperties();
-
-#ifdef CQUTIL_EVENT
-  CMouseEvent *convertEvent(QMouseEvent *event);
-  CKeyEvent   *convertEvent(QKeyEvent *event);
-
-  CMouseButton   convertButton(Qt::MouseButton button);
-  CKeyType       convertKey(int key, Qt::KeyboardModifiers modifiers);
-  CEventModifier convertModifier(Qt::KeyboardModifiers modifiers);
-#endif
-
-  QColor rgbToColor(const CRGB &rgb);
-  QColor rgbaToColor(const CRGBA &rgba);
-
-  inline QColor toQColor(const CRGB  &rgb ) { return rgbToColor (rgb ); }
-  inline QColor toQColor(const CRGBA &rgba) { return rgbaToColor(rgba); }
-
-  uint rgbaToInt(const CRGBA &rgba);
-
-  CRGB  colorToRGB(const QColor &color);
-  CRGBA colorToRGBA(const QColor &color);
-
-  Qt::PenCapStyle  toPenCapStyle (const CLineCapType  &lineCap);
-  Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
-
-  inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
-
-  void decodeFont(const QFont &font, QString &family, CFontStyle &style, int &pixelSize);
 
   //---
 
@@ -265,33 +196,6 @@ namespace CQUtil {
   QColor getBackground(QWidget *widget);
   void   setBackground(QWidget *widget, const QColor &color);
 
-  QPointF  toQPoint  (const CPoint2D &point);
-  QPoint   toQPointI (const CPoint2D &point);
-  CPoint2D fromQPoint(const QPointF &point);
-
-  QPoint    toQPoint   (const CIPoint2D &point);
-  CIPoint2D fromQPoint (const QPoint &point);
-  CPoint2D  fromQPointF(const QPoint &point);
-
-  QSizeF  toQSize  (const CSize2D &size);
-  CSize2D fromQSize(const QSizeF &size);
-
-  QSize    toQSize  (const CISize2D &size);
-  CISize2D fromQSize(const QSize &size);
-
-  QRectF  toQRect  (const CBBox2D &rect);
-  QRect   toQRectI (const CBBox2D &rect);
-  CBBox2D fromQRect(const QRectF &rect);
-
-  QRect    toQRect  (const CIBBox2D &rect);
-  CIBBox2D fromQRect(const QRect &rect);
-
-  QMatrix   toQMatrix  (const CMatrix2D &m);
-  CMatrix2D fromQMatrix(const QMatrix &m);
-
-  QTransform toQTransform  (const CMatrix2D &m);
-  CMatrix2D  fromQTransform(const QTransform &t);
-
   QString variantToString(const QVariant &var);
   bool variantToString(const QVariant &var, QString &str);
 
@@ -319,31 +223,14 @@ namespace CQUtil {
 
   //---
 
-#ifdef CQUTIL_GRADIENT
-  QLinearGradient toQGradient(const CLinearGradient *lgradient,
-                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
-  QRadialGradient toQGradient(const CRadialGradient *rgradient,
-                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
-#endif
-
   void getScreenSize(uint *w, uint *h);
 
   void setSelectText(const std::string &text);
 
   void setDockVisible(QDockWidget *dock, bool visible);
 
-#ifdef CQUTIL_LINE_DASH
-  void penSetLineDash(QPen &pen, const CLineDash &dash);
-#endif
-
   QString alignToString(Qt::Alignment align);
   bool stringToAlign(const QString &str, Qt::Alignment &align);
-
-  Qt::Alignment toQAlign(CHAlignType halign);
-  Qt::Alignment toQAlign(CVAlignType valign);
-
-  CHAlignType toHAlign(Qt::Alignment align);
-  CVAlignType toVAlign(Qt::Alignment align);
 
   //-----
 

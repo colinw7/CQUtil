@@ -1,7 +1,5 @@
 #include <CQFont.h>
 
-#ifdef CQUTIL_FONT
-
 #include <CConfig.h>
 #include <CFontMgr.h>
 #include <CQImage.h>
@@ -91,7 +89,7 @@ lookupFont(const std::string &family, CFontStyle style, double size, double angl
 {
   CFontPtr font = CFontMgrInst->lookupFont(family, style, size, angle, char_angle, x_res, y_res);
 
-  assert(font.cast<CQFont>() != 0);
+  assert(dynamic_cast<CQFont *>(font.get()) != nullptr);
 
   return font;
 }
@@ -349,5 +347,3 @@ getStringImage(const std::string &str)
 
   return image;
 }
-
-#endif

@@ -60,7 +60,7 @@ class CQWorkspaceUpdateWindowsMenu : public CQWorkspaceUpdateWindowsMenuIFace {
    workspace_(workspace) {
   }
 
-  void exec();
+  void exec() override;
 };
 
 class CQWorkspaceUpdateWindowsMenuObject : public QObject {
@@ -157,7 +157,7 @@ class CQWorkspace : public CQWorkspaceBase {
     return windows_;
   }
 
-  void setActiveWidget(QWidget *w) {
+  void setActiveWidget(QWidget *w) override {
     QList<QMdiSubWindow *> widgets = workspace_->subWindowList();
 
     QList<QMdiSubWindow *>::iterator p1 = widgets.begin();

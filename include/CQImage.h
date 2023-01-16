@@ -1,8 +1,6 @@
 #ifndef CQ_IMAGE_H
 #define CQ_IMAGE_H
 
-#ifdef CQUTIL_IMAGE
-
 #include <QImage>
 
 #include <CImage.h>
@@ -38,7 +36,7 @@ class CQImage : public CImage {
   CQImage &operator=(const CQImage &image);
 
  public:
-  CImagePtr dup() const;
+  CImagePtr dup() const override;
 
   void updateCImage();
 
@@ -47,20 +45,20 @@ class CQImage : public CImage {
 
   //------
 
-  void setDataSizeV(int width, int height);
+  void setDataSizeV(int width, int height) override;
 
-  bool setColorIndexPixel(int pos, uint pixel);
-  bool setColorIndexPixel(int x, int y, uint pixel);
+  bool setColorIndexPixel(int pos, uint pixel) override;
+  bool setColorIndexPixel(int x, int y, uint pixel) override;
 
-  bool setRGBAPixel(int pos, const CRGBA &rgba);
-  bool setRGBAPixel(int x, int y, const CRGBA &rgba);
+  bool setRGBAPixel(int pos, const CRGBA &rgba) override;
+  bool setRGBAPixel(int x, int y, const CRGBA &rgba) override;
 
   //------
 
-  void dataChanged();
+  void dataChanged() override;
 
  public:
-  bool gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny);
+  bool gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny) override;
 
  private:
   void initQImage();
@@ -69,7 +67,5 @@ class CQImage : public CImage {
   QImage qimage_;
   bool   initialized_ { false };
 };
-
-#endif
 
 #endif

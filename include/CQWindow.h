@@ -7,9 +7,9 @@
 
 class CQWindowFactory : public CWindowFactory {
  public:
-  CWindow *createWindow(int x, int y, uint width, uint height);
+  CWindow *createWindow(int x, int y, uint width, uint height) override;
 
-  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height);
+  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height) override;
 };
 
 //------

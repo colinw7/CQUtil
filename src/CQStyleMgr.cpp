@@ -49,7 +49,7 @@ setTheme(const Theme &theme)
   if (style_)
     style_->setTheme(static_cast<CQStyle::Theme>(theme_));
 
-  emit themeChanged();
+  Q_EMIT themeChanged();
 }
 
 QColor
@@ -65,7 +65,7 @@ setIconSize(int i)
 {
   iconSize_ = i;
 
-  emit iconSizeChanged();
+  Q_EMIT iconSizeChanged();
 }
 
 void
@@ -83,7 +83,7 @@ setLargeIconSize(int i)
 {
   largeIconSize_ = i;
 
-  emit iconSizeChanged();
+  Q_EMIT iconSizeChanged();
 }
 
 int
@@ -102,7 +102,7 @@ setSmallIconSize(int i)
 {
   smallIconSize_ = i;
 
-  emit iconSizeChanged();
+  Q_EMIT iconSizeChanged();
 }
 
 int
@@ -128,7 +128,7 @@ setFont(const QFont &font)
   for (const auto &w : widgets)
     w->setFont(font_);
 
-  emit fontChanged();
+  Q_EMIT fontChanged();
 }
 
 void
@@ -137,5 +137,5 @@ setFixedFont(const QFont &font)
 {
   fixedFont_ = font;
 
-  emit fixedFontChanged();
+  Q_EMIT fixedFontChanged();
 }

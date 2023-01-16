@@ -20,22 +20,22 @@ class CQPixmapIcon : public QIconEngine {
       icon_ = CQPixmapCacheInst->getPixmapIcon(lightId_);
   }
 
-  QSize actualSize(const QSize &size, QIcon::Mode, QIcon::State) {
+  QSize actualSize(const QSize &size, QIcon::Mode, QIcon::State) override {
     return size;
   }
 
-  QString iconName() const {
+  QString iconName() const override {
     if (dark_ && darkId_.length())
       return darkId_;
 
     return lightId_;
   }
 
-  void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state) {
+  void paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state) override {
     painter->drawPixmap(0, 0, pixmap(rect.size(), mode, state));
   }
 
-  QPixmap pixmap(const QSize &size, QIcon::Mode mode, QIcon::State state) {
+  QPixmap pixmap(const QSize &size, QIcon::Mode mode, QIcon::State state) override {
     bool dark = CQPixmapCacheInst->isDark();
 
     if (dark_ != dark) {
@@ -56,7 +56,7 @@ class CQPixmapIcon : public QIconEngine {
     return pixmap_;
   }
 
-  QIconEngine *clone() const {
+  QIconEngine *clone() const override {
     return new CQPixmapIcon(lightId_, darkId_);
   }
 

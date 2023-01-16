@@ -324,12 +324,12 @@ class CQWinTextEdit : public QTextEdit, public CQWinWidgetBase {
 
   virtual ~CQWinTextEdit() { }
 
-  void show() { QTextEdit::show(); widget_->show(); }
-  void hide() { QTextEdit::hide(); widget_->hide(); }
+  void show() override { QTextEdit::show(); widget_->show(); }
+  void hide() override { QTextEdit::hide(); widget_->hide(); }
 
-  void setText(const QString &text) { QTextEdit::setText(text); }
+  void setText(const QString &text) override { QTextEdit::setText(text); }
 
-  QString getText() const { return QTextEdit::toPlainText(); }
+  QString getText() const override { return QTextEdit::toPlainText(); }
 
  signals:
   void valueChanged();
@@ -383,8 +383,8 @@ class CQWinTable : public QTableWidget, public CQWinWidgetBase {
 
   virtual ~CQWinTable() { }
 
-  void show() { QTableWidget::show(); widget_->show(); }
-  void hide() { QTableWidget::hide(); widget_->hide(); }
+  void show() override { QTableWidget::show(); widget_->show(); }
+  void hide() override { QTableWidget::hide(); widget_->hide(); }
 
  signals:
   void valueChanged();
@@ -402,8 +402,8 @@ class CQWinTree : public QTreeWidget, public CQWinWidgetBase {
 
   virtual ~CQWinTree() { }
 
-  void show() { QTreeWidget::show(); widget_->show(); }
-  void hide() { QTreeWidget::hide(); widget_->hide(); }
+  void show() override { QTreeWidget::show(); widget_->show(); }
+  void hide() override { QTreeWidget::hide(); widget_->hide(); }
 
  signals:
   void valueChanged();
