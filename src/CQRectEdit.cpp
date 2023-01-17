@@ -41,7 +41,7 @@ init(const QRectF &value)
 {
   setObjectName("edit");
 
-  setFrameStyle(QFrame::NoFrame | QFrame::Plain);
+  setFrameStyle(uint(QFrame::NoFrame) | uint(QFrame::Plain));
 
   //---
 
@@ -97,8 +97,8 @@ rectToWidget()
 {
   disableSignals_ = true;
 
-  QString str = QString("%1 %2 %3 %4").arg(rect_.left ()).arg(rect_.bottom()).
-                                       arg(rect_.right()).arg(rect_.top   ());
+  QString str = QString("%1 %2 %3 %4").arg(rect_.left ()).arg(rect_.top   ()).
+                                       arg(rect_.right()).arg(rect_.bottom());
 
   edit_->setText(str);
 
@@ -109,7 +109,7 @@ bool
 CQRectEdit::
 widgetToPoint()
 {
-  QStringList strs = edit_->text().split(" ", QString::SkipEmptyParts);
+  QStringList strs = edit_->text().split(" ", Qt::SkipEmptyParts);
 
   if (strs.length() != 4)
     return false;
@@ -124,7 +124,7 @@ widgetToPoint()
   if (! ok1 || ! ok2 || ! ok3 || ! ok4)
     return false;
 
-  rect_ = QRectF(x1, y1, x2 - x1, y2 - y1);
+  rect_ = QRectF(std::min(x1, x2), std::min(y1, y2), std::abs(x2 - x1), std::abs(y2 - y1));
 
   return true;
 }

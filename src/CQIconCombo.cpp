@@ -32,7 +32,7 @@ class CQIconComboModel : public QAbstractListModel {
 
  ~CQIconComboModel() { }
 
-  int rowCount(const QModelIndex &) const { return data_.size(); }
+  int rowCount(const QModelIndex &) const { return int(data_.size()); }
 
   // icon, text
   int columnCount(const QModelIndex &) const { return 2; }
@@ -45,15 +45,15 @@ class CQIconComboModel : public QAbstractListModel {
 
     if      (role == Qt::DisplayRole || role == Qt::DecorationRole) {
       if      (col == 0)
-        return QVariant(data_[row].icon);
+        return QVariant(data_[size_t(row)].icon);
       else if (col == 1)
-        return QVariant(data_[row].text);
+        return QVariant(data_[size_t(row)].text);
       else
         return QVariant();
     }
 #if 0
     else if (role == Qt::ToolTipRole)
-      return QVariant(data_[row].text);
+      return QVariant(data_[size_t(row)].text);
 #endif
     else if (role == Qt::SizeHintRole) {
       int is = combo_->style()->pixelMetric(QStyle::PM_SmallIconSize);
@@ -62,13 +62,13 @@ class CQIconComboModel : public QAbstractListModel {
         return QVariant(QSize(is + 4, is + 4));
       }
       else if (col == 1) {
-        QString str = data_[row].text;
+        QString str = data_[size_t(row)].text;
 
         QFont font = combo_->font();
 
         QFontMetrics fm(font);
 
-        int width  = fm.width(str);
+        int width  = fm.horizontalAdvance(str);
         int height = std::max(fm.height() + 2, is + 4);
 
         return QSize(width, height);
@@ -79,7 +79,7 @@ class CQIconComboModel : public QAbstractListModel {
     else if (role == Qt::BackgroundRole)
       return QVariant(combo_->palette().window().color());
     else if (role == Qt::EditRole) {
-      return data_[row].var;
+      return data_[size_t(row)].var;
     }
     else
       return QVariant();
@@ -88,7 +88,7 @@ class CQIconComboModel : public QAbstractListModel {
   void addValue(const QIcon &icon, const QString &text, const QVariant &var) {
     data_.push_back(IconText(icon, text, var));
 
-    QModelIndex idx = index(data_.size() - 1, 0);
+    auto idx = index(int(data_.size() - 1), 0);
 
     emit dataChanged(idx, idx);
   }
@@ -96,7 +96,7 @@ class CQIconComboModel : public QAbstractListModel {
   void clear() {
     data_.clear();
 
-    QModelIndex idx = index(data_.size() - 1, 0);
+    auto idx = index(int(data_.size() - 1), 0);
 
     emit dataChanged(idx, idx);
   }
@@ -163,7 +163,7 @@ calcMenuTextWidth()
 
     QString text = model()->data(ind, Qt::DisplayRole).toString();
 
-    textWidth = std::max(textWidth, fm.width(text));
+    textWidth = std::max(textWidth, fm.horizontalAdvance(text));
   }
 
   setMenuTextWidth(textWidth);

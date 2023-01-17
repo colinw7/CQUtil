@@ -13,7 +13,8 @@ class CQIconCombo : public QComboBox {
 
  public:
   CQIconCombo(QWidget *parent=nullptr);
- ~CQIconCombo();
+
+  virtual ~CQIconCombo();
 
   int iconWidth() const { return iconWidth_; }
   void setIconWidth(int i) { iconWidth_ = i; }
@@ -25,16 +26,16 @@ class CQIconCombo : public QComboBox {
 
   QVariant itemData(int ind) const;
 
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
 
  private slots:
   void updateTip();
 
  protected:
-  void showPopup();
+  void showPopup() override;
 
   void calcMenuTextWidth();
 

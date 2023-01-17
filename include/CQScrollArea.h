@@ -19,7 +19,7 @@ class QPainter;
  * This is more efficient for large widgets or widgets that can clip themselves.
  *
  * API:
- *   Use setXSize and setYSize to set virutal size
+ *   Use setXSize and setYSize to set virtual size
  *
  *   Use getXOffset and getYOffset when drawing into widget
  *
@@ -31,6 +31,7 @@ class CQScrollArea : public QFrame {
   Q_OBJECT
 
  public:
+  CQScrollArea();
   CQScrollArea(QWidget *parent, QWidget *widget);
   CQScrollArea(QWidget *widget);
 
@@ -48,20 +49,28 @@ class CQScrollArea : public QFrame {
   void setCornerWidget(QWidget *w);
 
   //! get/set virtual widget size
-  int getXSize() const { return x_size_; }
-  void setXSize(int x_size);
+  QSize getSize() const { return QSize(xSize_, ySize_); }
+  void setSize(const QSize &size);
 
   //! get/set virtual widget size
-  int getYSize() const { return y_size_; }
-  void setYSize(int y_size);
+  int getXSize() const { return xSize_; }
+  void setXSize(int xSize);
+
+  //! get/set virtual widget size
+  int getYSize() const { return ySize_; }
+  void setYSize(int ySize);
+
+  //! get/set virtual widget offset
+  QPoint getOffset() const { return QPoint(xOffset_, yOffset_); }
+  void setOffset(const QPoint &offset);
 
   //! get/set virtual widget x offset
-  int getXOffset() const { return x_offset_; }
-  void setXOffset(int x_offset);
+  int getXOffset() const { return xOffset_; }
+  void setXOffset(int xOffset);
 
   //! get/set virtual widget y offset
-  void setYOffset(int y_offset);
-  int getYOffset() const { return y_offset_; }
+  void setYOffset(int yOffset);
+  int getYOffset() const { return yOffset_; }
 
   //! set x/y scrollbar single step
   void setXSingleStep(int x);
@@ -85,24 +94,25 @@ class CQScrollArea : public QFrame {
   //! handle wheel event
   void handleWheelEvent(QWheelEvent *e);
 
- private slots:
+ private Q_SLOTS:
   void hscrollSlot(int value);
   void vscrollSlot(int value);
 
  signals:
+  //! called when area scrolled
   void updateArea();
 
  private:
   void init();
 
  private:
-  QWidget*    widget_   { nullptr };
-  QScrollBar* hbar_     { nullptr };
-  QScrollBar* vbar_     { nullptr };
-  int         x_size_   { -1 };
-  int         y_size_   { -1 };
-  int         x_offset_ { 0 };
-  int         y_offset_ { 0 };
+  QWidget*    widget_  { nullptr };
+  QScrollBar* hbar_    { nullptr };
+  QScrollBar* vbar_    { nullptr };
+  int         xSize_   { -1 };
+  int         ySize_   { -1 };
+  int         xOffset_ { 0 };
+  int         yOffset_ { 0 };
 };
 
 #endif

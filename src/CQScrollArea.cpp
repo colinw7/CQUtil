@@ -6,6 +6,13 @@
 #include <QWheelEvent>
 
 CQScrollArea::
+CQScrollArea() :
+ QFrame(nullptr)
+{
+  init();
+}
+
+CQScrollArea::
 CQScrollArea(QWidget *parent, QWidget *widget) :
  QFrame(parent), widget_(widget)
 {
@@ -81,43 +88,63 @@ void
 CQScrollArea::
 setCornerWidget(QWidget *w)
 {
-  QGridLayout *grid = qobject_cast<QGridLayout *>(layout());
+  auto *grid = qobject_cast<QGridLayout *>(layout());
 
   grid->addWidget(w, 1, 1);
 }
 
 void
 CQScrollArea::
-setXSize(int x_size)
+setSize(const QSize &size)
 {
-  x_size_ = x_size;
+  xSize_ = size.width();
+  ySize_ = size.height();
 
   updateScrollbars();
 }
 
 void
 CQScrollArea::
-setYSize(int y_size)
+setXSize(int xSize)
 {
-  y_size_ = y_size;
+  xSize_ = xSize;
 
   updateScrollbars();
 }
 
 void
 CQScrollArea::
-setXOffset(int x_offset)
+setYSize(int ySize)
 {
-  x_offset_ = x_offset;
+  ySize_ = ySize;
 
   updateScrollbars();
 }
 
 void
 CQScrollArea::
-setYOffset(int y_offset)
+setOffset(const QPoint &offset)
 {
-  y_offset_ = y_offset;
+  xOffset_ = offset.x();
+  yOffset_ = offset.y();
+
+  updateScrollbars();
+}
+
+void
+CQScrollArea::
+setXOffset(int xOffset)
+{
+  xOffset_ = xOffset;
+
+  updateScrollbars();
+}
+
+void
+CQScrollArea::
+setYOffset(int yOffset)
+{
+  yOffset_ = yOffset;
 
   updateScrollbars();
 }
