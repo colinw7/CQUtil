@@ -23,6 +23,7 @@ MOC_DIR = .moc
 SOURCES += \
 CQUtil.cpp \
 CQUtilRGBA.cpp \
+CQUtilEvent.cpp \
 CQMsgHandler.cpp \
 \
 CQApp.cpp \
