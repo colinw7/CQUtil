@@ -58,7 +58,7 @@ init(CImagePtr image)
 {
   setObjectName("ibutton");
 
-  CQImage *qimage = image.cast<CQImage>();
+  auto *qimage = image.cast<CQImage>();
 
   if (qimage) {
     auto pixmap = QPixmap::fromImage(qimage->getQImage());
@@ -107,7 +107,7 @@ sizeHint() const
 
 QSize
 CQImageButton::
-minimumSizeHint () const
+minimumSizeHint() const
 {
   return size_ + QSize(8, 8);
 }

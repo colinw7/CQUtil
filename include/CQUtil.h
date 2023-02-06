@@ -7,8 +7,10 @@
 #include <QVariant>
 #include <QTableWidget>
 #include <QButtonGroup>
+#include <QPushButton>
 #include <QMenu>
 #include <QBoxLayout>
+#include <QTimer>
 #include <QAction>
 #include <QPen>
 
@@ -418,6 +420,29 @@ namespace CQUtil {
     assert(menu);
 
     menu->addActions(group->actions());
+  }
+
+  //---
+
+  template<typename T> struct Connector { };
+
+  template<>
+  struct Connector<QPushButton> {
+    void doConnect(QPushButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(clicked()), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QTimer> {
+    void doConnect(QTimer *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(timeout()), obj, slotName);
+    }
+  };
+
+  template<typename T>
+  inline void defConnect(T *w, QObject *obj, const char *slotName) {
+    Connector<T> connector; connector.doConnect(w, obj, slotName);
   }
 }
 
