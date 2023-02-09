@@ -30,6 +30,14 @@ CQPixmapButton(const QIcon &icon)
   init(icon);
 }
 
+CQPixmapButton::
+CQPixmapButton(const QIcon &icon, const QSize &size)
+{
+  setIconSize(size);
+
+  init(icon);
+}
+
 void
 CQPixmapButton::
 init(const QPixmap &pixmap)

@@ -13,6 +13,7 @@ class CQPixmapButton : public QToolButton {
   CQPixmapButton(uchar *data, uint len);
   CQPixmapButton(const QPixmap &pixmap);
   CQPixmapButton(const QIcon &icon);
+  CQPixmapButton(const QIcon &icon, const QSize &size);
 
   virtual ~CQPixmapButton() { }
 
