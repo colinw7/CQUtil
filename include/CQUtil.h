@@ -8,6 +8,7 @@
 #include <QTableWidget>
 #include <QButtonGroup>
 #include <QPushButton>
+#include <QToolButton>
 #include <QMenu>
 #include <QBoxLayout>
 #include <QTimer>
@@ -429,6 +430,13 @@ namespace CQUtil {
   template<>
   struct Connector<QPushButton> {
     void doConnect(QPushButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(clicked()), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QToolButton> {
+    void doConnect(QToolButton *w, QObject *obj, const char *slotName) {
       QObject::connect(w, SIGNAL(clicked()), obj, slotName);
     }
   };
