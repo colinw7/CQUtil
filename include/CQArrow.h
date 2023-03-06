@@ -6,13 +6,15 @@
 #include <QPolygonF>
 #include <QColor>
 
+#include <cmath>
+
 class QPainter;
 
-#define ACCESSOR(T,V,G,S) \
+#define ACCESSOR(T, V, G, S) \
 const T &G() const { return V; } \
 void S(const T &t) { V = t; }
 
-#define ACCESSOR_IMPL_GET_DCL_SET(T,V,G,S) \
+#define ACCESSOR_IMPL_GET_DCL_SET(T, V, G, S) \
 const T &G() const { return V; } \
 void S(const T &t);
 
@@ -38,6 +40,13 @@ class CQArrow : public QObject {
   Q_PROPERTY(double   tailLength     READ tailLength     WRITE setTailLength)
   Q_PROPERTY(bool     tailLineEnds   READ isTailLineEnds WRITE setTailLineEnds)
 
+  Q_PROPERTY(bool     midVisible    READ isMidHead     WRITE setMidHead)
+  Q_PROPERTY(HeadType midType       READ midType       WRITE setMidType)
+  Q_PROPERTY(double   midAngle      READ midAngle      WRITE setMidAngle)
+  Q_PROPERTY(double   midBackAngle  READ midBackAngle  WRITE setMidBackAngle)
+  Q_PROPERTY(double   midLength     READ midLength     WRITE setMidLength)
+  Q_PROPERTY(bool     midLineEnds   READ isMidLineEnds WRITE setMidLineEnds)
+
   Q_PROPERTY(bool   filled      READ isFilled    WRITE setFilled)
   Q_PROPERTY(bool   stroked     READ isStroked   WRITE setStroked)
   Q_PROPERTY(double strokeWidth READ strokeWidth WRITE setStrokeWidth)
@@ -53,7 +62,7 @@ class CQArrow : public QObject {
     TRIANGLE,
     STEALTH,
     DIAMOND,
-    LINE,
+    LINE
   };
 
  public:
@@ -64,27 +73,35 @@ class CQArrow : public QObject {
   ACCESSOR(bool   , relative_ , isRelative, setRelative);
   ACCESSOR(double , lineWidth_, lineWidth , setLineWidth);
 
-  ACCESSOR_IMPL_GET_DCL_SET(HeadType, frontData_.type, frontType, setFrontType);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, frontData_.type, frontType, setFrontType)
 
-  ACCESSOR(bool    , frontData_.visible  , isFHead        , setFHead);
-  ACCESSOR(double  , frontData_.angle    , frontAngle     , setFrontAngle);
-  ACCESSOR(double  , frontData_.backAngle, frontBackAngle , setFrontBackAngle);
-  ACCESSOR(double  , frontData_.length   , frontLength    , setFrontLength);
-  ACCESSOR(bool    , frontData_.lineEnds , isFrontLineEnds, setFrontLineEnds);
+  ACCESSOR(bool  , frontData_.visible  , isFHead        , setFHead);
+  ACCESSOR(double, frontData_.angle    , frontAngle     , setFrontAngle);
+  ACCESSOR(double, frontData_.backAngle, frontBackAngle , setFrontBackAngle);
+  ACCESSOR(double, frontData_.length   , frontLength    , setFrontLength);
+  ACCESSOR(bool  , frontData_.lineEnds , isFrontLineEnds, setFrontLineEnds);
 
-  ACCESSOR_IMPL_GET_DCL_SET(HeadType, tailData_.type, tailType, setTailType);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, tailData_.type, tailType, setTailType)
 
-  ACCESSOR(bool    , tailData_.visible  , isTHead       , setTHead);
-  ACCESSOR(double  , tailData_.angle    , tailAngle     , setTailAngle);
-  ACCESSOR(double  , tailData_.backAngle, tailBackAngle , setTailBackAngle);
-  ACCESSOR(double  , tailData_.length   , tailLength    , setTailLength);
-  ACCESSOR(bool    , tailData_.lineEnds , isTailLineEnds, setTailLineEnds);
+  ACCESSOR(bool  , tailData_.visible  , isTHead       , setTHead);
+  ACCESSOR(double, tailData_.angle    , tailAngle     , setTailAngle);
+  ACCESSOR(double, tailData_.backAngle, tailBackAngle , setTailBackAngle);
+  ACCESSOR(double, tailData_.length   , tailLength    , setTailLength);
+  ACCESSOR(bool  , tailData_.lineEnds , isTailLineEnds, setTailLineEnds);
 
-  ACCESSOR(bool   , filled_     , isFilled     , setFilled);
-  ACCESSOR(bool   , stroked_    , isStroked    , setStroked);
-  ACCESSOR(double , strokeWidth_, strokeWidth  , setStrokeWidth);
-  ACCESSOR(bool   , debugPoints_, isDebugPoints, setDebugPoints);
-  ACCESSOR(bool   , debugText_  , isDebugText  , setDebugText);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, midData_.type, midType, setMidType)
+
+  ACCESSOR(bool  , midData_.visible  , isMidHead    , setMidHead);
+  ACCESSOR(double, midData_.angle    , midAngle     , setMidAngle);
+  ACCESSOR(double, midData_.backAngle, midBackAngle , setMidBackAngle);
+  ACCESSOR(double, midData_.length   , midLength    , setMidLength);
+  ACCESSOR(bool  , midData_.lineEnds , isMidLineEnds, setMidLineEnds);
+
+  ACCESSOR(bool  , filled_     , isFilled     , setFilled);
+  ACCESSOR(bool  , stroked_    , isStroked    , setStroked);
+  ACCESSOR(double, strokeWidth_, strokeWidth  , setStrokeWidth);
+  ACCESSOR(bool  , debugPoints_, isDebugPoints, setDebugPoints);
+  ACCESSOR(bool  , debugText_  , isDebugText  , setDebugText);
 
   ACCESSOR(bool, inside_, isInside, setInside);
 
@@ -114,10 +131,12 @@ class CQArrow : public QObject {
 
   using PointLabels = std::vector<PointLabel>;
 
+#if DEBUG_LABELS
   void drawPointSymbolLabel(const QPointF &point, const QString &text, bool above=true);
 
   void drawPointSymbol(const QPointF &point);
   void drawPointLabel (const QPointF &point, const QString &text, bool above=true);
+#endif
 
 #if 0
   double pixelWidthToWindowWidth  (double p);
@@ -131,6 +150,69 @@ class CQArrow : public QObject {
 //QPointF pixelToWindow(const QPointF &w);
 
   static double pointLineDistance(const QPointF &p, const QPointF &p1, const QPointF &p2);
+
+  //---
+
+ public:
+  struct Angle {
+    double angle { 0.0 };
+    double cos   { 0.0 };
+    double sin   { 0.0 };
+
+    Angle() { }
+
+    Angle(double angle) :
+     angle(angle) {
+      init();
+    }
+
+    Angle(const QPointF &p1, const QPointF &p2) {
+      angle = std::atan2(p2.y() - p1.y(), p2.x() - p1.x());
+
+      init();
+    }
+
+    void init() {
+      cos = std::cos(angle);
+      sin = std::sin(angle);
+    }
+  };
+
+  //---
+
+ private:
+  struct GenHeadData {
+    double  len        { 0.0 };
+    Angle   angle;
+    Angle   backAngle;
+    double  lineLen    { 0.0 };
+    bool    isLineEnds { false };
+    bool    isPoints   { false };
+    QPointF headMid;
+    QPointF headMid1, headMid2;
+    Points  headPoints1;
+    Points  headPoints2;
+    QPointF tipPoint1, tipPoint2;
+    QPointF backLine1, backLine2;
+  };
+
+ private:
+  void calcHeadPolyData(const QPointF &startPoint, const QPointF &startPointI,
+                        const Angle &lineAngle, bool linePoly, double linePixelWidth,
+                        GenHeadData &frontData, const GenHeadData &tailData);
+  void calcTailPolyData(const QPointF &endPoint, const QPointF &endPointI,
+                        const Angle &lineAngle, bool linePoly, double linePixelWidth,
+                        const GenHeadData &frontData, GenHeadData &tailData);
+  void calcMidPolyData(const QPointF &startPoint, const QPointF &endPoint,
+                       const Angle &lineAngle, bool linePoly, bool swapped,
+                       double linePixelWidth, const QPointF &headMidR1, const QPointF &headMidR2,
+                       const GenHeadData &frontData, const GenHeadData &tailData,
+                       GenHeadData &midData);
+
+  void updateFrontLinePoly(GenHeadData &frontData, const GenHeadData &tailData);
+  void updateTailLinePoly (const GenHeadData &frontData, GenHeadData &tailData);
+  void updateMidLinePoly  (GenHeadData &midData, const GenHeadData &frontData,
+                           const GenHeadData &tailData);
 
  private:
   struct HeadData {
@@ -175,34 +257,64 @@ class CQArrow : public QObject {
 
   //---
 
-  int            ind_         { -1 };
-  QPointF        from_        { 0, 0 };
-  QPointF        to_          { 1, 1 };
-  bool           relative_    { false };
-  double         lineWidth_   { -1 };
-  HeadData       frontData_;
-  HeadData       tailData_;
-  bool           filled_      { true };
-  bool           stroked_     { false };
-  double         strokeWidth_ { -1 };
-  bool           debugPoints_ { false };
-  bool           debugText_   { false };
-  QPainter*      painter_     { nullptr };
-  CQArrowDevice* device_      { nullptr };
-  QColor         fillColor_   { 100, 100, 200 };
-  QColor         strokeColor_ { 100, 200, 100 };
-  QColor         textColor_   { 255, 0, 0 };
-  bool           inside_      { false };
+  // draw data
+  struct DrawData {
+    Line    frontLine1;
+    Line    frontLine2;
+    Line    endLine1;
+    Line    endLine2;
+    Line    midLine;
+    Polygon frontPoly;
+    Polygon tailPoly;
+    Polygon midPoly;
+    Polygon arrowPoly;
 
-  mutable Line    frontLine1_;
-  mutable Line    frontLine2_;
-  mutable Line    endLine1_;
-  mutable Line    endLine2_;
-  mutable Line    midLine_;
-  mutable Polygon frontPoly_;
-  mutable Polygon tailPoly_;
-  mutable Polygon arrowPoly_;
+    void reset() {
+      frontLine1.reset();
+      frontLine2.reset();
+      endLine1  .reset();
+      endLine2  .reset();
+      midLine   .reset();
+      frontPoly .reset();
+      tailPoly  .reset();
+      midPoly   .reset();
+      arrowPoly .reset();
+    }
+  };
+
+  //---
+
+  int ind_ { -1 };
+
+  QPointF from_ { 0, 0 };
+  QPointF to_   { 1, 1 };
+
+  bool relative_ { false };
+
+  double lineWidth_ { -1 };
+
+  HeadData frontData_;
+  HeadData tailData_;
+  HeadData midData_;
+
+  bool   filled_      { true };
+  QColor fillColor_   { 100, 100, 200 };
+  bool   stroked_     { false };
+  double strokeWidth_ { -1 };
+  QColor strokeColor_ { 100, 200, 100 };
+  QColor textColor_   { 255, 0, 0 };
+
+  bool debugPoints_ { false };
+  bool debugText_   { false };
+
+  QPainter*      painter_ { nullptr };
+  CQArrowDevice* device_  { nullptr };
+  bool           inside_  { false };
+
+  mutable DrawData drawData_;
 };
+
+//---
 
 class CQArrowDevice {
  public:

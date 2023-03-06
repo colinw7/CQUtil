@@ -23,8 +23,6 @@ Dialog()
 
   Canvas *canvas = new Canvas;
 
-  canvas->setMinimumSize(QSize(800, 800));
-
   splitter->addWidget(canvas);
 
   QFrame *rframe = new QFrame;
@@ -65,15 +63,21 @@ Canvas(QWidget *parent) :
   arrow_->setFrom(QPointF(-0.7,-0.7));
   arrow_->setTo  (QPointF( 0.7, 0.7));
 
-  arrow_->setFHead         (true);
+  arrow_->setFHead         (false);
   arrow_->setFrontAngle    (30);
   arrow_->setFrontBackAngle(45);
   arrow_->setFrontLength   (0.4);
 
-  arrow_->setTHead         (true);
+  arrow_->setTHead         (false);
   arrow_->setTailAngle     (45);
   arrow_->setTailBackAngle (60);
   arrow_->setTailLength    (0.2);
+
+  arrow_->setMidHead     (true);
+  arrow_->setMidAngle    (45);
+  arrow_->setMidBackAngle(60);
+  arrow_->setMidLength   (0.2);
+  arrow_->setMidLineEnds (true);
 
   arrow_->setFilled (false);
   arrow_->setStroked(true);
@@ -106,10 +110,19 @@ addPropeties(CQPropertyTree *tree)
   tree->addProperty("Arrow", arrow_, "tailLength"   )->setEditorFactory(redit1);
   tree->addProperty("Arrow", arrow_, "tailLineEnds" );
 
+  tree->addProperty("Arrow", arrow_, "midVisible"  );
+  tree->addProperty("Arrow", arrow_, "midType"     );
+  tree->addProperty("Arrow", arrow_, "midAngle"    )->setEditorFactory(redit2);
+  tree->addProperty("Arrow", arrow_, "midBackAngle")->setEditorFactory(redit2);
+  tree->addProperty("Arrow", arrow_, "midLength"   )->setEditorFactory(redit1);
+  tree->addProperty("Arrow", arrow_, "midLineEnds" );
+
   tree->addProperty("Arrow", arrow_, "filled"     );
   tree->addProperty("Arrow", arrow_, "stroked"    );
   tree->addProperty("Arrow", arrow_, "strokeWidth")->setEditorFactory(redit2);
-  tree->addProperty("Arrow", arrow_, "debugLabels");
+
+  tree->addProperty("Arrow", arrow_, "debugPoints");
+  tree->addProperty("Arrow", arrow_, "debugText");
 
   connect(tree, SIGNAL(valueChanged(QObject *, const QString &)), this, SLOT(update()));
 }
@@ -164,7 +177,7 @@ mouseMoveEvent(QMouseEvent *e)
   if (pressed_) {
     if      (button_ == Qt::LeftButton)
       arrow_->setFrom(w);
-    else if (button_ == Qt::MidButton)
+    else if (button_ == Qt::MiddleButton)
       arrow_->setTo  (w);
   }
   else {
@@ -215,6 +228,13 @@ pixelToWindow(const QPointF &p)
   double wy = (p.y() - pymin)*(ymin_ - ymax_)/(pymax - pymin) + ymax_;
 
   return QPointF(wx, wy);
+}
+
+QSize
+Canvas::
+sizeHint() const
+{
+  return QSize(2000, 1500);
 }
 
 //------

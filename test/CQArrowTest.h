@@ -24,6 +24,8 @@ class Canvas : public QWidget, public CQArrowDevice {
 
   void paint(QPainter *p);
 
+  QSize sizeHint() const override;
+
  private:
   void resizeEvent(QResizeEvent *) override;
 
