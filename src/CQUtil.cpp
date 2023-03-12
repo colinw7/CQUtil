@@ -215,6 +215,17 @@ nameToObject(const QString &name)
     }
   }
 
+  if (! current) {
+    for (auto *w : wlist) {
+      auto *l = w->layout();
+
+      if (l && l->objectName() == baseName) {
+        current = l;
+        break;
+      }
+    }
+  }
+
   if (! current)
     return nullptr;
 

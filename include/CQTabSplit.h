@@ -1,6 +1,8 @@
 #ifndef CQTabSplit_H
 #define CQTabSplit_H
 
+#include <CQIconButton.h>
+
 #include <QFrame>
 #include <QSplitter>
 #include <QTabWidget>
@@ -206,6 +208,18 @@ class CQTabSplitTabBar : public QTabBar {
 
  public:
   CQTabSplitTabBar(CQTabSplitTabWidget *tabWidget);
+
+ private:
+  CQTabSplitTabWidget* tabWidget_ { nullptr };
+};
+
+//---
+
+class CQTabSplitTabMenu : public CQIconButton {
+  Q_OBJECT
+
+ public:
+  CQTabSplitTabMenu(CQTabSplitTabWidget *tabWidget);
 
  private:
   CQTabSplitTabWidget* tabWidget_ { nullptr };

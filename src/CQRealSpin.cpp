@@ -1,5 +1,6 @@
 #include <CQRealSpin.h>
 #include <QLineEdit>
+#include <QKeyEvent>
 #include <cmath>
 
 CQRealSpin::
@@ -177,4 +178,21 @@ dotPos() const
       return i;
 
   return -1;
+}
+
+bool
+CQRealSpin::
+event(QEvent *event)
+{
+  switch (event->type()) {
+    case QEvent::KeyPress: {
+      auto *ke = static_cast<QKeyEvent *>(event);
+      emit keyPress(ke->key(), ke->modifiers());
+      break;
+    }
+    default:
+      break;
+  }
+
+  return QDoubleSpinBox::event(event);
 }

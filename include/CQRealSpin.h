@@ -33,11 +33,15 @@ class CQRealSpin : public QDoubleSpinBox {
   int cursorPosition() const;
   void setCursorPosition(int pos);
 
- signals:
+  bool event(QEvent *event) override;
+
+ Q_SIGNALS:
   //! emitted when step changed
   void stepChanged(double);
 
- private slots:
+  void keyPress(int key, int modifiers);
+
+ private Q_SLOTS:
   //! update step from cursor position
   void updateStep();
 

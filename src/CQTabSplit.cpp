@@ -2,6 +2,7 @@
 #include <CQTabSplitSplitter.h>
 #include <CQTabSplitSplitterTool.h>
 #include <CQGroupBox.h>
+#include <CQUtil.h>
 
 #include <QApplication>
 #include <QTabBar>
@@ -9,6 +10,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
+
+#include <svg/menu_svg.h>
 
 #include <cassert>
 
@@ -448,6 +451,12 @@ CQTabSplitTabWidget(CQTabSplit *split) :
   tabBar_ = new CQTabSplitTabBar(this);
 
   setTabBar(tabBar_);
+
+  //---
+
+  auto *menuButton_ = new CQTabSplitTabMenu(this);
+
+  setCornerWidget(menuButton_);
 }
 
 void
@@ -463,9 +472,7 @@ contextMenuEvent(QContextMenuEvent *e)
   if (p.y() >= r.height())
     return;
 
-  auto *menu = new QMenu(this);
-
-  menu->setObjectName("menu");
+  auto *menu = CQUtil::makeWidget<QMenu>(this, "menu");
 
   //---
 
@@ -572,4 +579,29 @@ CQTabSplitTabBar(CQTabSplitTabWidget *tabWidget) :
  QTabBar(tabWidget), tabWidget_(tabWidget)
 {
   setObjectName("tabBar");
+}
+
+//---
+
+CQTabSplitTabMenu::
+CQTabSplitTabMenu(CQTabSplitTabWidget *tabWidget) :
+ CQIconButton(tabWidget), tabWidget_(tabWidget)
+{
+  setObjectName("tabMenu");
+
+  setPopupMode(QToolButton::MenuButtonPopup);
+
+  setIcon("MENU");
+
+  auto *menu = CQUtil::makeWidget<QMenu>("menu");
+
+  //---
+
+  auto *hsplitAction = menu->addAction("Horizontal Split");
+  auto *vsplitAction = menu->addAction("Vertical Split");
+
+  connect(hsplitAction, SIGNAL(triggered()), tabWidget, SLOT(hsplitSlot()));
+  connect(vsplitAction, SIGNAL(triggered()), tabWidget, SLOT(vsplitSlot()));
+
+  setMenu(menu);
 }

@@ -2,6 +2,7 @@
 #include <CQIconCombo.h>
 #include <CQUtil.h>
 #include <CQUtilLineDash.h>
+#include <CQSwitchLineEdit.h>
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -10,36 +11,41 @@
 #include <QMenu>
 #include <QPainter>
 #include <QIconEngine>
+#include <QKeyEvent>
 
-#if 0
+#if 1
 #include <QProxyStyle>
 
 class CQLineDashProxyStyle : public QProxyStyle {
  public:
-  CQLineDashProxyStyle(int is) :
-   is_(is) {
+  CQLineDashProxyStyle(int is, int iconSize) :
+   is_(is), iconSize_(iconSize) {
   }
 
-  int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
+  int pixelMetric(PixelMetric metric, const QStyleOption *option,
+                  const QWidget *widget) const override {
     if      (metric == QStyle::PM_MenuHMargin  ) return 0;
     else if (metric == QStyle::PM_MenuVMargin  ) return 0;
-    else if (metric == QStyle::PM_SmallIconSize) return 4*is_;
+    else if (metric == QStyle::PM_SmallIconSize) return iconSize_;
 
     return QProxyStyle::pixelMetric(metric, option, widget);
   }
 
   QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size,
-                         const QWidget *widget) const {
+                         const QWidget *widget) const override {
     if (type == QStyle::CT_MenuItem)
-      return QSize(5*is_ + size.width(), 2*is_);
+      return QSize(iconSize_ + is_ + size.width(), 2*is_);
 
     return QProxyStyle::sizeFromContents(type, option, size, widget);
   }
 
  private:
-  int is_;
+  int is_       { 16 };
+  int iconSize_ { 16 };
 };
 #endif
+
+//---
 
 // draw line icon pixmap
 // TODO: cache pixmap ?
@@ -65,7 +71,7 @@ class CQLineDashIconEngine : public QIconEngine {
 
 CQLineDash::
 CQLineDash(QWidget *parent) :
- QFrame(parent), editable_(false)
+ QFrame(parent)
 {
   setObjectName("line_dash");
 
@@ -73,15 +79,15 @@ CQLineDash(QWidget *parent) :
 
   //---
 
-  QHBoxLayout *layout = new QHBoxLayout(this);
-  layout->setMargin(0); layout->setSpacing(0);
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(this, 0, 0);
+
+  int is = style()->pixelMetric(QStyle::PM_SmallIconSize);
 
   //---
 
   // editable controls
 
-  edit_ = new QLineEdit;
-  edit_->setObjectName("edit");
+  edit_ = CQUtil::makeWidget<QLineEdit>("edit");
 
   edit_->setToolTip("Line Dash\n(List of Dash Lengths)");
 
@@ -89,22 +95,19 @@ CQLineDash(QWidget *parent) :
 
   layout->addWidget(edit_);
 
-  button_ = new QToolButton;
-  button_->setObjectName("button");
+  button_ = CQUtil::makeWidget<QToolButton>("button");
 
-  menu_ = new QMenu;
+  menu_ = CQUtil::makeWidget<QMenu>();
 
-  //menu_->setStyle(new CQLineDashProxyStyle);
+  menu_->setStyle(new CQLineDashProxyStyle(is, 8*is));
 
   button_->setMenu(menu_);
 
   connect(menu_, SIGNAL(triggered(QAction *)), this, SLOT(menuItemActivated(QAction *)));
 
-  int is = style()->pixelMetric(QStyle::PM_SmallIconSize);
-
   button_->setPopupMode(QToolButton::InstantPopup);
   button_->setAutoRaise(true);
-  button_->setFixedSize(QSize(is, is + 4));
+  button_->setFixedSize(QSize(is + 2, is + 6));
 
   layout->addWidget(button_);
 
@@ -112,9 +115,7 @@ CQLineDash(QWidget *parent) :
 
   // combo control
 
-  combo_ = new CQIconCombo;
-
-  combo_->setObjectName("combo");
+  combo_ = CQUtil::makeWidget<CQIconCombo>("combo");
 
   combo_->setIconWidth(5*is);
 
@@ -167,13 +168,19 @@ CQLineDash(QWidget *parent) :
   //---
 
   updateState();
+
+  //---
+
+  combo_->installEventFilter(this);
+  edit_ ->installEventFilter(this);
 }
 
 void
 CQLineDash::
 setEditable(bool edit)
 {
-  if (edit == editable_) return;
+  if (edit == editable_)
+    return;
 
   editable_ = edit;
 
@@ -197,7 +204,7 @@ updateState()
   button_->setVisible(editable_);
   combo_ ->setVisible(! editable_);
 
-  edit_->setText(dash_.toString().c_str());
+  edit_->setText(QString::fromStdString(dash_.toString()));
 
   for (int i = 0; i < combo_->count(); ++i) {
     QVariant var = combo_->itemData(i);
@@ -210,6 +217,21 @@ updateState()
 
       break;
     }
+  }
+
+  if (editable_) {
+    setFocusProxy(edit_);
+
+    edit_->setFocus();
+
+    layout()->setMargin(0);
+  }
+  else {
+    setFocusProxy(combo_);
+
+    combo_->setFocus();
+
+    layout()->setMargin(3);
   }
 }
 
@@ -262,7 +284,7 @@ addDashOption(const std::string &id, const CLineDash &dash)
 
   QIcon icon = dashIcon(dash);
 
-  CQLineDashAction *action = new CQLineDashAction(this, id, dash, icon);
+  auto *action = new CQLineDashAction(this, id, dash, icon);
 
   actions_[id] = action;
 
@@ -278,6 +300,49 @@ dashIcon(const CLineDash &dash)
   return QIcon(new CQLineDashIconEngine(dash));
 }
 
+bool
+CQLineDash::
+event(QEvent *event)
+{
+  switch (event->type()) {
+    case QEvent::KeyPress: {
+      auto *ke = static_cast<QKeyEvent *>(event);
+
+      if (CQSwitchLineEdit::isSwitchKey(ke))
+        setEditable(! isEditable());
+
+      break;
+    }
+    default:
+      break;
+  }
+
+  return QFrame::event(event);
+}
+
+bool
+CQLineDash::
+eventFilter(QObject *o , QEvent *e)
+{
+  if      (e->type() == QEvent::KeyPress) {
+    auto *ke = static_cast<QKeyEvent *>(e);
+
+    if (CQSwitchLineEdit::isSwitchKey(ke)) {
+      setEditable(! isEditable());
+      return true;
+    }
+  }
+  else if (e->type() == QEvent::KeyRelease) {
+    auto *ke = static_cast<QKeyEvent *>(e);
+
+    if (CQSwitchLineEdit::isSwitchKey(ke)) {
+      return true;
+    }
+  }
+
+  return QObject::eventFilter(o, e);
+}
+
 //---
 
 CQLineDashAction::
@@ -286,7 +351,7 @@ CQLineDashAction(CQLineDash *parent, const std::string &id,
  QAction(parent), parent_(parent), id_(id), dash_(dash)
 {
   setIcon(icon);
-  setText(id_.c_str());
+  setText(QString::fromStdString(id_));
 
   setIconVisibleInMenu(true);
 }
@@ -330,8 +395,9 @@ paint(QPainter *painter, const QRect &rect, QIcon::Mode mode, QIcon::State state
     fg = QColor(255, 255, 255);
   }
   else {
-    bg = QColor(255, 255, 255); //qApp->palette().base().color();
-    fg = QColor(0, 0, 0);
+  //bg = QColor(255, 255, 255); //qApp->palette().base().color();
+    bg = qApp->palette().window().color();
+    fg = qApp->palette().text().color();
   }
 
   painter->fillRect(rect, bg);

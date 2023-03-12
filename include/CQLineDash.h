@@ -15,12 +15,12 @@ class CQLineDashAction;
 class CQLineDash : public QFrame {
   Q_OBJECT
 
-  Q_PROPERTY(bool editable READ editable WRITE setEditable)
+  Q_PROPERTY(bool editable READ isEditable WRITE setEditable)
 
  public:
   CQLineDash(QWidget *parent=0);
 
-  bool editable() const { return editable_; }
+  bool isEditable() const { return editable_; }
   void setEditable(bool b);
 
   void setLineDash(const CLineDash &dash);
@@ -33,6 +33,10 @@ class CQLineDash : public QFrame {
  private:
   void updateState();
 
+  bool event(QEvent *e) override;
+
+  bool eventFilter(QObject *o , QEvent *e) override;
+
  private slots:
   void dashChangedSlot();
   void menuItemActivated(QAction *);
@@ -42,16 +46,18 @@ class CQLineDash : public QFrame {
   void valueChanged(const CLineDash &dash);
 
  private:
-  typedef std::map<std::string, CQLineDashAction *> Actions;
+  using Actions = std::map<std::string, CQLineDashAction *>;
 
-  bool         editable_;
+  bool         editable_ { false };
   CLineDash    dash_;
-  QLineEdit   *edit_;
-  QToolButton *button_;
-  QMenu       *menu_;
-  CQIconCombo *combo_;
+  QLineEdit   *edit_     { nullptr };
+  QToolButton *button_   { nullptr };
+  QMenu       *menu_     { nullptr };
+  CQIconCombo *combo_    { nullptr };
   Actions      actions_;
 };
+
+//---
 
 class CQLineDashAction : public QAction {
  public:
@@ -62,7 +68,7 @@ class CQLineDashAction : public QAction {
   void init();
 
  private:
-  CQLineDash  *parent_;
+  CQLineDash  *parent_ { nullptr };
   std::string  id_;
   CLineDash    dash_;
 };

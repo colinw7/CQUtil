@@ -117,6 +117,8 @@ CQStrUtil.cpp \
 CQEnumCombo.cpp \
 \
 CQTrie.cpp \
+\
+CQSwitchLineEdit.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -215,6 +217,8 @@ HEADERS += \
 ../include/CQEnumCombo.h \
 \
 ../include/CQTrie.h \
+\
+../include/CQSwitchLineEdit.h \
 
 OBJECTS_DIR = ../obj
 
