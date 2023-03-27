@@ -8,7 +8,7 @@ class CQFontListView : public QListView {
   Q_OBJECT
 
  public:
-  CQFontListView(QWidget *parent=0);
+  CQFontListView(QWidget *parent=nullptr);
 
  ~CQFontListView();
 

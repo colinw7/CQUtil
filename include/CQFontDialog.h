@@ -37,8 +37,8 @@ class CQFontDialog : public QDialog {
                        const QString &title="", FontDialogOptions options=FontDialogOptions());
 
  public:
-  CQFontDialog(QWidget *parent=0);
-  CQFontDialog(const QFont &font, QWidget *parent=0);
+  CQFontDialog(QWidget *parent=nullptr);
+  CQFontDialog(const QFont &font, QWidget *parent=nullptr);
 
  ~CQFontDialog();
 

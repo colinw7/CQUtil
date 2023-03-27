@@ -363,7 +363,7 @@ eventFilter(QObject *o , QEvent *e)
       (void)QApplication::sendEvent(sizeList_, k);
 
       if (ci != sizeList_->currentItem() &&
-          style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this))
+          style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this))
         sizeEdit_->selectAll();
       return true;
     }
@@ -377,7 +377,7 @@ eventFilter(QObject *o , QEvent *e)
     }
   }
   else if (e->type() == QEvent::FocusIn &&
-           style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this)) {
+           style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this)) {
     if      (o == familyList_)
       familyEdit_->selectAll();
     else if (o == styleList_)
@@ -483,7 +483,7 @@ updateFamilies()
 
   familyEdit_->setText(familyList_->currentText());
 
-  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
       familyList_->hasFocus())
     familyEdit_->selectAll();
 
@@ -541,7 +541,7 @@ updateStyles()
     }
 
     styleEdit_->setText(styleList_->currentText());
-    if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+    if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
         styleList_->hasFocus())
       styleEdit_->selectAll();
 
@@ -589,7 +589,7 @@ updateSizes()
 
     sizeEdit_->setText((smoothScalable_ ? QString::number(size_) : sizeList_->currentText()));
 
-    if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+    if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
         sizeList_->hasFocus())
       sizeEdit_->selectAll();
   }
@@ -658,7 +658,7 @@ familyHighlighted(int i)
 
   familyEdit_->setText(family_);
 
-  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
       familyList_->hasFocus())
     familyEdit_->selectAll();
 
@@ -673,7 +673,7 @@ styleHighlighted(int index)
 
   styleEdit_->setText(s);
 
-  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
       styleList_->hasFocus())
     styleEdit_->selectAll();
 
@@ -690,7 +690,7 @@ sizeHighlighted(int index)
 
   sizeEdit_->setText(s);
 
-  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, 0, this) &&
+  if (style()->styleHint(QStyle::SH_FontDialog_SelectAssociatedText, nullptr, this) &&
       sizeEdit_->hasFocus())
     sizeEdit_->selectAll();
 

@@ -17,7 +17,7 @@ CQHRadioButtons(QWidget *parent, const char *name, ...) :
 
   std::vector<QString> names;
 
-  while (name != 0) {
+  while (name != nullptr) {
     names.push_back(name);
 
     name = va_arg(vargs, char *);
@@ -67,7 +67,7 @@ CQVRadioButtons(QWidget *parent, const char *name, ...) :
 
   std::vector<QString> names;
 
-  while (name != 0) {
+  while (name != nullptr) {
     names.push_back(name);
 
     name = va_arg(vargs, char *);
@@ -98,7 +98,7 @@ void
 CQVRadioButtons::
 addWidget(QWidget *widget)
 {
-  QVBoxLayout *l = qobject_cast<QVBoxLayout *>(layout());
+  auto *l = qobject_cast<QVBoxLayout *>(layout());
 
   l->addWidget(widget);
 }
@@ -117,7 +117,7 @@ CQToolbarRadioButtons(QWidget *parent, const char *title, const char *name, ...)
 
   std::vector<QString> names;
 
-  while (name != 0) {
+  while (name != nullptr) {
     names.push_back(name);
 
     name = va_arg(vargs, char *);

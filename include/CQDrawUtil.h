@@ -77,42 +77,42 @@ Q_GUI_EXPORT void qDrawShadeLine(QPainter *p, const QPoint &p1, const QPoint &p2
 Q_GUI_EXPORT void qDrawShadeRect(QPainter *p, int x, int y, int w, int h,
                                  const QPalette &pal, bool sunken = false,
                                  int lineWidth = 1, int midLineWidth = 0,
-                                 const QBrush *fill = 0);
+                                 const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawShadeRect(QPainter *p, const QRect &r,
                                  const QPalette &pal, bool sunken = false,
                                  int lineWidth = 1, int midLineWidth = 0,
-                                 const QBrush *fill = 0);
+                                 const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawShadePanel(QPainter *p, int x, int y, int w, int h,
                                   const QPalette &pal, bool sunken = false,
-                                  int lineWidth = 1, const QBrush *fill = 0);
+                                  int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawShadePanel(QPainter *p, const QRect &r,
                                   const QPalette &pal, bool sunken = false,
-                                  int lineWidth = 1, const QBrush *fill = 0);
+                                  int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawWinButton(QPainter *p, int x, int y, int w, int h,
                                  const QPalette &pal, bool sunken = false,
-                                 const QBrush *fill = 0);
+                                 const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawWinButton(QPainter *p, const QRect &r,
                                  const QPalette &pal, bool sunken = false,
-                                 const QBrush *fill = 0);
+                                 const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawWinPanel(QPainter *p, int x, int y, int w, int h,
                                 const QPalette &pal, bool sunken = false,
-                                const QBrush *fill = 0);
+                                const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawWinPanel(QPainter *p, const QRect &r,
                                 const QPalette &pal, bool sunken = false,
-                                const QBrush *fill = 0);
+                                const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawPlainRect(QPainter *p, int x, int y, int w, int h, const QColor &,
-                                 int lineWidth = 1, const QBrush *fill = 0);
+                                 int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_GUI_EXPORT void qDrawPlainRect(QPainter *p, const QRect &r, const QColor &,
-                                 int lineWidth = 1, const QBrush *fill = 0);
+                                 int lineWidth = 1, const QBrush *fill = nullptr);
 
 #ifdef QT3_SUPPORT
 //
@@ -125,7 +125,7 @@ Q_GUI_EXPORT QT3_SUPPORT QRect qItemRect(QPainter *p, Qt::GUIStyle gs, int x, in
 Q_GUI_EXPORT QT3_SUPPORT void qDrawItem(QPainter *p, Qt::GUIStyle gs, int x, int y, int w, int h,
                                         int flags, const QPalette &pal, bool enabled,
                                         const QPixmap *pixmap, const QString& text,
-                                        int len=-1, const QColor* penColor = 0);
+                                        int len=-1, const QColor* penColor = nullptr);
 
 Q_GUI_EXPORT QT3_SUPPORT void qDrawArrow(QPainter *p, Qt::ArrowType type, Qt::GUIStyle style,
                                          bool down, int x, int y, int w, int h,

@@ -3,6 +3,7 @@
 
 #include <CQIconButton.h>
 #include <CQFloatEdit.h>
+#include <CQUtil.h>
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -30,18 +31,14 @@ CQTabWidget(QWidget *parent) :
   setTabBar(tabBar_);
 
   connect(tabBar_, SIGNAL(tabChanged(int)), this, SIGNAL(tabChanged(int)));
-
   connect(tabBar_, SIGNAL(tabMoveRequested(int, int)), this, SLOT(moveTab(int, int)));
 
 #ifndef CQTAB_WIDGET_MOVABLE
   connect(tabBar_, SIGNAL(tabMoved(int, int)), this, SIGNAL(swapTabs(int, int)));
 #endif
 
-  auto *leftButton  = new CQIconButton; leftButton ->setIcon("LEFT" );
-  auto *rightButton = new CQIconButton; rightButton->setIcon("RIGHT");
-
-  leftButton ->setObjectName("left");
-  rightButton->setObjectName("right");
+  auto *leftButton  = CQUtil::makeWidget<CQIconButton>("left" ); leftButton ->setIcon("LEFT" );
+  auto *rightButton = CQUtil::makeWidget<CQIconButton>("right"); rightButton->setIcon("RIGHT");
 
   leftButton ->setToolTip("Scroll left");
   rightButton->setToolTip("Scroll right");
@@ -49,12 +46,9 @@ CQTabWidget(QWidget *parent) :
   connect(leftButton , SIGNAL(clicked()), this, SLOT(moveTabLeft ()));
   connect(rightButton, SIGNAL(clicked()), this, SLOT(moveTabRight()));
 
-  moveTabWidget_ = new QWidget;
+  moveTabWidget_ = CQUtil::makeWidget<QWidget>("moveTab");
 
-  moveTabWidget_->setObjectName("moveTab");
-
-  auto *moveTabLayout = new QHBoxLayout(moveTabWidget_);
-  moveTabLayout->setMargin(2); moveTabLayout->setSpacing(2);
+  auto *moveTabLayout = CQUtil::makeLayout<QHBoxLayout>(moveTabWidget_, 2, 2);
 
   moveTabLayout->addWidget(leftButton);
   moveTabLayout->addWidget(rightButton);

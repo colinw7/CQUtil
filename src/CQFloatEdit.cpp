@@ -31,7 +31,7 @@ display(const QRect &rect, const QString &text)
 
   saveText_ = text;
 
-  setParent(0, Qt::Tool | Qt::FramelessWindowHint);
+  setParent(nullptr, Qt::Tool | Qt::FramelessWindowHint);
 
   setGeometry(rect);
 

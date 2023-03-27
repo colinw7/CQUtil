@@ -67,7 +67,7 @@ toInt(const char *c_str, bool &ok, const char **p)
 {
   ok = true;
 
-  *p = 0;
+  *p = nullptr;
 
   long integer = 0;
 

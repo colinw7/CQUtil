@@ -21,7 +21,7 @@ class CQLineEdit : public QLineEdit {
 
  public:
   //! create widget
-  CQLineEdit(QWidget *parent=0);
+  CQLineEdit(QWidget *parent=nullptr);
 
   //! get placeholder text color
   const QColor &placeholderColor() const { return placeColor_; }

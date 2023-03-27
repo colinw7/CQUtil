@@ -11,7 +11,8 @@
 #include <QAction>
 #include <QContextMenuEvent>
 
-#include <svg/menu_svg.h>
+#include <svg/menu_light_svg.h>
+#include <svg/menu_dark_svg.h>
 
 #include <cassert>
 

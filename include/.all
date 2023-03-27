@@ -150,8 +150,6 @@ class CQAngleSpinBox : public QDoubleSpinBox {
 #ifndef CQApp_H
 #define CQApp_H
 
-//#define USE_OBJEDIT 1
-
 #include <QApplication>
 
 class CQStyle;
@@ -176,7 +174,7 @@ class CQApp : public QApplication {
   bool isDarkTheme() const;
   void setDarkTheme(bool b);
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
   void addObjEditFilter(QObject *o);
 #endif
 
@@ -193,7 +191,7 @@ class CQApp : public QApplication {
 
 //---
 
-#ifdef USE_OBJEDIT
+#ifdef CQAPP_USE_OBJEDIT
 class CQAppObjEditFilter : public QObject {
   Q_OBJECT
 
@@ -239,13 +237,15 @@ class CQAppOptions : public CQDialog {
 #include <QPolygonF>
 #include <QColor>
 
+#include <cmath>
+
 class QPainter;
 
-#define ACCESSOR(T,V,G,S) \
+#define ACCESSOR(T, V, G, S) \
 const T &G() const { return V; } \
 void S(const T &t) { V = t; }
 
-#define ACCESSOR_IMPL_GET_DCL_SET(T,V,G,S) \
+#define ACCESSOR_IMPL_GET_DCL_SET(T, V, G, S) \
 const T &G() const { return V; } \
 void S(const T &t);
 
@@ -271,6 +271,13 @@ class CQArrow : public QObject {
   Q_PROPERTY(double   tailLength     READ tailLength     WRITE setTailLength)
   Q_PROPERTY(bool     tailLineEnds   READ isTailLineEnds WRITE setTailLineEnds)
 
+  Q_PROPERTY(bool     midVisible    READ isMidHead     WRITE setMidHead)
+  Q_PROPERTY(HeadType midType       READ midType       WRITE setMidType)
+  Q_PROPERTY(double   midAngle      READ midAngle      WRITE setMidAngle)
+  Q_PROPERTY(double   midBackAngle  READ midBackAngle  WRITE setMidBackAngle)
+  Q_PROPERTY(double   midLength     READ midLength     WRITE setMidLength)
+  Q_PROPERTY(bool     midLineEnds   READ isMidLineEnds WRITE setMidLineEnds)
+
   Q_PROPERTY(bool   filled      READ isFilled    WRITE setFilled)
   Q_PROPERTY(bool   stroked     READ isStroked   WRITE setStroked)
   Q_PROPERTY(double strokeWidth READ strokeWidth WRITE setStrokeWidth)
@@ -286,7 +293,7 @@ class CQArrow : public QObject {
     TRIANGLE,
     STEALTH,
     DIAMOND,
-    LINE,
+    LINE
   };
 
  public:
@@ -297,27 +304,35 @@ class CQArrow : public QObject {
   ACCESSOR(bool   , relative_ , isRelative, setRelative);
   ACCESSOR(double , lineWidth_, lineWidth , setLineWidth);
 
-  ACCESSOR_IMPL_GET_DCL_SET(HeadType, frontData_.type, frontType, setFrontType);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, frontData_.type, frontType, setFrontType)
 
-  ACCESSOR(bool    , frontData_.visible  , isFHead        , setFHead);
-  ACCESSOR(double  , frontData_.angle    , frontAngle     , setFrontAngle);
-  ACCESSOR(double  , frontData_.backAngle, frontBackAngle , setFrontBackAngle);
-  ACCESSOR(double  , frontData_.length   , frontLength    , setFrontLength);
-  ACCESSOR(bool    , frontData_.lineEnds , isFrontLineEnds, setFrontLineEnds);
+  ACCESSOR(bool  , frontData_.visible  , isFHead        , setFHead);
+  ACCESSOR(double, frontData_.angle    , frontAngle     , setFrontAngle);
+  ACCESSOR(double, frontData_.backAngle, frontBackAngle , setFrontBackAngle);
+  ACCESSOR(double, frontData_.length   , frontLength    , setFrontLength);
+  ACCESSOR(bool  , frontData_.lineEnds , isFrontLineEnds, setFrontLineEnds);
 
-  ACCESSOR_IMPL_GET_DCL_SET(HeadType, tailData_.type, tailType, setTailType);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, tailData_.type, tailType, setTailType)
 
-  ACCESSOR(bool    , tailData_.visible  , isTHead       , setTHead);
-  ACCESSOR(double  , tailData_.angle    , tailAngle     , setTailAngle);
-  ACCESSOR(double  , tailData_.backAngle, tailBackAngle , setTailBackAngle);
-  ACCESSOR(double  , tailData_.length   , tailLength    , setTailLength);
-  ACCESSOR(bool    , tailData_.lineEnds , isTailLineEnds, setTailLineEnds);
+  ACCESSOR(bool  , tailData_.visible  , isTHead       , setTHead);
+  ACCESSOR(double, tailData_.angle    , tailAngle     , setTailAngle);
+  ACCESSOR(double, tailData_.backAngle, tailBackAngle , setTailBackAngle);
+  ACCESSOR(double, tailData_.length   , tailLength    , setTailLength);
+  ACCESSOR(bool  , tailData_.lineEnds , isTailLineEnds, setTailLineEnds);
 
-  ACCESSOR(bool   , filled_     , isFilled     , setFilled);
-  ACCESSOR(bool   , stroked_    , isStroked    , setStroked);
-  ACCESSOR(double , strokeWidth_, strokeWidth  , setStrokeWidth);
-  ACCESSOR(bool   , debugPoints_, isDebugPoints, setDebugPoints);
-  ACCESSOR(bool   , debugText_  , isDebugText  , setDebugText);
+  ACCESSOR_IMPL_GET_DCL_SET(HeadType, midData_.type, midType, setMidType)
+
+  ACCESSOR(bool  , midData_.visible  , isMidHead    , setMidHead);
+  ACCESSOR(double, midData_.angle    , midAngle     , setMidAngle);
+  ACCESSOR(double, midData_.backAngle, midBackAngle , setMidBackAngle);
+  ACCESSOR(double, midData_.length   , midLength    , setMidLength);
+  ACCESSOR(bool  , midData_.lineEnds , isMidLineEnds, setMidLineEnds);
+
+  ACCESSOR(bool  , filled_     , isFilled     , setFilled);
+  ACCESSOR(bool  , stroked_    , isStroked    , setStroked);
+  ACCESSOR(double, strokeWidth_, strokeWidth  , setStrokeWidth);
+  ACCESSOR(bool  , debugPoints_, isDebugPoints, setDebugPoints);
+  ACCESSOR(bool  , debugText_  , isDebugText  , setDebugText);
 
   ACCESSOR(bool, inside_, isInside, setInside);
 
@@ -347,10 +362,12 @@ class CQArrow : public QObject {
 
   using PointLabels = std::vector<PointLabel>;
 
+#if DEBUG_LABELS
   void drawPointSymbolLabel(const QPointF &point, const QString &text, bool above=true);
 
   void drawPointSymbol(const QPointF &point);
   void drawPointLabel (const QPointF &point, const QString &text, bool above=true);
+#endif
 
 #if 0
   double pixelWidthToWindowWidth  (double p);
@@ -364,6 +381,69 @@ class CQArrow : public QObject {
 //QPointF pixelToWindow(const QPointF &w);
 
   static double pointLineDistance(const QPointF &p, const QPointF &p1, const QPointF &p2);
+
+  //---
+
+ public:
+  struct Angle {
+    double angle { 0.0 };
+    double cos   { 0.0 };
+    double sin   { 0.0 };
+
+    Angle() { }
+
+    Angle(double angle) :
+     angle(angle) {
+      init();
+    }
+
+    Angle(const QPointF &p1, const QPointF &p2) {
+      angle = std::atan2(p2.y() - p1.y(), p2.x() - p1.x());
+
+      init();
+    }
+
+    void init() {
+      cos = std::cos(angle);
+      sin = std::sin(angle);
+    }
+  };
+
+  //---
+
+ private:
+  struct GenHeadData {
+    double  len        { 0.0 };
+    Angle   angle;
+    Angle   backAngle;
+    double  lineLen    { 0.0 };
+    bool    isLineEnds { false };
+    bool    isPoints   { false };
+    QPointF headMid;
+    QPointF headMid1, headMid2;
+    Points  headPoints1;
+    Points  headPoints2;
+    QPointF tipPoint1, tipPoint2;
+    QPointF backLine1, backLine2;
+  };
+
+ private:
+  void calcHeadPolyData(const QPointF &startPoint, const QPointF &startPointI,
+                        const Angle &lineAngle, bool linePoly, double linePixelWidth,
+                        GenHeadData &frontData, const GenHeadData &tailData);
+  void calcTailPolyData(const QPointF &endPoint, const QPointF &endPointI,
+                        const Angle &lineAngle, bool linePoly, double linePixelWidth,
+                        const GenHeadData &frontData, GenHeadData &tailData);
+  void calcMidPolyData(const QPointF &startPoint, const QPointF &endPoint,
+                       const Angle &lineAngle, bool linePoly, bool swapped,
+                       double linePixelWidth, const QPointF &headMidR1, const QPointF &headMidR2,
+                       const GenHeadData &frontData, const GenHeadData &tailData,
+                       GenHeadData &midData);
+
+  void updateFrontLinePoly(GenHeadData &frontData, const GenHeadData &tailData);
+  void updateTailLinePoly (const GenHeadData &frontData, GenHeadData &tailData);
+  void updateMidLinePoly  (GenHeadData &midData, const GenHeadData &frontData,
+                           const GenHeadData &tailData);
 
  private:
   struct HeadData {
@@ -408,34 +488,64 @@ class CQArrow : public QObject {
 
   //---
 
-  int            ind_         { -1 };
-  QPointF        from_        { 0, 0 };
-  QPointF        to_          { 1, 1 };
-  bool           relative_    { false };
-  double         lineWidth_   { -1 };
-  HeadData       frontData_;
-  HeadData       tailData_;
-  bool           filled_      { true };
-  bool           stroked_     { false };
-  double         strokeWidth_ { -1 };
-  bool           debugPoints_ { false };
-  bool           debugText_   { false };
-  QPainter*      painter_     { nullptr };
-  CQArrowDevice* device_      { nullptr };
-  QColor         fillColor_   { 100, 100, 200 };
-  QColor         strokeColor_ { 100, 200, 100 };
-  QColor         textColor_   { 255, 0, 0 };
-  bool           inside_      { false };
+  // draw data
+  struct DrawData {
+    Line    frontLine1;
+    Line    frontLine2;
+    Line    endLine1;
+    Line    endLine2;
+    Line    midLine;
+    Polygon frontPoly;
+    Polygon tailPoly;
+    Polygon midPoly;
+    Polygon arrowPoly;
 
-  mutable Line    frontLine1_;
-  mutable Line    frontLine2_;
-  mutable Line    endLine1_;
-  mutable Line    endLine2_;
-  mutable Line    midLine_;
-  mutable Polygon frontPoly_;
-  mutable Polygon tailPoly_;
-  mutable Polygon arrowPoly_;
+    void reset() {
+      frontLine1.reset();
+      frontLine2.reset();
+      endLine1  .reset();
+      endLine2  .reset();
+      midLine   .reset();
+      frontPoly .reset();
+      tailPoly  .reset();
+      midPoly   .reset();
+      arrowPoly .reset();
+    }
+  };
+
+  //---
+
+  int ind_ { -1 };
+
+  QPointF from_ { 0, 0 };
+  QPointF to_   { 1, 1 };
+
+  bool relative_ { false };
+
+  double lineWidth_ { -1 };
+
+  HeadData frontData_;
+  HeadData tailData_;
+  HeadData midData_;
+
+  bool   filled_      { true };
+  QColor fillColor_   { 100, 100, 200 };
+  bool   stroked_     { false };
+  double strokeWidth_ { -1 };
+  QColor strokeColor_ { 100, 200, 100 };
+  QColor textColor_   { 255, 0, 0 };
+
+  bool debugPoints_ { false };
+  bool debugText_   { false };
+
+  QPainter*      painter_ { nullptr };
+  CQArrowDevice* device_  { nullptr };
+  bool           inside_  { false };
+
+  mutable DrawData drawData_;
 };
+
+//---
 
 class CQArrowDevice {
  public:
@@ -628,9 +738,9 @@ class CQColorChooser : public QWidget {
   };
 
  public:
-  CQColorChooser(QWidget *parent=0);
+  CQColorChooser(QWidget *parent=nullptr);
 
-  CQColorChooser(uint styles, QWidget *parent=0);
+  CQColorChooser(uint styles, QWidget *parent=nullptr);
 
   bool getEditable() const { return editable_; }
   void setEditable(bool editable=true);
@@ -1022,7 +1132,7 @@ class CQDialog : public QDialog {
 
   void init();
 
-  int exec();
+  int exec() override;
 
   QCheckBox *addCheckBox(const QString &name, const QObject *receiver=nullptr,
                          const char *member=nullptr);
@@ -1049,8 +1159,8 @@ class CQDialog : public QDialog {
  protected:
   virtual void createWidgets(QWidget *) { }
 
-  virtual void accept() { }
-  virtual void reject() { }
+  virtual void accept() override { }
+  virtual void reject() override { }
 
  protected slots:
   void acceptSlot();
@@ -1380,7 +1490,7 @@ class CQFloatEdit : public QLineEdit {
   Q_OBJECT
 
  public:
-  CQFloatEdit(QWidget *parent=0);
+  CQFloatEdit(QWidget *parent=nullptr);
 
  ~CQFloatEdit();
 
@@ -1399,6 +1509,54 @@ class CQFloatEdit : public QLineEdit {
   bool        valid_ { false };
   QString     saveText_;
   CQAutoHide *hider_ { nullptr };
+};
+
+#endif
+##concat##CQFlowLayout.h
+#ifndef CQFlowLayout_H
+#define CQFlowLayout_H
+
+#include <QLayout>
+#include <QStyle>
+
+class CQFlowLayout : public QLayout {
+ public:
+  explicit CQFlowLayout(QWidget *parent, int margin = -1, int hSpacing = -1, int vSpacing = -1);
+  explicit CQFlowLayout(int margin = -1, int hSpacing = -1, int vSpacing = -1);
+
+ ~CQFlowLayout();
+
+  void addItem(QLayoutItem *item) override;
+
+  int horizontalSpacing() const;
+  int verticalSpacing  () const;
+
+  Qt::Orientations expandingDirections() const override;
+
+  bool hasHeightForWidth() const override;
+  int heightForWidth(int) const override;
+
+  int count() const override;
+
+  QLayoutItem *itemAt(int index) const override;
+
+  QSize minimumSize() const override;
+
+  void setGeometry(const QRect &rect) override;
+
+  QSize sizeHint() const override;
+
+  QLayoutItem *takeAt(int index) override;
+
+ private:
+  int doLayout(const QRect &rect, bool testOnly) const;
+  int smartSpacing(QStyle::PixelMetric pm) const;
+
+ private:
+  QList<QLayoutItem *> itemList_;
+
+  int hSpace_ { -1 };
+  int vSpace_ { -1 };
 };
 
 #endif
@@ -1533,8 +1691,8 @@ class CQFontDialog : public QDialog {
                        const QString &title="", FontDialogOptions options=FontDialogOptions());
 
  public:
-  CQFontDialog(QWidget *parent=0);
-  CQFontDialog(const QFont &font, QWidget *parent=0);
+  CQFontDialog(QWidget *parent=nullptr);
+  CQFontDialog(const QFont &font, QWidget *parent=nullptr);
 
  ~CQFontDialog();
 
@@ -1727,8 +1885,6 @@ class CQFontEditMenuButton : public QPushButton {
 #ifndef CQFONT_H
 #define CQFONT_H
 
-#ifdef CQUTIL_FONT
-
 #include <CFont.h>
 
 #include <QFont>
@@ -1776,10 +1932,11 @@ class CQFont : public CFont {
 
   explicit CQFont(const std::string &full_name);
 
-  virtual ~CQFont();
-
   CFontPtr dup(const std::string &family, CFontStyle style, double size, double angle=0,
-               double char_angle=0, int x_res=100, int y_res=100) const;
+               double char_angle=0, int x_res=100, int y_res=100) const override;
+
+ public:
+  virtual ~CQFont();
 
  private:
   CQFont(const CFont &qfont);
@@ -1792,24 +1949,22 @@ class CQFont : public CFont {
  public:
   const QFont &getQFont() const { return *qfont_; }
 
-  double getCharWidth () const;
-  double getCharAscent() const;
-  double getCharDescent() const;
-  double getCharHeight() const;
+  double getCharWidth () const override;
+  double getCharAscent() const override;
+  double getCharDescent() const override;
+  double getCharHeight() const override;
 
-  double getStringWidth(const std::string &str) const;
+  double getStringWidth(const std::string &str) const override;
 
-  bool isProportional() const;
+  bool isProportional() const override;
 
-  CImagePtr getStringImage(const std::string &str);
+  CImagePtr getStringImage(const std::string &str) override;
 
  private:
   friend class CQFontMgr;
 
-  QFont *qfont_ { 0 };
+  QFont *qfont_ { nullptr };
 };
-
-#endif
 
 #endif
 ##concat##CQFontListView.h
@@ -1823,7 +1978,7 @@ class CQFontListView : public QListView {
   Q_OBJECT
 
  public:
-  CQFontListView(QWidget *parent=0);
+  CQFontListView(QWidget *parent=nullptr);
 
  ~CQFontListView();
 
@@ -2112,7 +2267,7 @@ class CQGroupBox : public QWidget {
 #if 0
 class CQGroupBoxArea : public QWidget {
  public:
-  CQGroupBoxArea(QWidget *parent=0);
+  CQGroupBoxArea(QWidget *parent=nullptr);
 
   void paintEvent(QPaintEvent *e) override;
 };
@@ -2277,7 +2432,8 @@ class CQIconCombo : public QComboBox {
 
  public:
   CQIconCombo(QWidget *parent=nullptr);
- ~CQIconCombo();
+
+  virtual ~CQIconCombo();
 
   int iconWidth() const { return iconWidth_; }
   void setIconWidth(int i) { iconWidth_ = i; }
@@ -2289,16 +2445,16 @@ class CQIconCombo : public QComboBox {
 
   QVariant itemData(int ind) const;
 
-  QSize sizeHint() const;
-  QSize minimumSizeHint() const;
+  QSize sizeHint() const override;
+  QSize minimumSizeHint() const override;
 
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
 
  private slots:
   void updateTip();
 
  protected:
-  void showPopup();
+  void showPopup() override;
 
   void calcMenuTextWidth();
 
@@ -2514,8 +2670,6 @@ class CQImageGaussianBlur {
 #ifndef CQ_IMAGE_H
 #define CQ_IMAGE_H
 
-#ifdef CQUTIL_IMAGE
-
 #include <QImage>
 
 #include <CImage.h>
@@ -2551,7 +2705,7 @@ class CQImage : public CImage {
   CQImage &operator=(const CQImage &image);
 
  public:
-  CImagePtr dup() const;
+  CImagePtr dup() const override;
 
   void updateCImage();
 
@@ -2560,20 +2714,20 @@ class CQImage : public CImage {
 
   //------
 
-  void setDataSizeV(int width, int height);
+  void setDataSizeV(int width, int height) override;
 
-  bool setColorIndexPixel(int pos, uint pixel);
-  bool setColorIndexPixel(int x, int y, uint pixel);
+  bool setColorIndexPixel(int pos, uint pixel) override;
+  bool setColorIndexPixel(int x, int y, uint pixel) override;
 
-  bool setRGBAPixel(int pos, const CRGBA &rgba);
-  bool setRGBAPixel(int x, int y, const CRGBA &rgba);
+  bool setRGBAPixel(int pos, const CRGBA &rgba) override;
+  bool setRGBAPixel(int x, int y, const CRGBA &rgba) override;
 
   //------
 
-  void dataChanged();
+  void dataChanged() override;
 
  public:
-  bool gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny);
+  bool gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny) override;
 
  private:
   void initQImage();
@@ -2582,8 +2736,6 @@ class CQImage : public CImage {
   QImage qimage_;
   bool   initialized_ { false };
 };
-
-#endif
 
 #endif
 ##concat##CQImageUtil.h
@@ -2667,7 +2819,7 @@ class CQIntegerSpin : public QSpinBox {
 
   int step() const { return step_; }
 
-  void stepBy(int n);
+  void stepBy(int n) override;
 
  signals:
   void stepChanged(int);
@@ -2748,12 +2900,12 @@ class CQLineDashAction;
 class CQLineDash : public QFrame {
   Q_OBJECT
 
-  Q_PROPERTY(bool editable READ editable WRITE setEditable)
+  Q_PROPERTY(bool editable READ isEditable WRITE setEditable)
 
  public:
-  CQLineDash(QWidget *parent=0);
+  CQLineDash(QWidget *parent=nullptr);
 
-  bool editable() const { return editable_; }
+  bool isEditable() const { return editable_; }
   void setEditable(bool b);
 
   void setLineDash(const CLineDash &dash);
@@ -2766,6 +2918,10 @@ class CQLineDash : public QFrame {
  private:
   void updateState();
 
+  bool event(QEvent *e) override;
+
+  bool eventFilter(QObject *o , QEvent *e) override;
+
  private slots:
   void dashChangedSlot();
   void menuItemActivated(QAction *);
@@ -2775,16 +2931,18 @@ class CQLineDash : public QFrame {
   void valueChanged(const CLineDash &dash);
 
  private:
-  typedef std::map<std::string, CQLineDashAction *> Actions;
+  using Actions = std::map<std::string, CQLineDashAction *>;
 
-  bool         editable_;
+  bool         editable_ { false };
   CLineDash    dash_;
-  QLineEdit   *edit_;
-  QToolButton *button_;
-  QMenu       *menu_;
-  CQIconCombo *combo_;
+  QLineEdit   *edit_     { nullptr };
+  QToolButton *button_   { nullptr };
+  QMenu       *menu_     { nullptr };
+  CQIconCombo *combo_    { nullptr };
   Actions      actions_;
 };
+
+//---
 
 class CQLineDashAction : public QAction {
  public:
@@ -2795,7 +2953,7 @@ class CQLineDashAction : public QAction {
   void init();
 
  private:
-  CQLineDash  *parent_;
+  CQLineDash  *parent_ { nullptr };
   std::string  id_;
   CLineDash    dash_;
 };
@@ -2825,7 +2983,7 @@ class CQLineEdit : public QLineEdit {
 
  public:
   //! create widget
-  CQLineEdit(QWidget *parent=0);
+  CQLineEdit(QWidget *parent=nullptr);
 
   //! get placeholder text color
   const QColor &placeholderColor() const { return placeColor_; }
@@ -3425,6 +3583,7 @@ class CQPixmapButton : public QToolButton {
   CQPixmapButton(uchar *data, uint len);
   CQPixmapButton(const QPixmap &pixmap);
   CQPixmapButton(const QIcon &icon);
+  CQPixmapButton(const QIcon &icon, const QSize &size);
 
   virtual ~CQPixmapButton() { }
 
@@ -3497,7 +3656,7 @@ class CQPixmapCache : public QObject {
     int          len    = 0;
     QPixmap     *pixmap = 0;
 
-    Data(const uchar *data1=0, int len1=0) :
+    Data(const uchar *data1=nullptr, int len1=0) :
      data(data1), len(len1) {
     }
 
@@ -3630,7 +3789,7 @@ class CQRadioButtons : public QWidget {
   Q_OBJECT
 
  public:
-  CQRadioButtons(QWidget *parent=0);
+  CQRadioButtons(QWidget *parent=nullptr);
 
   virtual ~CQRadioButtons();
 
@@ -3667,12 +3826,12 @@ class CQRadioButtons : public QWidget {
 class CQHRadioButtons : public CQRadioButtons {
  public:
   CQHRadioButtons(QWidget *parent, const char *name, ...);
-  CQHRadioButtons(QWidget *parent=0);
+  CQHRadioButtons(QWidget *parent=nullptr);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 };
 
 //------
@@ -3680,12 +3839,12 @@ class CQHRadioButtons : public CQRadioButtons {
 class CQVRadioButtons : public CQRadioButtons {
  public:
   CQVRadioButtons(QWidget *parent, const char *name, ...);
-  CQVRadioButtons(QWidget *parent=0);
+  CQVRadioButtons(QWidget *parent=nullptr);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 };
 
 //------
@@ -3696,9 +3855,9 @@ class CQToolbarRadioButtons : public CQRadioButtons {
   CQToolbarRadioButtons(QWidget *parent, const char *title);
 
  protected:
-  QLayout *createLayout(QWidget *parent);
+  QLayout *createLayout(QWidget *parent) override;
 
-  void addWidget(QWidget *widget);
+  void addWidget(QWidget *widget) override;
 
  protected:
   QString title_;
@@ -3736,7 +3895,7 @@ class CQRealEdit : public QLineEdit {
  private:
   void init(const QString &name, double value);
 
-  void contextMenuEvent(QContextMenuEvent *);
+  void contextMenuEvent(QContextMenuEvent *) override;
 
  private slots:
   void editingFinishedI();
@@ -3798,17 +3957,21 @@ class CQRealSpin : public QDoubleSpinBox {
   double step() const { return step_; }
 
   //! step by n
-  void stepBy(int n);
+  void stepBy(int n) override;
 
   //! get/set cursor position
   int cursorPosition() const;
   void setCursorPosition(int pos);
 
- signals:
+  bool event(QEvent *event) override;
+
+ Q_SIGNALS:
   //! emitted when step changed
   void stepChanged(double);
 
- private slots:
+  void keyPress(int key, int modifiers);
+
+ private Q_SLOTS:
   //! update step from cursor position
   void updateStep();
 
@@ -3896,7 +4059,7 @@ class QPainter;
  * This is more efficient for large widgets or widgets that can clip themselves.
  *
  * API:
- *   Use setXSize and setYSize to set virutal size
+ *   Use setXSize and setYSize to set virtual size
  *
  *   Use getXOffset and getYOffset when drawing into widget
  *
@@ -3908,6 +4071,7 @@ class CQScrollArea : public QFrame {
   Q_OBJECT
 
  public:
+  CQScrollArea();
   CQScrollArea(QWidget *parent, QWidget *widget);
   CQScrollArea(QWidget *widget);
 
@@ -3925,20 +4089,28 @@ class CQScrollArea : public QFrame {
   void setCornerWidget(QWidget *w);
 
   //! get/set virtual widget size
-  int getXSize() const { return x_size_; }
-  void setXSize(int x_size);
+  QSize getSize() const { return QSize(xSize_, ySize_); }
+  void setSize(const QSize &size);
 
   //! get/set virtual widget size
-  int getYSize() const { return y_size_; }
-  void setYSize(int y_size);
+  int getXSize() const { return xSize_; }
+  void setXSize(int xSize);
+
+  //! get/set virtual widget size
+  int getYSize() const { return ySize_; }
+  void setYSize(int ySize);
+
+  //! get/set virtual widget offset
+  QPoint getOffset() const { return QPoint(xOffset_, yOffset_); }
+  void setOffset(const QPoint &offset);
 
   //! get/set virtual widget x offset
-  int getXOffset() const { return x_offset_; }
-  void setXOffset(int x_offset);
+  int getXOffset() const { return xOffset_; }
+  void setXOffset(int xOffset);
 
   //! get/set virtual widget y offset
-  void setYOffset(int y_offset);
-  int getYOffset() const { return y_offset_; }
+  void setYOffset(int yOffset);
+  int getYOffset() const { return yOffset_; }
 
   //! set x/y scrollbar single step
   void setXSingleStep(int x);
@@ -3962,24 +4134,25 @@ class CQScrollArea : public QFrame {
   //! handle wheel event
   void handleWheelEvent(QWheelEvent *e);
 
- private slots:
+ private Q_SLOTS:
   void hscrollSlot(int value);
   void vscrollSlot(int value);
 
  signals:
+  //! called when area scrolled
   void updateArea();
 
  private:
   void init();
 
  private:
-  QWidget*    widget_   { nullptr };
-  QScrollBar* hbar_     { nullptr };
-  QScrollBar* vbar_     { nullptr };
-  int         x_size_   { -1 };
-  int         y_size_   { -1 };
-  int         x_offset_ { 0 };
-  int         y_offset_ { 0 };
+  QWidget*    widget_  { nullptr };
+  QScrollBar* hbar_    { nullptr };
+  QScrollBar* vbar_    { nullptr };
+  int         xSize_   { -1 };
+  int         ySize_   { -1 };
+  int         xOffset_ { 0 };
+  int         yOffset_ { 0 };
 };
 
 #endif
@@ -4459,7 +4632,7 @@ class CQStyleMgr : public QObject {
  protected:
   CQStyleMgr();
 
- signals:
+ Q_SIGNALS:
   void themeChanged();
   void colorsChanged();
 
@@ -4536,6 +4709,60 @@ class CQSwitch : public QAbstractButton {
   QString offLabel_    { "Off" };
   int     margin_      { 2 };
   bool    highlightOn_ { true };
+};
+
+#endif
+##concat##CQSwitchLineEdit.h
+#ifndef CQSwitchLineEdit_H
+#define CQSwitchLineEdit_H
+
+#include <QFrame>
+#include <QPointer>
+
+class QLineEdit;
+
+class CQSwitchLineEdit : public QFrame {
+  Q_OBJECT
+
+  Q_PROPERTY(bool    showAltEdit READ isShowAltEdit WRITE setShowAltEdit)
+  Q_PROPERTY(QString text        READ text          WRITE setText)
+
+ public:
+  static bool isSwitchKey(QKeyEvent *ke);
+
+ public:
+  CQSwitchLineEdit(QWidget *parent=nullptr);
+
+  QLineEdit *edit() const { return edit_; }
+
+  QString text() const;
+  void setText(const QString &text);
+
+  void setAltEdit(QWidget *edit);
+
+  void setShowAltEdit(bool b);
+  bool isShowAltEdit() const { return isAlt_; }
+
+  QSize sizeHint() const override;
+
+ Q_SIGNALS:
+  void editSwitched(bool);
+  void editingFinished();
+
+ protected:
+  virtual void updatePlacement();
+
+ private:
+  bool event(QEvent *e) override;
+
+  bool eventFilter(QObject *o , QEvent *e) override;
+
+ private:
+  using WidgetP = QPointer<QWidget>;
+
+  QLineEdit *edit_ { nullptr };
+  WidgetP    altEdit_;
+  bool       isAlt_ { false };
 };
 
 #endif
@@ -4616,7 +4843,7 @@ class CQTableWidgetItem : public QObject, public QTableWidgetItem {
   //---
 
   // clone new item
-  virtual CQTableWidgetItem *clone() const = 0;
+  CQTableWidgetItem *clone() const override = 0;
 
   // create edit widget for item
   virtual QWidget *createEditor(QWidget *parent) const = 0;
@@ -4865,6 +5092,9 @@ class CQTableWidgetColorItem : public CQTableWidgetItem {
 
   bool paint(QPainter *painter, const QStyleOptionViewItem &option) const override;
 
+ private Q_SLOTS:
+  void checkSlot(int);
+
  private:
   using ColorChooserP = QPointer<CQColorChooser>;
 
@@ -4987,6 +5217,8 @@ class CQTableWidgetAlignItem : public CQTableWidgetItem {
 #ifndef CQTabSplit_H
 #define CQTabSplit_H
 
+#include <CQIconButton.h>
+
 #include <QFrame>
 #include <QSplitter>
 #include <QTabWidget>
@@ -5058,6 +5290,7 @@ class CQTabSplit : public QFrame {
 
   //---
 
+  //! get/set current index
   int currentIndex() const { return currentIndex_; }
   void setCurrentIndex(int i);
 
@@ -5094,11 +5327,14 @@ class CQTabSplit : public QFrame {
   //! return size hint
   QSize sizeHint() const override;
 
- signals:
+ Q_SIGNALS:
   //! emitted when close of tab/splitter requested (if closable)
   void widgetCloseRequested(int i);
 
- public slots:
+  //! emitted when current index changes
+  void currentIndexChanged(int i);
+
+ public Q_SLOTS:
   void currentIndexSlot(int);
 
   //! close specified tab (if closable)
@@ -5163,7 +5399,7 @@ class CQTabSplitTabWidget : public QTabWidget {
  private:
   void showTool(const QPoint &pos);
 
- private slots:
+ private Q_SLOTS:
   //! set to horizontal split mode
   void hsplitSlot();
 
@@ -5188,6 +5424,18 @@ class CQTabSplitTabBar : public QTabBar {
 
  public:
   CQTabSplitTabBar(CQTabSplitTabWidget *tabWidget);
+
+ private:
+  CQTabSplitTabWidget* tabWidget_ { nullptr };
+};
+
+//---
+
+class CQTabSplitTabMenu : public CQIconButton {
+  Q_OBJECT
+
+ public:
+  CQTabSplitTabMenu(CQTabSplitTabWidget *tabWidget);
 
  private:
   CQTabSplitTabWidget* tabWidget_ { nullptr };
@@ -5587,7 +5835,7 @@ class CQToolTipWidgetIFace : public CQToolTipIFace {
     w_(w) {
   }
 
-  virtual QWidget *showWidget(const QPoint &) { return w_; }
+  QWidget *showWidget(const QPoint &) override { return w_; }
 
  private:
   using QWidgetP = QPointer<QWidget>;
@@ -5923,14 +6171,130 @@ class CQTriePatterns {
 };
 
 #endif
+##concat##CQUtilAlignType.h
+#ifndef CQUTIL_ALIGN_TYPE_H
+#define CQUTIL_ALIGN_TYPE_H
+
+#include <CAlignType.h>
+
+namespace CQUtil {
+
+Qt::Alignment toQAlign(CHAlignType halign);
+Qt::Alignment toQAlign(CVAlignType valign);
+
+CHAlignType toHAlign(Qt::Alignment align);
+CVAlignType toVAlign(Qt::Alignment align);
+
+}
+
+#endif
+##concat##CQUtilAngle.h
+#ifndef CQUTIL_ANGLE_H
+#define CQUTIL_ANGLE_H
+
+#include <CAngle.h>
+
+//---
+
+#include <CQUtilMeta.h>
+
+CQUTIL_DCL_META_TYPE(CAngle)
+
+#endif
+##concat##CQUtilEvent.h
+#ifndef CQUTIL_EVENT_H
+#define CQUTIL_EVENT_H
+
+#include <CEvent.h>
+
+#include<QMouseEvent>
+
+class QKeyEvent;
+
+namespace CQUtil {
+
+CMouseEvent *convertEvent(QMouseEvent *event);
+CKeyEvent   *convertEvent(QKeyEvent *event);
+
+CMouseButton   convertButton(Qt::MouseButton button);
+CKeyType       convertKey(int key, Qt::KeyboardModifiers modifiers);
+CEventModifier convertModifier(Qt::KeyboardModifiers modifiers);
+
+}
+
+#endif
+##concat##CQUtilFont.h
+#ifndef CQUTIL_FONT__H
+#define CQUTIL_FONT__H
+
+#include <CFontStyle.h>
+
+namespace CQUtil {
+  void decodeFont(const QFont &font, QString &family, CFontStyle &style, int &pixelSize);
+}
+
+#endif
+##concat##CQUtilGeom.h
+#ifndef CQUTIL_GEOM_H
+#define CQUTIL_GEOM_H
+
+#include <CIBBox2D.h>
+#include <CBBox2D.h>
+#include <CPoint2D.h>
+#include <CMatrix2D.h>
+
+//---
+
+namespace CQUtil {
+  QPointF  toQPoint  (const CPoint2D &point);
+  QPoint   toQPointI (const CPoint2D &point);
+  CPoint2D fromQPoint(const QPointF &point);
+
+  QPoint    toQPoint   (const CIPoint2D &point);
+  CIPoint2D fromQPoint (const QPoint &point);
+  CPoint2D  fromQPointF(const QPoint &point);
+
+  QSizeF  toQSize  (const CSize2D &size);
+  CSize2D fromQSize(const QSizeF &size);
+
+  QSize    toQSize  (const CISize2D &size);
+  CISize2D fromQSize(const QSize &size);
+
+  QRectF  toQRect  (const CBBox2D &rect);
+  QRect   toQRectI (const CBBox2D &rect);
+  CBBox2D fromQRect(const QRectF &rect);
+
+  QRect    toQRect  (const CIBBox2D &rect);
+  CIBBox2D fromQRect(const QRect &rect);
+
+  QMatrix   toQMatrix  (const CMatrix2D &m);
+  CMatrix2D fromQMatrix(const QMatrix &m);
+
+  QTransform toQTransform  (const CMatrix2D &m);
+  CMatrix2D  fromQTransform(const QTransform &t);
+}
+
+#endif
+##concat##CQUtilGradient.h
+#ifndef CQUTIL_GRADIENT_H
+#define CQUTIL_GRADIENT_H
+
+class CLinearGradient;
+class CRadialGradient;
+
+namespace CQUtil {
+
+QLinearGradient toQGradient(const CLinearGradient *lgradient,
+                            QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
+QRadialGradient toQGradient(const CRadialGradient *rgradient,
+                            QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
+
+}
+
+#endif
 ##concat##CQUtil.h
 #ifndef CQUTIL_H
 #define CQUTIL_H
-
-#define CQUTIL_EVENT     1
-#define CQUTIL_LINE_DASH 1
-#define CQUTIL_ANGLE     1
-#define CQUTIL_GRADIENT  1
 
 #include <Qt>
 #include <QColor>
@@ -5938,48 +6302,21 @@ class CQTriePatterns {
 #include <QVariant>
 #include <QTableWidget>
 #include <QButtonGroup>
+#include <QPushButton>
+#include <QToolButton>
+#include <QRadioButton>
+#include <QCheckBox>
 #include <QMenu>
 #include <QBoxLayout>
+#include <QTimer>
 #include <QAction>
 #include <QPen>
-
-#ifdef CQUTIL_EVENT
-#include <CEvent.h>
-#endif
-
-#include <CRGBA.h>
-
-#ifdef CQUTIL_LINE_DASH
-#include <CLineDash.h>
-#endif
-
-#ifdef CQUTIL_ANGLE
-#include <CAngle.h>
-#endif
-
-#include <CFontStyle.h>
-#include <CLineCapType.h>
-#include <CLineJoinType.h>
-#include <CIBBox2D.h>
-
-#include <CPoint2D.h>
-#include <CBBox2D.h>
-#include <CMatrix2D.h>
-#include <CAlignType.h>
 
 #include <map>
 
 //---
 
 #include <CQUtilMeta.h>
-
-#ifdef CQUTIL_LINE_DASH
-CQUTIL_DCL_META_TYPE(CLineDash)
-#endif
-
-#ifdef CQUTIL_ANGLE
-CQUTIL_DCL_META_TYPE(CAngle)
-#endif
 
 //---
 
@@ -5990,11 +6327,6 @@ class QDockWidget;
 class QLabel;
 
 struct QMetaObject;
-
-#ifdef CQUTIL_GRADIENT
-class CLinearGradient;
-class CRadialGradient;
-#endif
 
 namespace CQUtil {
   class PropInfo {
@@ -6048,33 +6380,6 @@ namespace CQUtil {
 
   void initProperties();
 
-#ifdef CQUTIL_EVENT
-  CMouseEvent *convertEvent(QMouseEvent *event);
-  CKeyEvent   *convertEvent(QKeyEvent *event);
-
-  CMouseButton   convertButton(Qt::MouseButton button);
-  CKeyType       convertKey(int key, Qt::KeyboardModifiers modifiers);
-  CEventModifier convertModifier(Qt::KeyboardModifiers modifiers);
-#endif
-
-  QColor rgbToColor(const CRGB &rgb);
-  QColor rgbaToColor(const CRGBA &rgba);
-
-  inline QColor toQColor(const CRGB  &rgb ) { return rgbToColor (rgb ); }
-  inline QColor toQColor(const CRGBA &rgba) { return rgbaToColor(rgba); }
-
-  uint rgbaToInt(const CRGBA &rgba);
-
-  CRGB  colorToRGB(const QColor &color);
-  CRGBA colorToRGBA(const QColor &color);
-
-  Qt::PenCapStyle  toPenCapStyle (const CLineCapType  &lineCap);
-  Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
-
-  inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
-
-  void decodeFont(const QFont &font, QString &family, CFontStyle &style, int &pixelSize);
-
   //---
 
   QString fullName(const QObject* object);
@@ -6085,6 +6390,8 @@ namespace CQUtil {
   QObject *hierChildObject(QObject *object, int ind, const QStringList &names);
 
   QObject *childObject(QObject *parent, const QString &name);
+
+  QList<QObject *> childObjects(QObject *parent, const QString &name);
 
   QString addObjectAlias(QObject *object);
 
@@ -6155,6 +6462,7 @@ namespace CQUtil {
 
   bool getPropInfoEnumNameValue(const CQUtil::PropInfo &propInfo, const QString &name, int &value);
   bool getPropInfoEnumValueName(const CQUtil::PropInfo &propInfo, int value, QString &name);
+  bool getPropInfoEnumFlagValueName(const CQUtil::PropInfo &propInfo, int value, QString &name);
 
   //---
 
@@ -6191,33 +6499,6 @@ namespace CQUtil {
   QColor getBackground(QWidget *widget);
   void   setBackground(QWidget *widget, const QColor &color);
 
-  QPointF  toQPoint  (const CPoint2D &point);
-  QPoint   toQPointI (const CPoint2D &point);
-  CPoint2D fromQPoint(const QPointF &point);
-
-  QPoint    toQPoint   (const CIPoint2D &point);
-  CIPoint2D fromQPoint (const QPoint &point);
-  CPoint2D  fromQPointF(const QPoint &point);
-
-  QSizeF  toQSize  (const CSize2D &size);
-  CSize2D fromQSize(const QSizeF &size);
-
-  QSize    toQSize  (const CISize2D &size);
-  CISize2D fromQSize(const QSize &size);
-
-  QRectF  toQRect  (const CBBox2D &rect);
-  QRect   toQRectI (const CBBox2D &rect);
-  CBBox2D fromQRect(const QRectF &rect);
-
-  QRect    toQRect  (const CIBBox2D &rect);
-  CIBBox2D fromQRect(const QRect &rect);
-
-  QMatrix   toQMatrix  (const CMatrix2D &m);
-  CMatrix2D fromQMatrix(const QMatrix &m);
-
-  QTransform toQTransform  (const CMatrix2D &m);
-  CMatrix2D  fromQTransform(const QTransform &t);
-
   QString variantToString(const QVariant &var);
   bool variantToString(const QVariant &var, QString &str);
 
@@ -6245,31 +6526,14 @@ namespace CQUtil {
 
   //---
 
-#ifdef CQUTIL_GRADIENT
-  QLinearGradient toQGradient(const CLinearGradient *lgradient,
-                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
-  QRadialGradient toQGradient(const CRadialGradient *rgradient,
-                              QGradient::CoordinateMode mode=QGradient::ObjectBoundingMode);
-#endif
-
   void getScreenSize(uint *w, uint *h);
 
   void setSelectText(const std::string &text);
 
   void setDockVisible(QDockWidget *dock, bool visible);
 
-#ifdef CQUTIL_LINE_DASH
-  void penSetLineDash(QPen &pen, const CLineDash &dash);
-#endif
-
   QString alignToString(Qt::Alignment align);
   bool stringToAlign(const QString &str, Qt::Alignment &align);
-
-  Qt::Alignment toQAlign(CHAlignType halign);
-  Qt::Alignment toQAlign(CVAlignType valign);
-
-  CHAlignType toHAlign(Qt::Alignment align);
-  CVAlignType toVAlign(Qt::Alignment align);
 
   //-----
 
@@ -6458,6 +6722,51 @@ namespace CQUtil {
 
     menu->addActions(group->actions());
   }
+
+  //---
+
+  // default widget connection
+  template<typename T> struct Connector { };
+
+  template<>
+  struct Connector<QPushButton> {
+    void doConnect(QPushButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(clicked()), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QToolButton> {
+    void doConnect(QToolButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(clicked()), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QRadioButton> {
+    void doConnect(QRadioButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(toggled(bool)), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QCheckBox> {
+    void doConnect(QCheckBox *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(stateChanged(int)), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QTimer> {
+    void doConnect(QTimer *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(timeout()), obj, slotName);
+    }
+  };
+
+  template<typename T>
+  inline void defConnect(T *w, QObject *obj, const char *slotName) {
+    Connector<T> connector; connector.doConnect(w, obj, slotName);
+  }
 }
 
 //---
@@ -6490,6 +6799,49 @@ namespace CQUtil {
   bool isFixedPitch(const QFont &font);
 
   QFont getMonospaceFont();
+}
+
+#endif
+##concat##CQUtilLineCap.h
+#ifndef CQUTIL_LINE_CAP_H
+#define CQUTIL_LINE_CAP_H
+
+#include <CLineCapType.h>
+
+namespace CQUtil {
+
+Qt::PenCapStyle toPenCapStyle(const CLineCapType &lineCap);
+
+}
+
+#endif
+##concat##CQUtilLineDash.h
+#ifndef CQUTIL_LINE_DASH_H
+#define CQUTIL_LINE_DASH_H
+
+#include <CLineDash.h>
+
+//---
+
+#include <CQUtilMeta.h>
+
+CQUTIL_DCL_META_TYPE(CLineDash)
+
+namespace CQUtil {
+  void penSetLineDash(QPen &pen, const CLineDash &dash);
+}
+
+#endif
+##concat##CQUtilLineJoin.h
+#ifndef CQUTIL_LINE_JOIN_H
+#define CQUTIL_LINE_JOIN_H
+
+#include <CLineJoinType.h>
+
+namespace CQUtil {
+
+Qt::PenJoinStyle toPenJoinStyle(const CLineJoinType &lineJoin);
+
 }
 
 #endif
@@ -6659,6 +7011,31 @@ static QVariant toVariant(const TYPE &value) { \
 }
 
 #endif
+##concat##CQUtilRGBA.h
+#ifndef CQUTIL_RGBA_H
+#define CQUTIL_RGBA_H
+
+#include <CRGBA.h>
+
+#include <QColor>
+
+namespace CQUtil {
+
+QColor rgbToColor(const CRGB &rgb);
+QColor rgbaToColor(const CRGBA &rgba);
+
+inline QColor toQColor(const CRGB  &rgb ) { return rgbToColor (rgb ); }
+inline QColor toQColor(const CRGBA &rgba) { return rgbaToColor(rgba); }
+
+uint rgbaToInt(const CRGBA &rgba);
+
+CRGB  colorToRGB(const QColor &color);
+CRGBA colorToRGBA(const QColor &color);
+
+inline CRGBA fromQColor(const QColor &color) { return colorToRGBA(color); }
+}
+
+#endif
 ##concat##CQWidgetFactory.h
 #ifndef CQWidgetFactory_H
 #define CQWidgetFactory_H
@@ -6668,34 +7045,59 @@ static QVariant toVariant(const TYPE &value) { \
 class QWidget;
 class QLayout;
 
+// TODO: object factory ?
+
+// abstract class to create widget
 class CQWidgetFactory {
  public:
   CQWidgetFactory() { }
 
   virtual ~CQWidgetFactory() { }
 
+  //! create widget for parent with arguments
   virtual QWidget *createWidget(QWidget *parent=nullptr,
-                                const QStringList &params=QStringList()) = 0;
+                                const QStringList &params=QStringList()) const = 0;
+
+  //! get/set is simple (single line) widget
+  bool isSimple() const { return simple_; }
+
+  void setSimple(bool b=true) { simple_ = b; }
+  void setComplex(bool b=true) { simple_ = ! b; }
+
+  //! get/set is toplevel (QDialog/QMainWindow) widget
+  bool isTopLevel() const { return simple_; }
+  void setTopLevel(bool b=true) { toplevel_ = b; }
+
+  //! validate widget matched traits
+  virtual bool validateWidget(QWidget *w) const;
+
+ protected:
+  bool simple_   { true };
+  bool toplevel_ { false };
 };
 
+// abstract class to create layout
 class CQLayoutFactory {
  public:
   CQLayoutFactory() { }
 
   virtual ~CQLayoutFactory() { }
 
+  //! create layout for parent with arguments
   virtual QLayout *createLayout(QWidget *parent=nullptr,
-                                const QStringList &params=QStringList()) = 0;
+                                const QStringList &params=QStringList()) const = 0;
 };
 
 //----
 
+// implementation of CQWidgetFactory to create class of type T using constructor
+// taking single parent argument
 template<typename T>
 class CQWidgetFactoryT : public CQWidgetFactory {
  public:
   CQWidgetFactoryT() { }
 
-  QWidget *createWidget(QWidget *parent, const QStringList &) {
+  QWidget *createWidget(QWidget *parent, const QStringList &) const override {
     auto *w = new T(parent);
 
     // TODO: set object name
@@ -6704,12 +7106,14 @@ class CQWidgetFactoryT : public CQWidgetFactory {
   }
 };
 
+// implementation of CQWidgetFactory to create class of type T using constructor
+// taking no argumnents
 template<typename T>
 class CQWidgetFactoryNoArgsT : public CQWidgetFactory {
  public:
   CQWidgetFactoryNoArgsT() { }
 
-  QWidget *createWidget(QWidget *, const QStringList &) {
+  QWidget *createWidget(QWidget *, const QStringList &) const override {
     auto *w = new T();
 
     // TODO: set object name
@@ -6718,12 +7122,14 @@ class CQWidgetFactoryNoArgsT : public CQWidgetFactory {
   }
 };
 
+// implementation of CQLayoutFactory to create class of type T using constructor
+// taking single parent argument
 template<typename T>
 class CQLayoutFactoryT : public CQLayoutFactory {
  public:
   CQLayoutFactoryT() { }
 
-  QLayout *createLayout(QWidget *parent, const QStringList &) {
+  QLayout *createLayout(QWidget *parent, const QStringList &) const override {
     auto *w = new T(parent);
 
     // TODO: set object name
@@ -6734,8 +7140,88 @@ class CQLayoutFactoryT : public CQLayoutFactory {
 
 //---
 
+// class to manage named set of widget factories
+class CQWidgetFactorySet : public QObject {
+ public:
+  CQWidgetFactorySet(const QString &name) :
+   name_(name) {
+  }
+
+ ~CQWidgetFactorySet() { }
+
+  //---
+
+  //! is name an existing widget factory
+  bool isWidgetFactory(const QString &name) const;
+
+  //! add factory for type T with constructor taking single parent argument
+  template<typename T>
+  CQWidgetFactory *addWidgetFactoryT(const QString &name) {
+    return addWidgetFactory(name, new CQWidgetFactoryT<T>());
+  }
+
+  //! add factory for type T with constructor taking no arguments
+  template<typename T>
+  CQWidgetFactory *addWidgetFactoryNoArgsT(const QString &name) {
+    return addWidgetFactory(name, new CQWidgetFactoryNoArgsT<T>());
+  }
+
+  //! add widget factory implementation
+  CQWidgetFactory *addWidgetFactory(const QString &name, CQWidgetFactory *factory);
+
+  //! remove widget factory of name (asserts if name is no factory of name)
+  void removeWidgetFactory(const QString &name);
+
+  //! get widget factory (asserts if name is no factory of name)
+  CQWidgetFactory *getWidgetFactory(const QString &name) const;
+
+  //! get all widget factory names
+  QStringList widgetFactoryNames(bool simple=false) const;
+
+  //---
+
+  //! is name an existing layout factory
+  bool isLayoutFactory(const QString &name) const;
+
+  //! add layout factory implementation
+  CQLayoutFactory *addLayoutFactory(const QString &name, CQLayoutFactory *factory);
+
+  //! remove layout factory of name (asserts if name is no factory of name)
+  void removeLayoutFactory(const QString &name);
+
+  //! get layout factory of name (asserts if name is no factory of name)
+  CQLayoutFactory *getLayoutFactory(const QString &name) const;
+
+  //! get all layout factory names
+  QStringList layoutFactoryNames() const;
+
+  //---
+
+  // create widget of specified type using widget factory for type name
+  QWidget *createWidget(const QString &type, QWidget *parent=nullptr,
+                        const QStringList &options=QStringList()) const;
+
+  // create layout of specified type using widget factory for type name
+  QLayout *createLayout(const QString &type, QWidget *parent=nullptr,
+                        const QStringList &options=QStringList()) const;
+
+ private:
+  void init();
+
+ private:
+  using WidgetFactories = std::map<QString, CQWidgetFactory *>;
+  using LayoutFactories = std::map<QString, CQLayoutFactory *>;
+
+  QString         name_;
+  WidgetFactories widgetFactories_;
+  LayoutFactories layoutFactories_;
+};
+
+//---
+
 #define CQWidgetFactoryMgrInst CQWidgetFactoryMgr::instance()
 
+// class to manage all widget factories and factory sets
 class CQWidgetFactoryMgr : public QObject {
   Q_OBJECT
 
@@ -6747,55 +7233,81 @@ class CQWidgetFactoryMgr : public QObject {
 
   //---
 
+  //! is name an existing widget factory
   bool isWidgetFactory(const QString &name) const;
 
+  //! add factory for type T with constructor taking single parent argument
   template<typename T>
-  void addWidgetFactoryT(const QString &name) {
-    addWidgetFactory(name, new CQWidgetFactoryT<T>());
+  CQWidgetFactory *addWidgetFactoryT(const QString &name) {
+    return addWidgetFactory(name, new CQWidgetFactoryT<T>());
   }
 
+  //! add factory for type T with constructor taking no arguments
   template<typename T>
-  void addWidgetFactoryNoArgsT(const QString &name) {
-    addWidgetFactory(name, new CQWidgetFactoryNoArgsT<T>());
+  CQWidgetFactory *addWidgetFactoryNoArgsT(const QString &name) {
+    return addWidgetFactory(name, new CQWidgetFactoryNoArgsT<T>());
   }
 
-  void addWidgetFactory(const QString &name, CQWidgetFactory *factory);
+  //! add widget factory implementation
+  CQWidgetFactory *addWidgetFactory(const QString &name, CQWidgetFactory *factory);
 
+  //! remove widget factory of name (asserts if name is no factory of name)
   void removeWidgetFactory(const QString &name);
 
+  //! get widget factory (asserts if name is no factory of name)
   CQWidgetFactory *getWidgetFactory(const QString &name) const;
 
-  QStringList widgetFactoryNames() const;
+  //! get all widget factory set names
+  QStringList widgetFactorySetNames() const;
+  QStringList setWidgetFactoryNames(const QString &set, bool simple=false) const;
+
+  //! get all widget factory names
+  QStringList widgetFactoryNames(bool simple=false) const;
 
   //---
 
+  //! is name an existing layout factory
   bool isLayoutFactory(const QString &name) const;
 
-  void addLayoutFactory(const QString &name, CQLayoutFactory *factory);
+  //! add layout factory implementation
+  CQLayoutFactory *addLayoutFactory(const QString &name, CQLayoutFactory *factory);
 
+  //! remove layout factory of name (asserts if name is no factory of name)
   void removeLayoutFactory(const QString &name);
 
+  //! get layout factory of name (asserts if name is no factory of name)
   CQLayoutFactory *getLayoutFactory(const QString &name) const;
 
+  //! get all layout factory names
   QStringList layoutFactoryNames() const;
 
   //---
 
+  // create widget of specified type using widget factory for type name
   QWidget *createWidget(const QString &type, QWidget *parent=nullptr,
-                        const QStringList &options=QStringList());
+                        const QStringList &options=QStringList()) const;
 
+  // create layout of specified type using widget factory for type name
   QLayout *createLayout(const QString &type, QWidget *parent=nullptr,
-                        const QStringList &options=QStringList());
+                        const QStringList &options=QStringList()) const;
 
  private:
   void init();
 
+  bool decodeSet(const QString &name, CQWidgetFactorySet* &set, QString &widgetName);
+  bool decodeSet(const QString &name, const CQWidgetFactorySet* &set, QString &widgetName) const;
+
+  const CQWidgetFactorySet *getSet(const QString &setName) const;
+
+  void decodeName(const QString &name, QString &setName, QString &widgetName) const;
+
  private:
+  using FactorySets     = std::map<QString, CQWidgetFactorySet *>;
   using WidgetFactories = std::map<QString, CQWidgetFactory *>;
   using LayoutFactories = std::map<QString, CQLayoutFactory *>;
 
-  WidgetFactories widgetFactories_;
-  LayoutFactories layoutFactories_;
+  FactorySets        factorySets_;
+  CQWidgetFactorySet baseSet_;
 };
 
 #endif
@@ -6973,7 +7485,7 @@ class CQWidgetMenuAction : public QWidgetAction {
 
  private:
   //! create menu widget (required implementation for QWidgetAction)
-  QWidget *createWidget(QWidget *parent);
+  QWidget *createWidget(QWidget *parent) override;
 
  protected:
   CQWidgetMenu     *menu_ { nullptr }; //! parent menu
@@ -7162,9 +7674,9 @@ namespace CQWidgetUtil {
 
 class CQWindowFactory : public CWindowFactory {
  public:
-  CWindow *createWindow(int x, int y, uint width, uint height);
+  CWindow *createWindow(int x, int y, uint width, uint height) override;
 
-  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height);
+  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height) override;
 };
 
 //------
@@ -7608,16 +8120,16 @@ class CQWinTextEdit : public QTextEdit, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTextEdit(QWidget *parent, const char *name=0);
+  CQWinTextEdit(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTextEdit() { }
 
-  void show() { QTextEdit::show(); widget_->show(); }
-  void hide() { QTextEdit::hide(); widget_->hide(); }
+  void show() override { QTextEdit::show(); widget_->show(); }
+  void hide() override { QTextEdit::hide(); widget_->hide(); }
 
-  void setText(const QString &text) { QTextEdit::setText(text); }
+  void setText(const QString &text) override { QTextEdit::setText(text); }
 
-  QString getText() const { return QTextEdit::toPlainText(); }
+  QString getText() const override { return QTextEdit::toPlainText(); }
 
  signals:
   void valueChanged();
@@ -7631,7 +8143,7 @@ class CQWinImage : public QLabel, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinImage(QWidget *parent, const char *name=0);
+  CQWinImage(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinImage() { }
 
@@ -7667,12 +8179,12 @@ class CQWinTable : public QTableWidget, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTable(QWidget *parent, const char *name=0);
+  CQWinTable(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTable() { }
 
-  void show() { QTableWidget::show(); widget_->show(); }
-  void hide() { QTableWidget::hide(); widget_->hide(); }
+  void show() override { QTableWidget::show(); widget_->show(); }
+  void hide() override { QTableWidget::hide(); widget_->hide(); }
 
  signals:
   void valueChanged();
@@ -7686,12 +8198,12 @@ class CQWinTree : public QTreeWidget, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTree(QWidget *parent, const char *name=0);
+  CQWinTree(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTree() { }
 
-  void show() { QTreeWidget::show(); widget_->show(); }
-  void hide() { QTreeWidget::hide(); widget_->hide(); }
+  void show() override { QTreeWidget::show(); widget_->show(); }
+  void hide() override { QTreeWidget::hide(); widget_->hide(); }
 
  signals:
   void valueChanged();
@@ -7763,7 +8275,7 @@ class CQWorkspaceUpdateWindowsMenu : public CQWorkspaceUpdateWindowsMenuIFace {
    workspace_(workspace) {
   }
 
-  void exec();
+  void exec() override;
 };
 
 class CQWorkspaceUpdateWindowsMenuObject : public QObject {
@@ -7860,7 +8372,7 @@ class CQWorkspace : public CQWorkspaceBase {
     return windows_;
   }
 
-  void setActiveWidget(QWidget *w) {
+  void setActiveWidget(QWidget *w) override {
     QList<QMdiSubWindow *> widgets = workspace_->subWindowList();
 
     QList<QMdiSubWindow *>::iterator p1 = widgets.begin();

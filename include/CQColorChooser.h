@@ -31,9 +31,9 @@ class CQColorChooser : public QWidget {
   };
 
  public:
-  CQColorChooser(QWidget *parent=0);
+  CQColorChooser(QWidget *parent=nullptr);
 
-  CQColorChooser(uint styles, QWidget *parent=0);
+  CQColorChooser(uint styles, QWidget *parent=nullptr);
 
   bool getEditable() const { return editable_; }
   void setEditable(bool editable=true);

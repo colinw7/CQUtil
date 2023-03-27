@@ -18,6 +18,8 @@ QMAKE_CXXFLAGS += \
 -DCBRUSH_IMAGE \
 -DQT_NO_X11 \
 
+CONFIG += c++17
+
 MOC_DIR = .moc
 
 SOURCES += \
@@ -119,6 +121,10 @@ CQEnumCombo.cpp \
 CQTrie.cpp \
 \
 CQSwitchLineEdit.cpp \
+\
+CQFlowLayout.cpp \
+\
+CQFlagsCombo.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -219,6 +225,10 @@ HEADERS += \
 ../include/CQTrie.h \
 \
 ../include/CQSwitchLineEdit.h \
+\
+../include/CQFlowLayout.h \
+\
+../include/CQFlagsCombo.h \
 
 OBJECTS_DIR = ../obj
 

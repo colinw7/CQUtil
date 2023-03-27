@@ -19,7 +19,7 @@ CQFontEdit(QWidget *parent) :
 
   //-----
 
-  QHBoxLayout *layout = new QHBoxLayout(this);
+  auto *layout = new QHBoxLayout(this);
   layout->setMargin(0); layout->setSpacing(2);
 
   //---
@@ -93,7 +93,7 @@ setNoFocusHier(QWidget *w)
 {
   w->setFocusPolicy(Qt::NoFocus);
 
-  const QObjectList &children = w->children();
+  const auto &children = w->children();
 
   for (QObjectList::const_iterator po = children.begin(); po != children.end(); ++po) {
     QWidget *w1 = qobject_cast<QWidget *>(*po);

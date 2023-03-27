@@ -18,7 +18,7 @@ class CQLineDash : public QFrame {
   Q_PROPERTY(bool editable READ isEditable WRITE setEditable)
 
  public:
-  CQLineDash(QWidget *parent=0);
+  CQLineDash(QWidget *parent=nullptr);
 
   bool isEditable() const { return editable_; }
   void setEditable(bool b);

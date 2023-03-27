@@ -11,7 +11,7 @@ class CQRadioButtons : public QWidget {
   Q_OBJECT
 
  public:
-  CQRadioButtons(QWidget *parent=0);
+  CQRadioButtons(QWidget *parent=nullptr);
 
   virtual ~CQRadioButtons();
 
@@ -48,7 +48,7 @@ class CQRadioButtons : public QWidget {
 class CQHRadioButtons : public CQRadioButtons {
  public:
   CQHRadioButtons(QWidget *parent, const char *name, ...);
-  CQHRadioButtons(QWidget *parent=0);
+  CQHRadioButtons(QWidget *parent=nullptr);
 
  protected:
   QLayout *createLayout(QWidget *parent) override;
@@ -61,7 +61,7 @@ class CQHRadioButtons : public CQRadioButtons {
 class CQVRadioButtons : public CQRadioButtons {
  public:
   CQVRadioButtons(QWidget *parent, const char *name, ...);
-  CQVRadioButtons(QWidget *parent=0);
+  CQVRadioButtons(QWidget *parent=nullptr);
 
  protected:
   QLayout *createLayout(QWidget *parent) override;

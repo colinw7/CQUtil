@@ -31,12 +31,12 @@ class CQTabWidgetTabBar : public QTabBar {
 
   void contextMenuEvent(QContextMenuEvent *e) override;
 
- signals:
+ Q_SIGNALS:
   void tabChanged(int ind);
 
   void tabMoveRequested(int fromIndex, int toIndex);
 
- private slots:
+ private Q_SLOTS:
   void tabEditFinished(const QString &text);
 
  private:

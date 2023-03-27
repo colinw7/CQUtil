@@ -135,7 +135,7 @@ sizeHint() const
 
 CQWidgetMenuAction::
 CQWidgetMenuAction(CQWidgetMenu *menu) :
- QWidgetAction(menu), menu_(menu), area_(0)
+ QWidgetAction(menu), menu_(menu), area_(nullptr)
 {
 }
 
@@ -185,7 +185,7 @@ createWidget(QWidget *parent)
 
 CQWidgetMenuArea::
 CQWidgetMenuArea(QWidget *parent) :
- QWidget(parent), action_(0), w_(-1), h_(-1)
+ QWidget(parent), action_(nullptr), w_(-1), h_(-1)
 {
   setObjectName("menu_area");
 
@@ -193,7 +193,7 @@ CQWidgetMenuArea(QWidget *parent) :
   area_ = new QWidget(this);
 
   // init contents widget
-  areaWidget_ = 0;
+  areaWidget_ = nullptr;
 }
 
 // set contents widget

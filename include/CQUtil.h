@@ -9,6 +9,8 @@
 #include <QButtonGroup>
 #include <QPushButton>
 #include <QToolButton>
+#include <QRadioButton>
+#include <QCheckBox>
 #include <QMenu>
 #include <QBoxLayout>
 #include <QTimer>
@@ -94,6 +96,8 @@ namespace CQUtil {
 
   QObject *childObject(QObject *parent, const QString &name);
 
+  QList<QObject *> childObjects(QObject *parent, const QString &name);
+
   QString addObjectAlias(QObject *object);
 
   //---
@@ -163,6 +167,7 @@ namespace CQUtil {
 
   bool getPropInfoEnumNameValue(const CQUtil::PropInfo &propInfo, const QString &name, int &value);
   bool getPropInfoEnumValueName(const CQUtil::PropInfo &propInfo, int value, QString &name);
+  bool getPropInfoEnumFlagValueName(const CQUtil::PropInfo &propInfo, int value, QString &name);
 
   //---
 
@@ -425,6 +430,7 @@ namespace CQUtil {
 
   //---
 
+  // default widget connection
   template<typename T> struct Connector { };
 
   template<>
@@ -438,6 +444,20 @@ namespace CQUtil {
   struct Connector<QToolButton> {
     void doConnect(QToolButton *w, QObject *obj, const char *slotName) {
       QObject::connect(w, SIGNAL(clicked()), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QRadioButton> {
+    void doConnect(QRadioButton *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(toggled(bool)), obj, slotName);
+    }
+  };
+
+  template<>
+  struct Connector<QCheckBox> {
+    void doConnect(QCheckBox *w, QObject *obj, const char *slotName) {
+      QObject::connect(w, SIGNAL(stateChanged(int)), obj, slotName);
     }
   };
 

@@ -77,7 +77,7 @@ void
 CQWindow::
 resetFactory()
 {
-  CWindowMgrInst->setFactory(0);
+  CWindowMgrInst->setFactory(nullptr);
 }
 
 CQWindow::

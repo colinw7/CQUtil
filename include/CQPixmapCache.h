@@ -46,11 +46,11 @@ class CQPixmapCache : public QObject {
 
  private:
   struct Data {
-    const uchar *data   = 0;
+    const uchar *data   = nullptr;
     int          len    = 0;
-    QPixmap     *pixmap = 0;
+    QPixmap     *pixmap = nullptr;
 
-    Data(const uchar *data1=0, int len1=0) :
+    Data(const uchar *data1=nullptr, int len1=0) :
      data(data1), len(len1) {
     }
 

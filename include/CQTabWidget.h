@@ -4,13 +4,13 @@
 #define CQTAB_WIDGET_MOVABLE 1
 
 #include <QTabWidget>
-#include <QTabBar>
 
 class CQFloatEdit;
 class CQTabWidgetTabBar;
 
 class QMenu;
 
+//! extension of tab widget to add move buttons
 class CQTabWidget : public QTabWidget {
   Q_OBJECT
 
@@ -22,15 +22,15 @@ class CQTabWidget : public QTabWidget {
 
   void addCreateButton();
 
+  //! get/set show move buttons
   bool getShowMoveButtons() const { return moveButtons_; }
-
   void setShowMoveButtons(bool show);
 
   void contextMenuEvent(QContextMenuEvent *e) override;
 
   QMenu *createTabMenu() const;
 
- public slots:
+ public Q_SLOTS:
   void moveTabLeft ();
   void moveTabRight();
 
@@ -38,7 +38,7 @@ class CQTabWidget : public QTabWidget {
 
   void tabSlot();
 
- signals:
+ Q_SIGNALS:
   void tabChanged(int ind);
 
   void createTab();

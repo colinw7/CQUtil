@@ -239,9 +239,11 @@ QObject *
 CQUtil::
 hierChildObject(QObject *object, int ind, const QStringList &names)
 {
-  auto *child = childObject(object, names[ind]);
+  auto children = childObjects(object, names[ind]);
 
-  if (child) {
+  if (children.length() > 0) {
+    auto *child = children[0];
+
     ++ind;
 
     if (ind < names.size())
@@ -269,6 +271,13 @@ CQUtil::
 childObject(QObject *parent, const QString &name)
 {
   return parent->findChild<QObject *>(name);
+}
+
+QList<QObject *>
+CQUtil::
+childObjects(QObject *parent, const QString &name)
+{
+  return parent->findChildren<QObject *>(name);
 }
 
 QString
@@ -967,6 +976,26 @@ CQUtil::
 getPropInfoEnumValueName(const CQUtil::PropInfo &propInfo, int value, QString &name)
 {
   return propInfo.enumValueName(value, name);
+}
+
+bool
+CQUtil::
+getPropInfoEnumFlagValueName(const CQUtil::PropInfo &propInfo, int value, QString &name)
+{
+  name = "";
+
+  for (const auto &ename : propInfo.enumNames()) {
+    int evalue = 0; (void) propInfo.enumNameValue(ename, evalue);
+
+    if (value & evalue) {
+      if (name != "")
+        name += "|";
+
+      name += ename;
+    }
+  }
+
+  return true;
 }
 
 //---

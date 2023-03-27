@@ -235,7 +235,7 @@ class CQWinWidget : public QWidget {
   void expandSlot();
   void collapseSlot();
 
- signals:
+ Q_SIGNALS:
   void geometryChanging();
   void geometryChanged();
 
@@ -311,7 +311,7 @@ class CQWinWidgetBase {
   void setEditMode(CQWinWidget::EditMode editMode);
 
  protected:
-  CQWinWidget *widget_ { 0 };
+  CQWinWidget *widget_ { nullptr };
 };
 
 //------
@@ -320,7 +320,7 @@ class CQWinTextEdit : public QTextEdit, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTextEdit(QWidget *parent, const char *name=0);
+  CQWinTextEdit(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTextEdit() { }
 
@@ -331,7 +331,7 @@ class CQWinTextEdit : public QTextEdit, public CQWinWidgetBase {
 
   QString getText() const override { return QTextEdit::toPlainText(); }
 
- signals:
+ Q_SIGNALS:
   void valueChanged();
   void geometryChanging();
   void geometryChanged();
@@ -343,7 +343,7 @@ class CQWinImage : public QLabel, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinImage(QWidget *parent, const char *name=0);
+  CQWinImage(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinImage() { }
 
@@ -359,7 +359,7 @@ class CQWinImage : public QLabel, public CQWinWidgetBase {
  private:
   void contextMenuEvent(QContextMenuEvent *event) override;
 
- signals:
+ Q_SIGNALS:
   void valueChanged();
   void geometryChanging();
   void geometryChanged();
@@ -379,14 +379,14 @@ class CQWinTable : public QTableWidget, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTable(QWidget *parent, const char *name=0);
+  CQWinTable(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTable() { }
 
   void show() override { QTableWidget::show(); widget_->show(); }
   void hide() override { QTableWidget::hide(); widget_->hide(); }
 
- signals:
+ Q_SIGNALS:
   void valueChanged();
   void geometryChanging();
   void geometryChanged();
@@ -398,14 +398,14 @@ class CQWinTree : public QTreeWidget, public CQWinWidgetBase {
   Q_OBJECT
 
  public:
-  CQWinTree(QWidget *parent, const char *name=0);
+  CQWinTree(QWidget *parent, const char *name=nullptr);
 
   virtual ~CQWinTree() { }
 
   void show() override { QTreeWidget::show(); widget_->show(); }
   void hide() override { QTreeWidget::hide(); widget_->hide(); }
 
- signals:
+ Q_SIGNALS:
   void valueChanged();
   void geometryChanging();
   void geometryChanged();

@@ -29,11 +29,11 @@ class CQWorkspaceArea : public QMdiArea {
 
  public:
   CQWorkspaceArea(CQWorkspaceBase *base) :
-   QMdiArea(0), base_(base) {
+   QMdiArea(nullptr), base_(base) {
     setObjectName("area");
   }
 
- public slots:
+ public Q_SLOTS:
   void setActiveWidget(QWidget *w) {
     base_->setActiveWidget(w);
 
@@ -72,7 +72,7 @@ class CQWorkspaceUpdateWindowsMenuObject : public QObject {
  public:
   CQWorkspaceUpdateWindowsMenuObject(CQMenu *menu, CQWorkspaceUpdateWindowsMenuIFace *iface);
 
- private slots:
+ private Q_SLOTS:
   void updateWindowsMenu();
 };
 
@@ -135,7 +135,7 @@ class CQWorkspace : public CQWorkspaceBase {
   W *activeWindow() const {
     QMdiSubWindow *subWindow = workspace_->activeSubWindow();
 
-    return dynamic_cast<W *>(subWindow ? subWindow->widget() : 0);
+    return dynamic_cast<W *>(subWindow ? subWindow->widget() : nullptr);
   }
 
   const WindowList &windowList() const {

@@ -222,7 +222,7 @@ class CQGroupBox : public QWidget {
 #if 0
 class CQGroupBoxArea : public QWidget {
  public:
-  CQGroupBoxArea(QWidget *parent=0);
+  CQGroupBoxArea(QWidget *parent=nullptr);
 
   void paintEvent(QPaintEvent *e) override;
 };

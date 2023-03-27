@@ -23,11 +23,11 @@ class CQTabSplitSplitterTool : public QFrame {
   void startHideTimer();
   void resetHideTimer();
 
- public slots:
+ public Q_SLOTS:
   void showSlot();
   void hideSlot();
 
- private slots:
+ private Q_SLOTS:
   void hsplitSlot();
   void vsplitSlot();
   void tabbedSlot();

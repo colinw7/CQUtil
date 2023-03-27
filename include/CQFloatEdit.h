@@ -9,7 +9,7 @@ class CQFloatEdit : public QLineEdit {
   Q_OBJECT
 
  public:
-  CQFloatEdit(QWidget *parent=0);
+  CQFloatEdit(QWidget *parent=nullptr);
 
  ~CQFloatEdit();
 
