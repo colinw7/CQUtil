@@ -94,6 +94,9 @@ updateEdit()
     str += (*pi).second;
   }
 
+  if (str == "" && value_ == 0)
+    str = zeroName();
+
   if (str != edit_->text())
     edit_->setText(str);
 }

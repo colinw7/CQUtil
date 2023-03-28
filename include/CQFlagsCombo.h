@@ -18,7 +18,8 @@ class QStyleOptionComboBox;
 class CQFlagsCombo : public QFrame {
   Q_OBJECT
 
-  Q_PROPERTY(uint value READ value WRITE setValue)
+  Q_PROPERTY(uint    value    READ value    WRITE setValue)
+  Q_PROPERTY(QString zeroName READ zeroName WRITE setZeroName)
 
  public:
   CQFlagsCombo(QWidget *parent = nullptr);
@@ -26,6 +27,9 @@ class CQFlagsCombo : public QFrame {
 
   uint value() const { return value_; }
   void setValue(uint value);
+
+  const QString &zeroName() const { return zeroName_; }
+  void setZeroName(const QString &s) { zeroName_ = s; }
 
   void addItem(const QString &item, uint id);
 
@@ -55,6 +59,8 @@ class CQFlagsCombo : public QFrame {
   using IdItem = std::map<uint, QString>;
 
   uint value_ { 0 };
+
+  QString zeroName_;
 
   QLineEdit*              edit_   { nullptr };
   CQFlagsComboMenuButton* button_ { nullptr };
