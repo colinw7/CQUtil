@@ -550,15 +550,18 @@ paint(QPainter *painter, const QStyleOptionViewItem &option) const
 {
   paintBackground(painter, option);
 
-  auto rect = option.rect;
+  QFontMetrics fm(table_->font());
 
-  rect.setWidth(option.rect.height());
+  int is = fm.height();
 
-  rect.adjust(0, 1, -3, -2);
+  int x = option.rect.left();
+  int y = option.rect.top() + (option.rect.height() - is)/2;
+
+  auto rect = QRect(x, y, is, is);
 
   table_->delegate()->drawBoolCheck(painter, option, rect, b_);
 
-  int x = rect.right() + 4;
+  x = rect.right() + 3;
 
   QRect rect1;
 

@@ -188,8 +188,14 @@ class CQTableWidgetBoolItem : public CQTableWidgetItem {
   void setEditorData() override;
   void getEditorData(QString &str) override;
 
-  bool sizeHint(const QStyleOptionViewItem &option, QSize &size) const override {
-    size = QSize(128, option.rect.height());
+  bool sizeHint(const QStyleOptionViewItem &, QSize &size) const override {
+    QFontMetrics fm(table_->font());
+
+    int is = fm.height();
+
+    auto tw = fm.horizontalAdvance("false");
+
+    size = QSize(is + tw + 8, is);
 
     return true;
   }
@@ -231,8 +237,12 @@ class CQTableWidgetStringItem : public CQTableWidgetItem {
   void setEditorData() override;
   void getEditorData(QString &str) override;
 
-  bool sizeHint(const QStyleOptionViewItem &option, QSize &size) const override {
-    size = QSize(128, option.rect.height());
+  bool sizeHint(const QStyleOptionViewItem &, QSize &size) const override {
+    QFontMetrics fm(table_->font());
+
+    int is = fm.height();
+
+    size = QSize(5*is, is);
 
     return true;
   }

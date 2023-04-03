@@ -472,6 +472,53 @@ namespace CQUtil {
   inline void defConnect(T *w, QObject *obj, const char *slotName) {
     Connector<T> connector; connector.doConnect(w, obj, slotName);
   }
+
+  //---
+
+  inline void connectDisconnect(bool b, QObject *from, const char *fromName,
+                                QObject *to, const char *toName) {
+    if (b)
+      QObject::connect(from, fromName, to, toName);
+    else
+      QObject::disconnect(from, fromName, to, toName);
+  }
+
+  inline void optConnectDisconnect(bool b, QObject *from, const char *fromName,
+                                   QObject *to, const char *toName) {
+    if (! from || ! to) return;
+
+    connectDisconnect(b, from, fromName, to, toName);
+  }
+}
+
+//---
+
+namespace CQUtil {
+
+/*!
+ * \brief RAII Class to Auto Connect/Disconnect to signal/slot
+ * \ingroup Charts
+ */
+class AutoDisconnect {
+ public:
+  AutoDisconnect(QObject *from, const char *fromName, QObject *to, const char *toName) :
+   from_(from), fromName_(fromName), to_(to), toName_(toName) {
+    assert(from_ && to_);
+
+    connectDisconnect(false, from_, fromName_, to_, toName_);
+  }
+
+ ~AutoDisconnect() {
+    connectDisconnect(true, from_, fromName_, to_, toName_);
+  }
+
+ private:
+  QObject    *from_     { nullptr };
+  const char *fromName_ { nullptr };
+  QObject    *to_       { nullptr };
+  const char *toName_   { nullptr };
+};
+
 }
 
 //---

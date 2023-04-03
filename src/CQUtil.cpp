@@ -875,7 +875,9 @@ stringToEnumValue(const QString &str, const QMetaProperty &metaProperty, int &va
       int value1;
 
       if (stringToEnumSubValue(strs[i], metaEnum, value1)) {
-        value |= value1;
+        if (value1)
+          value |= value1;
+
         found = true;
       }
     }
@@ -984,16 +986,25 @@ getPropInfoEnumFlagValueName(const CQUtil::PropInfo &propInfo, int value, QStrin
 {
   name = "";
 
+  QString zeroName;
   for (const auto &ename : propInfo.enumNames()) {
     int evalue = 0; (void) propInfo.enumNameValue(ename, evalue);
 
-    if (value & evalue) {
-      if (name != "")
-        name += "|";
+    if (evalue) {
+      if (value & evalue) {
+        if (name != "")
+          name += "|";
 
-      name += ename;
+        name += ename;
+      }
+    }
+    else {
+      zeroName = ename;
     }
   }
+
+  if (name == "")
+    name = zeroName;
 
   return true;
 }

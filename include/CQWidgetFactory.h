@@ -112,6 +112,10 @@ class CQWidgetFactorySet : public QObject {
 
   //---
 
+  const QString &name() const { return name_; }
+
+  //--
+
   //! is name an existing widget factory
   bool isWidgetFactory(const QString &name) const;
 
@@ -143,6 +147,12 @@ class CQWidgetFactorySet : public QObject {
 
   //! is name an existing layout factory
   bool isLayoutFactory(const QString &name) const;
+
+  //! add factory for type T with constructor taking no arguments
+  template<typename T>
+  CQLayoutFactory *addLayoutFactoryT(const QString &name) {
+    return addLayoutFactory(name, new CQLayoutFactoryT<T>());
+  }
 
   //! add layout factory implementation
   CQLayoutFactory *addLayoutFactory(const QString &name, CQLayoutFactory *factory);
@@ -229,6 +239,12 @@ class CQWidgetFactoryMgr : public QObject {
 
   //! is name an existing layout factory
   bool isLayoutFactory(const QString &name) const;
+
+  //! add factory for type T with constructor taking no arguments
+  template<typename T>
+  CQLayoutFactory *addLayoutFactoryT(const QString &name) {
+    return addLayoutFactory(name, new CQLayoutFactoryT<T>());
+  }
 
   //! add layout factory implementation
   CQLayoutFactory *addLayoutFactory(const QString &name, CQLayoutFactory *factory);

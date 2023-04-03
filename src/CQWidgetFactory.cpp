@@ -264,10 +264,19 @@ widgetFactoryNames(bool simple) const
 {
   QStringList names;
 
-  names << baseSet_.widgetFactoryNames(simple);
+  auto names1 = baseSet_.widgetFactoryNames(simple);
 
-  for (const auto &ps : factorySets_)
-    names << ps.second->widgetFactoryNames(simple);
+  for (const auto &name : names1)
+    names << name;
+
+  for (const auto &ps : factorySets_) {
+    auto *factorySet = ps.second;
+
+    auto names1 = factorySet->widgetFactoryNames(simple);
+
+    for (const auto &name : names1)
+      names << (factorySet->name() + ":" + name);
+  }
 
   return names;
 }
@@ -342,10 +351,19 @@ layoutFactoryNames() const
 {
   QStringList names;
 
-  names << baseSet_.layoutFactoryNames();
+  auto names1 = baseSet_.layoutFactoryNames();
 
-  for (const auto &ps : factorySets_)
-    names << ps.second->layoutFactoryNames();
+  for (const auto &name : names1)
+    names << name;
+
+  for (const auto &ps : factorySets_) {
+    auto *factorySet = ps.second;
+
+    auto names1 = factorySet->layoutFactoryNames();
+
+    for (const auto &name : names1)
+      names << (factorySet->name() + ":" + name);
+  }
 
   return names;
 }

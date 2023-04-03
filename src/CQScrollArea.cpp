@@ -266,7 +266,7 @@ void
 CQScrollArea::
 handleWheelEvent(QWheelEvent *e)
 {
-  if (static_cast<QWheelEvent*>(e)->orientation() == Qt::Horizontal)
+  if (std::abs(e->angleDelta().x()) > std::abs(e->angleDelta().y()))
     QApplication::sendEvent(hbar_, e);
   else
     QApplication::sendEvent(vbar_, e);

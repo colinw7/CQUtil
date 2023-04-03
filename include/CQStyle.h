@@ -26,10 +26,10 @@ class CQStyle : public QProxyStyle {
   //---
 
   void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option,
-                           QPainter *painter, const QWidget *widget = 0) const override;
+                           QPainter *painter, const QWidget *widget = nullptr) const override;
 
   void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter,
-                   const QWidget *widget = 0) const override;
+                   const QWidget *widget = nullptr) const override;
 
   void drawItemPixmap(QPainter *painter, const QRect &rect, int alignment,
                       const QPixmap &pixmap) const override;
@@ -39,20 +39,21 @@ class CQStyle : public QProxyStyle {
                     QPalette::ColorRole textRole = QPalette::NoRole) const override;
 
   void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter,
-                     const QWidget *widget = 0) const override;
+                     const QWidget *widget = nullptr) const override;
 
   QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap,
                               const QStyleOption *opt) const override;
 
   SubControl hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option,
-                                   const QPoint &pos, const QWidget *widget = 0) const override;
+                                   const QPoint &pos,
+                                   const QWidget *widget = nullptr) const override;
 
   QRect itemPixmapRect(const QRect &r, int flags, const QPixmap &pixmap) const override;
   QRect itemTextRect(const QFontMetrics &fm, const QRect &r, int flags, bool enabled,
                      const QString &text) const override;
 
-  int pixelMetric(PixelMetric metric, const QStyleOption *option = 0,
-                  const QWidget *widget = 0) const override;
+  int pixelMetric(PixelMetric metric, const QStyleOption *option = nullptr,
+                  const QWidget *widget = nullptr) const override;
 
 #if 0
   void polish(QWidget *widget) override;
@@ -66,10 +67,11 @@ class CQStyle : public QProxyStyle {
   QPalette standardPalette() const override;
 
   QPixmap standardPixmap(StandardPixmap standardPixmap, const QStyleOption *opt,
-                         const QWidget *widget = 0) const override;
+                         const QWidget *widget = nullptr) const override;
 
-  int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0,
-                QStyleHintReturn *returnData = 0) const override;
+  int styleHint(StyleHint hint, const QStyleOption *option = nullptr,
+                const QWidget *widget = nullptr,
+                QStyleHintReturn *returnData = nullptr) const override;
 
   QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *option, SubControl sc,
                        const QWidget *widget) const override;
