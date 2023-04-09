@@ -36,8 +36,7 @@ init()
 {
   setObjectName("tabSplit");
 
-  auto *layout = new QHBoxLayout(this);
-  layout->setMargin(0); layout->setSpacing(0);
+  auto *layout = CQUtil::makeLayout<QHBoxLayout>(this, 0, 0);
 
   splitter_  = new CQTabSplitSplitter (this);
   tabWidget_ = new CQTabSplitTabWidget(this);
@@ -151,10 +150,9 @@ addWidget(QWidget *w, const QString &name)
 
   if (isGrouped(w)) {
     data.group = new CQGroupBox(name);
-    data.group->setObjectName("group");
+    data.group->setObjectName(QString("group%1").arg(widgets_.size()));
 
-    data.layout = new QVBoxLayout(data.group);
-    data.layout->setMargin(2); data.layout->setSpacing(2);
+    data.layout = CQUtil::makeLayout<QVBoxLayout>(data.group, 2, 2);
 
     data.layout->addWidget(w);
   }
@@ -348,6 +346,12 @@ setState(State state)
 
       data.w->setVisible(true);
     }
+
+    //---
+
+    orient_ = (state_ == State::HSPLIT ? Qt::Horizontal : Qt::Vertical);
+
+    splitter_->setOrientation(orientation());
 
     //---
 
