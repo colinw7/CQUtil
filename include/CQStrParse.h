@@ -52,6 +52,8 @@ class CQStrParse {
   virtual bool skipString();
   virtual void skipToEnd();
 
+  virtual bool skipLastString() { return skipChars(lastStringLen_); }
+
   virtual bool backSkipChar();
 
   virtual void autoSkipSpace() const;
@@ -162,6 +164,8 @@ class CQStrParse {
   int     len_ { 0 };
   bool    autoSkipSpace_ { false };
   int     lineNum_ { 1 };
+
+  mutable uint lastStringLen_ { 0 };
 };
 
 #endif

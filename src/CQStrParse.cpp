@@ -996,12 +996,12 @@ skipBaseIntegerI(const QString &str, int base, int *pos)
   if (*pos < len && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
 
-  if (*pos >= len || ! isBaseCharI(str[*pos], base, 0))
+  if (*pos >= len || ! isBaseCharI(str[*pos], base, nullptr))
     return false;
 
   ++(*pos);
 
-  while (*pos < len && isBaseCharI(str[*pos], base, 0))
+  while (*pos < len && isBaseCharI(str[*pos], base, nullptr))
     ++(*pos);
 
   return true;
@@ -1354,7 +1354,7 @@ bool
 CQStrParse::
 isString(const QString &str) const
 {
-  int len = str.size();
+  auto len = str.size();
 
   if (pos_ + len > len_)
     return false;
@@ -1362,6 +1362,8 @@ isString(const QString &str) const
   for (int i = 0; i < len; ++i)
     if (str_[pos_ + i] != str[i])
       return false;
+
+  lastStringLen_ = uint(len);
 
   return true;
 }
