@@ -207,6 +207,8 @@ namespace CQUtil {
   QString variantToString(const QVariant &var);
   bool variantToString(const QVariant &var, QString &str);
 
+  bool variantFromString(QVariant &var, const QString &str);
+
   bool stringToVariant(const QString &str, QVariant::Type type, const char *typeName,
                        int userType, QVariant &var, const QVariant &oldVar=QVariant());
 

@@ -2160,6 +2160,62 @@ userVariantToString(const QVariant &var, QString &str)
 
 bool
 CQUtil::
+variantFromString(QVariant &var, const QString &str)
+{
+#if 0
+  QByteArray ba;
+
+  // write current string to buffer
+  QBuffer obuffer(&ba);
+  obuffer.open(QIODevice::WriteOnly);
+
+  QDataStream out(&obuffer);
+  out.setVersion(dataStreamVersion());
+
+  out << str;
+
+  // create type data from data stream using registered DataStream methods
+  QBuffer ibuffer(&ba);
+  ibuffer.open(QIODevice::ReadOnly);
+
+  QDataStream in(&ibuffer);
+  in.setVersion(dataStreamVersion());
+
+#if 0
+  QVariant var1(var.type(), 0);
+
+  // const cast is safe since we operate on a newly constructed variant
+  if (! QMetaType::load(in, var.type(), const_cast<void *>(var1.constData())))
+    return false;
+
+  if (! var1.isValid())
+    return false;
+
+  var = var1;
+#else
+  //QVariant var1(var.type(), 0);
+
+  // const cast is safe since we operate on a newly constructed variant
+  CQUtilMetaData::setResult(true);
+
+  if (! QMetaType::load(in, var.type(), const_cast<void *>(var.constData())))
+    return false;
+
+  if (! CQUtilMetaData::getResult())
+    return false;
+
+  if (! var.isValid())
+    return false;
+#endif
+
+  return true;
+#else
+  return stringToVariant(str, var.type(), var.typeName(), var.userType(), var, var);
+#endif
+}
+
+bool
+CQUtil::
 userVariantFromString(QVariant &var, const QString &str)
 {
   QByteArray ba;
