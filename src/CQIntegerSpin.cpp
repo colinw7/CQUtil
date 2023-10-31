@@ -11,7 +11,7 @@ CQIntegerSpin(QWidget *parent, int value) :
 
 CQIntegerSpin::
 CQIntegerSpin(int value) :
- QSpinBox(0)
+ QSpinBox(nullptr)
 {
   init(value);
 }

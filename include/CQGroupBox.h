@@ -155,6 +155,8 @@ class CQGroupBox : public QWidget {
   void updateEnabled();
   void updateCollapsed();
 
+  void updateStyle();
+
  signals:
   void clicked(bool checked);
   void toggled(bool checked);

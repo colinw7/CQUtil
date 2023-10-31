@@ -35,9 +35,7 @@ init()
 {
   setObjectName("groupBox");
 
-  setTitleFont();
-
-  lineColor_ = palette().color(QPalette::Mid);
+  updateStyle();
 
   //----
 
@@ -51,6 +49,7 @@ init()
 
   //----
 
+  connect(CQStyleMgrInst, SIGNAL(fontChanged()), this, SLOT(updateSlot()));
   connect(CQStyleMgrInst, SIGNAL(colorsChanged()), this, SLOT(updateSlot()));
 }
 
@@ -456,10 +455,12 @@ paintEvent(QPaintEvent *)
   QFontMetrics fm(titleFont_);
 
   // set check size
-  int checkSize = (isCheckable() ? fm.height() + 4 : 0);
+  int checkSize  = (isCheckable() ? fm.height() + 4 : 0);
+  int checkSize1 = (isCheckable() ? checkSize + dx_ : 0);
 
   // set collapse size
-  int collapseSize = (isCollapsible() ? fm.ascent() : 0);
+  int collapseSize  = (isCollapsible() ? fm.ascent() : 0);
+  int collapseSize1 = (isCollapsible() ? collapseSize + dx_ : 0);
 
   // set text position
   int textX = 0;
@@ -467,11 +468,11 @@ paintEvent(QPaintEvent *)
   int tw = (title_ != "" ? fm.horizontalAdvance(title_) : 0);
 
   if      (titleAlignment_ & Qt::AlignRight)
-    textX = width() - dx_ - tw - collapseSize;
+    textX = width() - dx_ - tw - collapseSize1;
   else if (titleAlignment_ & Qt::AlignHCenter)
-    textX = (width() - tw - checkSize - collapseSize)/2 + checkSize;
+    textX = (width() - tw - checkSize1 - collapseSize1)/2 + checkSize1 + dx_;
   else if (titleAlignment_ & Qt::AlignLeft)
-    textX = dx_ + checkSize;
+    textX = dx_ + checkSize1;
 
   int textY = 0;
 
@@ -483,11 +484,11 @@ paintEvent(QPaintEvent *)
     textY = spaceTop()/2 + fm.descent() + 2;
 
   // set check position
-  int checkX = textX - checkSize;
+  int checkX = textX - checkSize1;
   int checkY = textY - fm.ascent()/2;
 
   // set collapse position
-  int collapseX = width() - collapseSize;
+  int collapseX = width() - collapseSize1;
   int collapseY = textY - fm.ascent()/2;
 
   // draw top line
@@ -510,8 +511,7 @@ paintEvent(QPaintEvent *)
   if (title_ != "") {
     painter.setFont(titleFont_);
 
-    int tw1 = width() - checkSize - collapseSize - 4*dx_;
-
+    int tw1 = width() - 2*dx_ - checkSize1 - collapseSize1;
     int tw2 = std::min(tw, tw1);
 
     titleRect_ = QRect(textX - dx_, textY - fm.ascent() + fm.descent(), tw2 + dx_, fm.height());
@@ -865,7 +865,18 @@ void
 CQGroupBox::
 updateSlot()
 {
+  updateStyle();
+
   update();
+}
+
+void
+CQGroupBox::
+updateStyle()
+{
+  setTitleFont();
+
+  lineColor_ = palette().color(QPalette::Mid);
 }
 
 //-----------
