@@ -216,7 +216,7 @@ CQColorEdit::
 emitColorChanged()
 {
   emit colorChanged(color_);
-  emit colorChanged(colorName_);
+  emit colorNameChanged(colorName_);
 }
 
 void

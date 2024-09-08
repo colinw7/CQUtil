@@ -52,7 +52,7 @@ class CQColorEdit : public QFrame {
 
   void initStyle(QStyleOptionComboBox &opt);
 
- private slots:
+ private Q_SLOTS:
   void textChangedSlot();
 
   void buttonSlot();
@@ -64,9 +64,9 @@ class CQColorEdit : public QFrame {
 
   void closeMenuSlot();
 
- signals:
+ Q_SIGNALS:
   void colorChanged(const QColor &color);
-  void colorChanged(const QString &colorName);
+  void colorNameChanged(const QString &colorName);
 
   void menuHidden();
 
