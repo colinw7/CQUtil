@@ -34,6 +34,8 @@ init(double value)
   connect(lineEdit(), SIGNAL(cursorPositionChanged(int, int)), this, SLOT(updateStep()));
 
   updateStep();
+
+  connect(this, SIGNAL(valueChanged(double)), this, SIGNAL(realValueChanged(double)));
 }
 
 void

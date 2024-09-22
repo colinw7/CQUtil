@@ -36,6 +36,8 @@ class CQRealSpin : public QDoubleSpinBox {
   bool event(QEvent *event) override;
 
  Q_SIGNALS:
+  void realValueChanged(double);
+
   //! emitted when step changed
   void stepChanged(double);
 
