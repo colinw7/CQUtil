@@ -117,16 +117,16 @@ processEvent(QObject *obj, QEvent *event)
     else
       showValid = isPreviewValid(w, me->globalPos());
 
-    pressWidget_ = 0;
+    pressWidget_ = nullptr;
   }
   else if (type == QEvent::Show) {
-    if (qobject_cast<QMenu *>(w) != 0) {
+    if (qobject_cast<QMenu *>(w) != nullptr) {
       menuActive_ = true;
       //std::cerr << "menu active" << std::endl;
     }
   }
   else if (type == QEvent::Hide) {
-    if (qobject_cast<QMenu *>(w) != 0) {
+    if (qobject_cast<QMenu *>(w) != nullptr) {
       menuActive_ = false;
       //std::cerr << "menu inactive" << std::endl;
     }

@@ -11,7 +11,7 @@ void
 CQMainWindow::
 init()
 {
-  QWidget *w = createCentralWidget();
+  auto *w = createCentralWidget();
 
   if (w)
     setCentralWidget(w);

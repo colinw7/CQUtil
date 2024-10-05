@@ -269,9 +269,13 @@ void
 CQTableWidget::
 showEvent(QShowEvent *)
 {
-  //resizeColumnsToContents();
+  bool autoFit = (! shown_ && autoFit_);
 
-  //fixTableColumnWidths(this, 16, true);
+  shown_   = true;
+  autoFit_ = false;
+
+  if (autoFit)
+    fixTableColumnWidths();
 }
 
 void
@@ -303,9 +307,15 @@ void
 CQTableWidget::
 fixTableColumnWidths()
 {
-  resizeColumnsToContents();
+  if (shown_) {
+    resizeColumnsToContents();
 
-  //fixTableColumnWidths(this, 16, false);
+    //fixTableColumnWidths(this, 16, false);
+
+    fitAll();
+  }
+  else
+    autoFit_ = true;
 }
 
 void

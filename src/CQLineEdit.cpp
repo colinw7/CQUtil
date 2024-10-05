@@ -8,7 +8,7 @@
 // create line edit
 CQLineEdit::
 CQLineEdit(QWidget *parent) :
- QLineEdit(parent), placeColor_(), placeItalic_(true), state_(STATE_NONE), ignore_(false)
+ QLineEdit(parent)
 {
 #if QT_VERSION >= 0x050000
   setClearButtonEnabled(true);
@@ -21,7 +21,7 @@ CQLineEdit(QWidget *parent) :
   //---
 
   for (int i = 0; i < children().size(); ++i) {
-    QAction *action = qobject_cast<QAction *>(children().at(i));
+    auto *action = qobject_cast<QAction *>(children().at(i));
 
     if (action)
       connect(action, SIGNAL(triggered()), this, SIGNAL(returnPressed()), Qt::QueuedConnection);

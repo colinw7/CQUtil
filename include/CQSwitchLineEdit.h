@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QPointer>
 
+class CQIconButton;
 class QLineEdit;
 
 class CQSwitchLineEdit : public QFrame {
@@ -34,6 +35,9 @@ class CQSwitchLineEdit : public QFrame {
   void editSwitched(bool);
   void editingFinished();
 
+ public Q_SLOTS:
+  void toggleAltEdit();
+
  protected:
   virtual void updatePlacement();
 
@@ -45,9 +49,10 @@ class CQSwitchLineEdit : public QFrame {
  private:
   using WidgetP = QPointer<QWidget>;
 
-  QLineEdit *edit_ { nullptr };
-  WidgetP    altEdit_;
-  bool       isAlt_ { false };
+  QLineEdit*    edit_   { nullptr }; //!< line edit
+  CQIconButton* button_ { nullptr }; //!< switch button
+  WidgetP       altEdit_;            //!< alternate editor
+  bool          isAlt_  { false };   //!< is alternate editor current
 };
 
 #endif

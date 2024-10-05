@@ -354,7 +354,7 @@ initWidgets()
   int n = count();
 
   while (widgets_.size() < n)
-    widgets_.push_back(0);
+    widgets_.push_back(nullptr);
 
   while (widgets_.size() > n) {
     auto *w = widgets_.back();

@@ -11,7 +11,7 @@ CQPoint2DEdit(QWidget *parent, const CPoint2D &value, bool spin) :
 
 CQPoint2DEdit::
 CQPoint2DEdit(const CPoint2D &value, bool spin) :
- QFrame(0), spin_(spin)
+ QFrame(nullptr), spin_(spin)
 {
   init(value);
 }
@@ -25,7 +25,7 @@ CQPoint2DEdit(QWidget *parent, const QPointF &value, bool spin) :
 
 CQPoint2DEdit::
 CQPoint2DEdit(const QPointF &value, bool spin) :
- QFrame(0), spin_(spin)
+ QFrame(nullptr), spin_(spin)
 {
   init(CPoint2D(value.x(), value.y()));
 }

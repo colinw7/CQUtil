@@ -1,8 +1,12 @@
 #include <CQSwitchLineEdit.h>
 #include <CQUtil.h>
+#include <CQIconButton.h>
+
 #include <QLineEdit>
 #include <QKeyEvent>
 #include <iostream>
+
+#include <svg/switch_edit_svg.h>
 
 CQSwitchLineEdit::
 CQSwitchLineEdit(QWidget *parent) :
@@ -10,9 +14,16 @@ CQSwitchLineEdit(QWidget *parent) :
 {
   setObjectName("switch");
 
-  edit_ = CQUtil::makeWidget<QLineEdit>(this, "edit");
+  edit_   = CQUtil::makeWidget<QLineEdit>(this, "edit");
+  button_ = CQUtil::makeWidget<CQIconButton>(this, "switch");
+
+  button_->setAutoRaise(true);
+  button_->setIcon("SWITCH_EDIT");
+  button_->setFocusPolicy(Qt::NoFocus);
+  button_->setToolTip("Switch between custom edit to line edit");
 
   connect(edit_, SIGNAL(editingFinished()), this, SIGNAL(editingFinished()));
+  connect(button_, SIGNAL(clicked()), this, SLOT(toggleAltEdit()));
 
   setFocusProxy(edit_);
 
@@ -53,6 +64,13 @@ setAltEdit(QWidget *edit)
 
 void
 CQSwitchLineEdit::
+toggleAltEdit()
+{
+  setShowAltEdit(! isAlt_);
+}
+
+void
+CQSwitchLineEdit::
 setShowAltEdit(bool isAlt)
 {
   //std::cerr << "Show Alt Edit" << isAlt << "\n";
@@ -81,9 +99,16 @@ updatePlacement()
   if (altEdit_)
     altEdit_->setVisible(isShowAltEdit());
 
+  int bw = 0;
+
+  if (altEdit_)
+    bw = button_->sizeHint().width();
+
+  button_->setVisible(altEdit_);
+
   if (! isShowAltEdit()) {
     edit_->move(0, 0);
-    edit_->resize(width(), height());
+    edit_->resize(width() - bw, height());
 
     setFocusProxy(edit_);
 
@@ -93,7 +118,7 @@ updatePlacement()
   }
   else {
     altEdit_->move(0, 0);
-    altEdit_->resize(width(), height());
+    altEdit_->resize(width() - bw, height());
 
     setFocusProxy(altEdit_);
 
@@ -101,6 +126,9 @@ updatePlacement()
 
     //altEdit_->raise();
   }
+
+  button_->move(width() - bw, 0);
+  button_->resize(bw, height());
 }
 
 bool

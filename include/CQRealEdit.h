@@ -17,9 +17,8 @@ class CQRealEdit : public QLineEdit {
 
   virtual ~CQRealEdit() { }
 
-  void setValue(double value);
-
   double getValue() const;
+  void setValue(double value);
 
   void setRange(double lower, double upper, int decimals=0);
 
@@ -30,11 +29,11 @@ class CQRealEdit : public QLineEdit {
 
   void contextMenuEvent(QContextMenuEvent *) override;
 
- private slots:
+ private Q_SLOTS:
   void editingFinishedI();
   void menuItemActivated(QAction *);
 
- signals:
+ Q_SIGNALS:
   void valueChanged(double);
 
  private:

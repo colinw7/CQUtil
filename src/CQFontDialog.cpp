@@ -37,8 +37,8 @@ void parseFontName(const QString &name, QString &foundry, QString &family) {
   // capitalize the family/foundry names
   bool space = true;
 
-  QChar *s   = family.data();
-  int    len = family.length();
+  auto *s   = family.data();
+  int   len = family.length();
 
   while (len--) {
     if (space) *s = s->toUpper();
@@ -142,7 +142,7 @@ initWidgets()
   //setSizeGripEnabled(true);
 
   // grid layout
-  QGridLayout *mainGrid = new QGridLayout(this);
+  auto *mainGrid = new QGridLayout(this);
   mainGrid->setMargin(2); mainGrid->setSpacing(2);
 
   // font family
@@ -190,7 +190,7 @@ initWidgets()
   sizeEdit_ = new QLineEdit;
   sizeEdit_->setFocusPolicy(Qt::ClickFocus);
 
-  QIntValidator *validator = new QIntValidator(1, 512, this);
+  auto *validator = new QIntValidator(1, 512, this);
   sizeEdit_->setValidator(validator);
 
   sizeList_ = new CQFontListView;
@@ -210,9 +210,9 @@ initWidgets()
   //---
 
   // font effects box
-  QGroupBox *effectsGroup = new QGroupBox("Effects");
+  auto *effectsGroup = new QGroupBox("Effects");
 
-  QVBoxLayout *effectsLayout = new QVBoxLayout(effectsGroup);
+  auto *effectsLayout = new QVBoxLayout(effectsGroup);
 
   strikeout_ = new QCheckBox("Stri&keout");
   underline_ = new QCheckBox("&Underline");
@@ -228,9 +228,9 @@ initWidgets()
   //---
 
   // font sample
-  QGroupBox *sampleGroup = new QGroupBox("Sample");
+  auto *sampleGroup = new QGroupBox("Sample");
 
-  QHBoxLayout *sampleLayout = new QHBoxLayout(sampleGroup);
+  auto *sampleLayout = new QHBoxLayout(sampleGroup);
 
   sampleEdit_ = new QLineEdit;
   sampleEdit_->setObjectName("sampleEdit");
@@ -260,9 +260,9 @@ initWidgets()
   smoothScalable_ = false;
 
   for (int i = 0; i < QFontDatabase::WritingSystemsCount; ++i) {
-    QFontDatabase::WritingSystem ws = QFontDatabase::WritingSystem(i);
+    auto ws = QFontDatabase::WritingSystem(i);
 
-    QString writingSystemName = QFontDatabase::writingSystemName(ws);
+    auto writingSystemName = QFontDatabase::writingSystemName(ws);
 
     if (writingSystemName.isEmpty())
       break;
@@ -286,7 +286,7 @@ initWidgets()
 
   mainGrid->addWidget(buttonBox_, 9, 0, 1, 5);
 
-  QPushButton *button = static_cast<QPushButton *>(buttonBox_->addButton(QDialogButtonBox::Ok));
+  auto *button = static_cast<QPushButton *>(buttonBox_->addButton(QDialogButtonBox::Ok));
 
   connect(buttonBox_, SIGNAL(accepted()), this, SLOT(accept()));
 
@@ -398,11 +398,9 @@ updateFamilies()
 {
   enum match_t { MATCH_NONE = 0, MATCH_LAST_RESORT = 1, MATCH_APP = 2, MATCH_FAMILY = 3 };
 
-  const CQFontDialog::FontDialogOptions scalableMask =
-    (CQFontDialog::ScalableFonts | CQFontDialog::NonScalableFonts);
-  const CQFontDialog::FontDialogOptions spacingMask =
-    (CQFontDialog::ProportionalFonts | CQFontDialog::MonospacedFonts);
-  const CQFontDialog::FontDialogOptions options = this->options();
+  const auto scalableMask = (CQFontDialog::ScalableFonts | CQFontDialog::NonScalableFonts);
+  const auto spacingMask  = (CQFontDialog::ProportionalFonts | CQFontDialog::MonospacedFonts);
+  const auto options      = this->options();
 
   QFontDatabase fdb;
 
@@ -441,8 +439,7 @@ updateFamilies()
 
   int i = 0;
 
-  for (QStringList::const_iterator it = familyNames.constBegin();
-        it != familyNames.constEnd(); ++it, ++i) {
+  for (auto it = familyNames.constBegin(); it != familyNames.constEnd(); ++it, ++i) {
     parseFontName(*it, foundryName2, familyName2);
 
     //try to match...
@@ -498,7 +495,7 @@ void
 CQFontDialog::
 updateStyles()
 {
-  QStringList styles = fdb_.styles(familyList_->currentText());
+  auto styles = fdb_.styles(familyList_->currentText());
 
   styleList_->model()->setStringList(styles);
 
@@ -512,7 +509,7 @@ updateStyles()
       bool found = false;
       bool first = true;
 
-      QString cstyle = style_;
+      auto cstyle = style_;
 
     redo:
       for (int i = 0; i < int(styleList_->count()); i++) {
@@ -563,7 +560,7 @@ CQFontDialog::
 updateSizes()
 {
   if (! familyList_->currentText().isEmpty()) {
-    QList<int> sizes = fdb_.pointSizes(familyList_->currentText(), styleList_->currentText());
+    auto sizes = fdb_.pointSizes(familyList_->currentText(), styleList_->currentText());
 
     int i       = 0;
     int current = -1;
@@ -571,7 +568,7 @@ updateSizes()
     QStringList str_sizes;
     str_sizes.reserve(sizes.size());
 
-    for (QList<int>::const_iterator it = sizes.constBegin(); it != sizes.constEnd(); ++it) {
+    for (auto it = sizes.constBegin(); it != sizes.constEnd(); ++it) {
       str_sizes.append(QString::number(*it));
 
       if (current == -1 && *it == size_)
@@ -669,7 +666,7 @@ void
 CQFontDialog::
 styleHighlighted(int index)
 {
-  QString s = styleList_->text(index);
+  auto s = styleList_->text(index);
 
   styleEdit_->setText(s);
 
@@ -686,7 +683,7 @@ void
 CQFontDialog::
 sizeHighlighted(int index)
 {
-  QString s = sizeList_->text(index);
+  auto s = sizeList_->text(index);
 
   sizeEdit_->setText(s);
 
@@ -772,7 +769,7 @@ done(int result)
 
   if (result == Accepted) {
     // We check if this is the same font we had before, if so we emit currentFontChanged
-    QFont selectedFont = currentFont();
+    auto selectedFont = currentFont();
 
     if (selectedFont != this->selectedFont_)
       emit currentFontChanged(selectedFont);

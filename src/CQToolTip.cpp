@@ -583,7 +583,7 @@ getToolTip(QWidget *parent)
   auto *inst = CQToolTipInst;
 
   if (! inst->tooltips_.contains(parent))
-    return 0;
+    return nullptr;
 
   return inst->tooltips_.value(parent);
 }

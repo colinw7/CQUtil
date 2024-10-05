@@ -8,7 +8,7 @@ class QLayout;
 
 // TODO: object factory ?
 
-// abstract class to create widget
+// abstract class to create widget of a specific type
 class CQWidgetFactory {
  public:
   CQWidgetFactory() { }

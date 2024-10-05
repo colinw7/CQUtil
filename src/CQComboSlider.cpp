@@ -32,6 +32,7 @@ init()
 
   slider_ = new QSlider(Qt::Horizontal, this);
   slider_->setRange(0, 100000);
+  slider_->setFocusPolicy(Qt::NoFocus);
 
   spinner_ = new CQRealSpin(this);
   spinner_->setDecimals(5);

@@ -165,6 +165,9 @@ class CQTableWidget : public QTableWidget {
   CQHeaderView*          header_ { nullptr };
   TypeList               types_;
   CQTableWidgetDelegate* delegate_ { nullptr };
+
+  bool shown_   { false };
+  bool autoFit_ { false };
 };
 
 //---

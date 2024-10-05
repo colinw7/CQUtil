@@ -598,7 +598,7 @@ CQTabSplitTabMenu(CQTabSplitTabWidget *tabWidget) :
 
   setIcon("MENU");
 
-  auto *menu = CQUtil::makeWidget<QMenu>("menu");
+  auto *menu = CQUtil::makeWidget<QMenu>(this, "menu");
 
   //---
 

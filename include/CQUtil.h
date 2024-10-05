@@ -89,8 +89,16 @@ namespace CQUtil {
 
   QString fullName(const QObject* object);
 
+  QObject *getGlobalObject(const QString &name);
+
   QObject *nameToObject(const QString &name);
   QObject *nameToObject(QObject *parent, const QString &name);
+
+  std::vector<QObject *> nameToObjects(QObject *parent, const QString &name);
+  std::vector<QObject *> nameToObjects(const QString &name);
+
+  bool hierChildObjects(QObject *object, int ind, const QStringList &names,
+                        std::vector<QObject *> &objects);
 
   QObject *hierChildObject(QObject *object, int ind, const QStringList &names);
 
@@ -553,6 +561,17 @@ namespace CQUtil {
   bool isFixedPitch(const QFont &font);
 
   QFont getMonospaceFont();
+}
+
+//---
+
+namespace CQUtil {
+
+bool getWidgetValue(QWidget *w, QVariant &value);
+bool setWidgetValue(QWidget *w, const QVariant &value);
+
+void connectWidgetChanged(QWidget *w, QObject *obj, const char *slotName);
+
 }
 
 #endif

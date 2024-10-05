@@ -8,7 +8,9 @@
 #include <CQUtilAlignType.h>
 #include <CQUtilGeom.h>
 #include <CQUtilGradient.h>
+
 #include <CQStyleMgr.h>
+#include <CQHtmlTextPainter.h>
 
 //#include <CQImageUtil.h>
 //#include <CQUtilMeta.h>
@@ -29,22 +31,29 @@
 #endif
 
 #include <Qt>
+#include <QAbstractButton>
 #include <QApplication>
-#include <QDesktopWidget>
-#include <QScreen>
-#include <QDockWidget>
+#include <QComboBox>
+#include <QAbstractTextDocumentLayout>
 #include <QAction>
-#include <QMouseEvent>
+#include <QBuffer>
+#include <QClipboard>
+#include <QDesktopWidget>
+#include <QDockWidget>
+#include <QDoubleSpinBox>
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
 #include <QMetaObject>
 #include <QMetaProperty>
-#include <QPalette>
-#include <QLabel>
-#include <QClipboard>
-#include <QAbstractButton>
-#include <QAbstractTextDocumentLayout>
+#include <QMouseEvent>
 #include <QPainter>
-#include <QBuffer>
-#include <QGridLayout>
+#include <QPalette>
+#include <QScreen>
+#include <QTextBrowser>
+#include <QTextEdit>
+#include <QTreeWidget>
 
 #ifdef CQUTIL_LINE_DASH
 CQUTIL_DEF_META_TYPE_STD(CLineDash, toString, fromString)
@@ -178,7 +187,7 @@ fullName(const QObject *object)
 
 QObject *
 CQUtil::
-nameToObject(const QString &name)
+getGlobalObject(const QString &name)
 {
   if (! name.length())
     return nullptr;
@@ -190,17 +199,125 @@ nameToObject(const QString &name)
   if (name == "STYLE_MGR")
     return CQStyleMgrInst;
 
+  if (name == "DESKTOP")
+    return QApplication::desktop();
+
   auto po = s_aliasObject.find(name);
 
   if (po != s_aliasObject.end())
     return (*po).second;
 
+  return nullptr;
+}
+
+std::vector<QObject *>
+CQUtil::
+nameToObjects(const QString &name)
+{
+  return nameToObjects(nullptr, name);
+}
+
+std::vector<QObject *>
+CQUtil::
+nameToObjects(QObject *parent, const QString &name)
+{
+  std::vector<QObject *> objects;
+
+  if (! name.length())
+    return objects;
+
+  if (! parent) {
+    auto *obj = getGlobalObject(name);
+
+    if (obj) {
+      objects.push_back(obj);
+      return objects;
+    }
+  }
+
   auto names = name.split("|");
 
   int num_names = names.size();
+  if (num_names == 0) return objects;
 
-  if (num_names == 0)
+  auto baseName = names[0];
+
+  if (! parent) {
+    auto wlist = QApplication::topLevelWidgets();
+
+    if (name == "*") {
+      for (auto *w : wlist) {
+        if (w->objectName() != "")
+          objects.push_back(w);
+      }
+
+      return objects;
+    }
+
+    for (auto *w : wlist) {
+      if (w->objectName() != baseName)
+        continue;
+
+      if (names.size() > 1) {
+        std::vector<QObject *> objects1;
+
+        if (hierChildObjects(w, 1, names, objects1)) {
+          for (auto *object1 : objects1)
+            objects.push_back(object1);
+        }
+      }
+      else
+        objects.push_back(w);
+    }
+
+    for (auto *w : wlist) {
+      auto *l = w->layout();
+
+      if (! l || l->objectName() != baseName)
+        continue;
+
+      if (names.size() > 1) {
+        std::vector<QObject *> objects1;
+
+        if (hierChildObjects(l, 1, names, objects1)) {
+          for (auto *object1 : objects1)
+            objects.push_back(object1);
+        }
+      }
+      else
+        objects.push_back(l);
+    }
+  }
+  else {
+    std::vector<QObject *> objects1;
+
+    if (hierChildObjects(parent, 0, names, objects1)) {
+      for (auto *object1 : objects1)
+        objects.push_back(object1);
+    }
+  }
+
+  return objects;
+}
+
+QObject *
+CQUtil::
+nameToObject(const QString &name)
+{
+  if (! name.length())
     return nullptr;
+
+  auto *obj = getGlobalObject(name);
+
+  if (obj)
+    return obj;
+
+  //---
+
+  auto names = name.split("|");
+
+  int num_names = names.size();
+  if (num_names == 0) return nullptr;
 
   auto baseName = names[0];
 
@@ -233,6 +350,51 @@ nameToObject(const QString &name)
     return hierChildObject(current, 1, names);
   else
     return current;
+}
+
+bool
+CQUtil::
+hierChildObjects(QObject *object, int ind, const QStringList &names,
+                 std::vector<QObject *> &objects)
+{
+  auto children = childObjects(object, names[ind]);
+
+  for (auto *child : children) {
+    if (ind + 1 < names.size()) {
+      std::vector<QObject *> objects1;
+
+      if (! hierChildObjects(child, ind + 1, names, objects))
+        continue;
+
+      for (auto *object1 : objects1)
+        objects.push_back(object1);
+    }
+    else {
+      objects.push_back(child);
+    }
+  }
+
+  if (names[ind] == "*") {
+    const auto &children = object->children();
+
+    for (auto *child : children) {
+      if (ind + 1 < names.size()) {
+        std::vector<QObject *> objects1;
+
+        if (! hierChildObjects(child, ind + 1, names, objects1))
+          continue;
+
+        for (auto *object1 : objects1)
+          objects.push_back(object1);
+      }
+      else {
+        if (child->objectName() != "")
+          objects.push_back(child);
+      }
+    }
+  }
+
+  return ! objects.empty();
 }
 
 QObject *
@@ -1344,15 +1506,15 @@ variantToString(const QVariant &var, QString &valueStr)
     auto rect = var.value<QRect>();
 
     valueStr = QString("{%1 %2} {%3 %4}").
-               arg(rect.left ()).arg(rect.bottom()).
-               arg(rect.right()).arg(rect.top   ());
+               arg(rect.left ()).arg(rect.top   ()).
+               arg(rect.right()).arg(rect.bottom());
   }
   else if (type == QVariant::RectF) {
     auto rect = var.value<QRectF>();
 
     valueStr = QString("{%1 %2} {%3 %4}").
-               arg(rect.left ()).arg(rect.bottom()).
-               arg(rect.right()).arg(rect.top   ());
+               arg(rect.left ()).arg(rect.top   ()).
+               arg(rect.right()).arg(rect.bottom());
   }
   else if (type == QVariant::Size) {
     auto size = var.value<QSize>();
@@ -1375,8 +1537,8 @@ variantToString(const QVariant &var, QString &valueStr)
     auto r = region.boundingRect();
 
     valueStr = QString("{%1 %2} {%3 %4}").
-               arg(r.left ()).arg(r.bottom()).
-               arg(r.right()).arg(r.top   ());
+               arg(r.left ()).arg(r.top   ()).
+               arg(r.right()).arg(r.bottom());
   }
   else if (type == QVariant::Locale) {
     auto locale = var.value<QLocale>();
@@ -2287,9 +2449,8 @@ toQGradient(const CLinearGradient *lgradient, QGradient::CoordinateMode mode)
 
   QGradientStops stops;
 
-  for (CLinearGradient::StopList::const_iterator ps = lgradient->beginStops();
-         ps != lgradient->endStops(); ++ps) {
-    const CGradientStop &stop = *ps;
+  for (auto ps = lgradient->beginStops(); ps != lgradient->endStops(); ++ps) {
+    const auto &stop = *ps;
 
     stops.push_back(QGradientStop(stop.getOffset(), CQUtil::rgbaToColor(stop.getColor())));
   }
@@ -2318,9 +2479,8 @@ toQGradient(const CRadialGradient *rgradient, QGradient::CoordinateMode mode)
 
   QGradientStops stops;
 
-  for (CRadialGradient::StopList::const_iterator ps = rgradient->beginStops();
-         ps != rgradient->endStops(); ++ps) {
-    const CGradientStop &stop = *ps;
+  for (auto ps = rgradient->beginStops(); ps != rgradient->endStops(); ++ps) {
+    const auto &stop = *ps;
 
     stops.push_back(QGradientStop(stop.getOffset(), CQUtil::rgbaToColor(stop.getColor())));
   }
@@ -2832,35 +2992,19 @@ recolorImage(QImage &image, const QColor &fg, const QColor &bg)
 
 void
 CQUtil::
-drawHtmlText(QWidget *w, QPainter *painter, const QString &text,
+drawHtmlText(QWidget *, QPainter *painter, const QString &text,
              const QPalette &palette, const QRect &rect, bool active)
 {
-  painter->setRenderHints(QPainter::Antialiasing);
+  CQHtmlTextPainter textPainter;
 
-  QTextDocument td;
-
-  td.setHtml(text);
-
-  auto trect = rect.translated(-rect.x(), -rect.y());
-
-  painter->translate(rect.x(), rect.y());
-
-  painter->setClipRect(trect);
-
-  QAbstractTextDocumentLayout::PaintContext ctx;
+  textPainter.setText(text);
 
   if (active)
-    ctx.palette.setColor(QPalette::Text, palette.highlightedText().color());
+    textPainter.setTextColor(palette.highlightedText().color());
   else
-    ctx.palette.setColor(QPalette::Text, palette.text().color());
+    textPainter.setTextColor(palette.text().color());
 
-  auto *layout = td.documentLayout();
-
-  layout->setPaintDevice(w);
-
-  layout->draw(painter, ctx);
-
-  painter->translate(-rect.x(), -rect.y());
+  textPainter.drawInRect(painter, rect);
 }
 
 QString
@@ -3093,3 +3237,185 @@ getMonospaceFont()
 
   return font;
 }
+
+//------
+
+bool
+CQUtil::
+getWidgetValue(QWidget *w, QVariant &value)
+{
+  auto *check = qobject_cast<QCheckBox *>(w);
+  auto *combo = qobject_cast<QComboBox *>(w);
+  auto *dspin = qobject_cast<QDoubleSpinBox *>(w);
+  auto *ledit = qobject_cast<QLineEdit *>(w);
+  auto *list  = qobject_cast<QListWidget *>(w);
+  auto *radio = qobject_cast<QRadioButton *>(w);
+  auto *ispin = qobject_cast<QSpinBox *>(w);
+  auto *table = qobject_cast<QTableWidget *>(w);
+  auto *tbrow = qobject_cast<QTextBrowser *>(w);
+  auto *tedit = qobject_cast<QTextEdit *>(w);
+  auto *tree  = qobject_cast<QTreeWidget *>(w);
+
+  auto listValue = [&](QListView *list, QVariant &var) {
+    auto *sm = list->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+
+  auto tableValue = [&](QTableView *table, QVariant &var) {
+    auto *sm = table->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+
+  auto treeValue = [&](QTreeView *tree, QVariant &var) {
+    auto *sm = tree->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+
+  if      (check) value = QVariant(check->isChecked());
+  else if (combo) value = QVariant(combo->currentIndex());
+  else if (dspin) value = QVariant(dspin->value());
+  else if (ledit) value = QVariant(ledit->text());
+  else if (list ) { if (! listValue(list, value)) return false; }
+  else if (radio) value = QVariant(radio->isChecked());
+  else if (ispin) value = QVariant(ispin->value());
+  else if (table) { if (! tableValue(table, value)) return false; }
+  else if (tbrow) value = QVariant(tbrow->toPlainText());
+  else if (tedit) value = QVariant(tedit->toPlainText());
+  else if (tree ) { if (! treeValue(tree, value)) return false; }
+  else return false;
+
+  return true;
+}
+
+bool
+CQUtil::
+setWidgetValue(QWidget *w, const QVariant &value)
+{
+  auto *check = qobject_cast<QCheckBox *>(w);
+  auto *combo = qobject_cast<QComboBox *>(w);
+  auto *dspin = qobject_cast<QDoubleSpinBox *>(w);
+  auto *ledit = qobject_cast<QLineEdit *>(w);
+//auto *list  = qobject_cast<QListWidget *>(w);
+  auto *radio = qobject_cast<QRadioButton *>(w);
+  auto *ispin = qobject_cast<QSpinBox *>(w);
+//auto *table = qobject_cast<QTableWidget *>(w);
+  auto *tbrow = qobject_cast<QTextBrowser *>(w);
+  auto *tedit = qobject_cast<QTextEdit *>(w);
+//auto *tree  = qobject_cast<QTreeWidget *>(w);
+
+#if 0
+  auto setListValue = [&](QListView *list, const QVariant &var) {
+    auto *sm = list->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+
+  auto setTableValue = [&](QTableView *table, const QVariant &var) {
+    auto *sm = table->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+
+  auto setTreeValue = [&](QTreeView *tree, const QVariant &var) {
+    auto *sm = tree->selectionModel();
+    if (! sm) return false;
+
+    auto inds = sm->selectedIndexes();
+
+    if (inds.length() == 0)
+      var = QVariant(-1);
+    else
+      var = QVariant(inds[0].row());
+
+    return true;
+  };
+#endif
+
+  if      (check) check->setChecked(value.toInt());
+  else if (combo) combo->setCurrentIndex(value.toInt());
+  else if (dspin) dspin->setValue(value.toDouble());
+  else if (ledit) ledit->setText(value.toString());
+//else if (list ) setListValue(list, value);
+  else if (radio) radio->setChecked(value.toInt());
+  else if (ispin) ispin->setValue(value.toInt());
+//else if (table) setTableValue(table, value);
+  else if (tbrow) tbrow->setText(value.toString());
+  else if (tedit) tedit->setText(value.toString());
+//else if (tree ) setTreeValue(tree, value);
+  else return false;
+
+  return true;
+}
+
+void
+CQUtil::
+connectWidgetChanged(QWidget *w, QObject *obj, const char *slotName)
+{
+  auto *check = qobject_cast<QCheckBox *>(w);
+  auto *combo = qobject_cast<QComboBox *>(w);
+  auto *dspin = qobject_cast<QDoubleSpinBox *>(w);
+  auto *ledit = qobject_cast<QLineEdit *>(w);
+//auto *list  = qobject_cast<QListWidget *>(w);
+  auto *radio = qobject_cast<QRadioButton *>(w);
+  auto *ispin = qobject_cast<QSpinBox *>(w);
+//auto *table = qobject_cast<QTableWidget *>(w);
+  auto *tbrow = qobject_cast<QTextBrowser *>(w);
+  auto *tedit = qobject_cast<QTextEdit *>(w);
+//auto *tree  = qobject_cast<QTreeWidget *>(w);
+
+  if      (check) QObject::connect(check, SIGNAL(stateChanged(int)), obj, slotName);
+  else if (combo) QObject::connect(combo, SIGNAL(currentIndexChanged(int)), obj, slotName);
+  else if (dspin) QObject::connect(dspin, SIGNAL(valueChanged(double)), obj, slotName);
+  else if (ledit) QObject::connect(ledit, SIGNAL(returnPressed()), obj, slotName);
+//else if (list ) QObject::connect(list , SIGNAL(selectionChanged()), obj, slotName);
+  else if (radio) QObject::connect(radio, SIGNAL(clicked()), obj, slotName);
+  else if (ispin) QObject::connect(ispin, SIGNAL(valueChanged(int)), obj, slotName);
+//else if (table) QObject::connect(table, SIGNAL(selectionChanged()), obj, slotName);
+  else if (tbrow) QObject::connect(tbrow, SIGNAL(textChanged()), obj, slotName);
+  else if (tedit) QObject::connect(tedit, SIGNAL(textChanged()), obj, slotName);
+//else if (tree ) QObject::connect(tree ,SIGNAL(selectionChanged()), obj, slotName);
+}
+

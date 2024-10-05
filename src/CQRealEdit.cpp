@@ -136,6 +136,6 @@ menuItemActivated(QAction *action)
 
 CQRealEditAction::
 CQRealEditAction(double value) :
- QAction(QString("%1").arg(value), 0), value_(value)
+ QAction(QString("%1").arg(value), nullptr), value_(value)
 {
 }
