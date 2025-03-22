@@ -262,7 +262,7 @@ CQImage::
 gaussianBlurExec(CImagePtr &dst, double bx, double by, int nx, int ny)
 {
   QImage *image1 = getQImageP();
-  QImage *image2 = dynamic_cast<CQImage *>(dst.getPtr())->getQImageP();
+  QImage *image2 = dynamic_cast<CQImage *>(dst.get())->getQImageP();
 
   CQImageGaussianBlur blur(*image1);
 

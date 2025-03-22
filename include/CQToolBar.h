@@ -1,10 +1,9 @@
 #ifndef CQTOOLBAR_H
 #define CQTOOLBAR_H
 
-#include <COptVal.h>
-
 #include <QString>
 #include <QSize>
+#include <optional>
 
 class CQMenuItem;
 class QMainWindow;
@@ -16,18 +15,21 @@ class QAction;
 
 class CQToolBarMgr {
  public:
+  using OptInt = std::optional<int>;
+
+ public:
   static CQToolBarMgr *instance();
 
   static void release();
 
-  const COptInt &iconSize() const { return iconSize_; }
+  const OptInt &iconSize() const { return iconSize_; }
   void setIconSize(int i) { iconSize_ = i; }
 
  private:
   CQToolBarMgr();
 
  private:
-  COptInt iconSize_;
+  OptInt iconSize_;
 };
 
 //---

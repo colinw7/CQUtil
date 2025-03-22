@@ -58,7 +58,7 @@ init(CImagePtr image)
 {
   setObjectName("ibutton");
 
-  auto *qimage = image.cast<CQImage>();
+  auto *qimage = dynamic_cast<CQImage *>(image.get());
 
   if (qimage) {
     auto pixmap = QPixmap::fromImage(qimage->getQImage());

@@ -313,7 +313,7 @@ getStringImage(const std::string &str)
 
   image->setDataSize(int(w), int(h));
 
-  CQImage *qimage = image.cast<CQImage>();
+  CQImage *qimage = dynamic_cast<CQImage *>(image.get());
 
   qimage->updateCImage();
 

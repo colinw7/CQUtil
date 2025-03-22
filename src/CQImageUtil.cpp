@@ -15,6 +15,6 @@ QImage
 CQImageUtil::
 toQImage(CImagePtr image)
 {
-  return image.cast<CQImage>()->getQImage();
+  return dynamic_cast<CQImage *>(image.get())->getQImage();
 }
 #endif
