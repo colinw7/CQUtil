@@ -127,6 +127,8 @@ CQSwitchLineEdit.cpp \
 CQFlowLayout.cpp \
 \
 CQFlagsCombo.cpp \
+\
+CQHtmlTextPainter.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -231,6 +233,8 @@ HEADERS += \
 ../include/CQFlowLayout.h \
 \
 ../include/CQFlagsCombo.h \
+\
+../include/CQHtmlTextPainter.h \
 
 OBJECTS_DIR = ../obj
 
