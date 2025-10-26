@@ -14,8 +14,8 @@ class CQRealSpin : public QDoubleSpinBox {
   Q_PROPERTY(double step     READ step)
 
  public:
-  CQRealSpin(QWidget *parent, double value=0);
-  CQRealSpin(double value=0);
+  CQRealSpin(QWidget *parent, double value=0.0);
+  CQRealSpin(double value=0.0);
 
   virtual ~CQRealSpin() { }
 
@@ -32,6 +32,8 @@ class CQRealSpin : public QDoubleSpinBox {
   //! get/set cursor position
   int cursorPosition() const;
   void setCursorPosition(int pos);
+
+  void setPlaceholderText(const QString &str);
 
   bool event(QEvent *event) override;
 

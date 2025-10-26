@@ -4,8 +4,9 @@
 #include <QApplication>
 
 class CQStyle;
-class CConfig;
 class CQAppObjEditFilter;
+class CConfig;
+class QToolButton;
 
 #define CQAppInst CQApp::getApp()
 
@@ -31,6 +32,13 @@ class CQApp : public QApplication {
 
   static void showMetaEdit(QObject *obj=nullptr);
   static void showPerfDialog();
+
+  QToolButton *createDebugButton(QWidget *parent=nullptr);
+
+ private Q_SLOTS:
+  void metaEditSlot();
+  void performanceSlot();
+  void optionsSlot();
 
  private:
   static CQApp *app_;

@@ -182,6 +182,13 @@ dotPos() const
   return -1;
 }
 
+void
+CQRealSpin::
+setPlaceholderText(const QString &str)
+{
+  lineEdit()->setPlaceholderText(str);
+}
+
 bool
 CQRealSpin::
 event(QEvent *event)

@@ -36,7 +36,10 @@
 
 #include <QScreen>
 #include <QDesktopWidget>
+#include <QToolButton>
 #include <QKeyEvent>
+
+#include <svg/menu_svg.h>
 
 CQApp *CQApp::app_;
 
@@ -140,14 +143,17 @@ CQApp(int &argc, char **argv) :
   config_ = new CConfig("CQApp");
 
   std::string fontName;
+  double      fontSize = 12;
 
-  if (! config_->getValue("fontName", fontName))
-    fontName = "Helvetica";
+  if (! getenv("CQAPP_NO_FONT")) {
+    if (! config_->getValue("fontName", fontName))
+      fontName = "Helvetica";
 
-  double fontSize = 12;
+    if (! config_->getValue("fontSize", &fontSize))
+      fontSize = dotsPerInch/8.0;
+  }
 
-  if (! config_->getValue("fontSize", &fontSize))
-    fontSize = dotsPerInch/8.0;
+  //---
 
   double dpi;
 
@@ -156,14 +162,20 @@ CQApp(int &argc, char **argv) :
 
   //---
 
-  QFont font(fontName.c_str(), int(fontSize));
+  QFontMetrics fm(qApp->font());
 
-  CQStyleMgrInst->setFont(font);
+  if (fontName != "") {
+    QFont font(fontName.c_str(), int(fontSize));
 
-  QFontMetrics fm(CQStyleMgrInst->font());
+    CQStyleMgrInst->setFont(font);
+
+    fm = QFontMetrics(CQStyleMgrInst->font());
+  }
 
   CScreenUnitsMgrInst->setEmSize(fm.height());
   CScreenUnitsMgrInst->setExSize(fm.horizontalAdvance("x"));
+
+  //---
 
   auto fixedFont = CQUtil::getMonospaceFont();
 
@@ -280,3 +292,53 @@ addObjEditFilter(QObject *o)
   o->installEventFilter(objEditFilter_);
 }
 #endif
+
+QToolButton *
+CQApp::
+createDebugButton(QWidget *parent)
+{
+  int is = QFontMetrics(font()).height() + 6;
+
+  auto *button = new QToolButton(parent);
+
+  button->setIcon(CQPixmapCacheInst->getIcon("MENU"));
+  button->setPopupMode(QToolButton::InstantPopup);
+
+  button->setAutoRaise(true);
+  button->setIconSize(QSize(is, is));
+
+  auto *menu = new QMenu;
+
+  auto *action1 = menu->addAction("Meta Edit");
+  auto *action2 = menu->addAction("Performance");
+  auto *action3 = menu->addAction("Options");
+
+  connect(action1, SIGNAL(triggered()), this, SLOT(metaEditSlot()));
+  connect(action2, SIGNAL(triggered()), this, SLOT(performanceSlot()));
+  connect(action3, SIGNAL(triggered()), this, SLOT(optionsSlot()));
+
+  button->setMenu(menu);
+
+  return button;
+}
+
+void
+CQApp::
+metaEditSlot()
+{
+  CQApp::showMetaEdit();
+}
+
+void
+CQApp::
+performanceSlot()
+{
+  CQApp::showPerfDialog();
+}
+
+void
+CQApp::
+optionsSlot()
+{
+  CQAppOptions::show();
+}
