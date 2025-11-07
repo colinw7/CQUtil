@@ -129,6 +129,10 @@ CQFlowLayout.cpp \
 CQFlagsCombo.cpp \
 \
 CQHtmlTextPainter.cpp \
+\
+CQMatrixStack2D.cpp \
+\
+CQLabelImage.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -235,6 +239,10 @@ HEADERS += \
 ../include/CQFlagsCombo.h \
 \
 ../include/CQHtmlTextPainter.h \
+\
+../include/CQMatrixStack2D.h \
+\
+../include/CQLabelImage.h \
 
 OBJECTS_DIR = ../obj
 
