@@ -97,7 +97,7 @@ class CQSlider : public CQSliderBase {
   Q_PROPERTY(int tickLabelDelta READ tickLabelDelta WRITE setTickLabelDelta)
 
  public:
-  CQSlider(QWidget *parent=nullptr, Qt::Orientation orient=Qt::Horizontal);
+  CQSlider(QWidget *parent, Qt::Orientation orient=Qt::Horizontal);
   CQSlider(Qt::Orientation orient=Qt::Horizontal);
 
   int tickLabelDelta() const { return tickLabelDelta_; }
@@ -130,7 +130,7 @@ class CQRealSlider : public CQSliderBase {
   Q_PROPERTY(double tickLabelDelta READ tickLabelDelta WRITE setTickLabelDelta)
 
  public:
-  CQRealSlider(QWidget *parent=nullptr, Qt::Orientation orient=Qt::Horizontal);
+  CQRealSlider(QWidget *parent, Qt::Orientation orient=Qt::Horizontal);
   CQRealSlider(Qt::Orientation orient=Qt::Horizontal);
 
   //---

@@ -133,6 +133,8 @@ CQHtmlTextPainter.cpp \
 CQMatrixStack2D.cpp \
 \
 CQLabelImage.cpp \
+\
+CQRotatedText.cpp \
 
 HEADERS += \
 ../include/CQUtil.h \
@@ -243,6 +245,8 @@ HEADERS += \
 ../include/CQMatrixStack2D.h \
 \
 ../include/CQLabelImage.h \
+\
+../include/CQRotatedText.h \
 
 OBJECTS_DIR = ../obj
 
