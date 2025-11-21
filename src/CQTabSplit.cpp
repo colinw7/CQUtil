@@ -1,7 +1,6 @@
 #include <CQTabSplit.h>
 #include <CQTabSplitSplitter.h>
 #include <CQTabSplitSplitterTool.h>
-#include <CQGroupBox.h>
 #include <CQUtil.h>
 
 #include <QApplication>
@@ -70,7 +69,21 @@ setGrouped(bool b)
   if (b != grouped_) {
     grouped_ = b;
 
-    // TODO: re-layout with/widthout groups
+    // TODO: re-layout with/without groups
+  }
+}
+
+void
+CQTabSplit::
+setGroupBold(bool b)
+{
+  if (b != groupBold_) {
+    groupBold_ = b;
+
+    for (auto &data : widgets_) {
+      if (data.group)
+        data.group->setTitleBold(groupBold_);
+    }
   }
 }
 
@@ -114,7 +127,20 @@ setCurrentIndex(int i)
   if (i < 0 || i >= int(widgets_.size()))
     return;
 
-  tabWidget_->setCurrentIndex(i);
+  currentIndex_ = i;
+
+  tabWidget_->setCurrentIndex(currentIndex_);
+
+  Q_EMIT currentIndexChanged(currentIndex_);
+
+  updateGroupColored();
+}
+
+QWidget *
+CQTabSplit::
+currentWidget() const
+{
+  return widget(currentIndex_);
 }
 
 void
@@ -124,6 +150,8 @@ currentIndexSlot(int i)
   currentIndex_ = i;
 
   Q_EMIT currentIndexChanged(currentIndex_);
+
+  updateGroupColored();
 }
 
 void
@@ -149,8 +177,9 @@ addWidget(QWidget *w, const QString &name)
   WidgetData data(w, name);
 
   if (isGrouped(w)) {
-    data.group = new CQGroupBox(name);
-    data.group->setObjectName(QString("group%1").arg(widgets_.size()));
+    int ind = widgets_.size();
+
+    data.group = new CQTabSplitGroup(this, name, ind);
 
     data.layout = CQUtil::makeLayout<QVBoxLayout>(data.group, 2, 2);
 
@@ -178,38 +207,47 @@ addWidget(QWidget *w, const QString &name)
   }
 
   w->setVisible(true); // has been reparented
+
+  updateGroupColored();
 }
 
 void
 CQTabSplit::
 removeWidget(QWidget *w, bool deleteWidget)
 {
-  int i = 0;
+  int ind = 0;
 
   for (auto &data : widgets_) {
     if (w == data.w)
       break;
 
-    ++i;
+    ++ind;
   }
 
-  if (i >= int(widgets_.size())) {
+  removeWidget(ind, deleteWidget);
+}
+
+void
+CQTabSplit::
+removeWidget(int ind, bool deleteWidget)
+{
+  if (ind >= int(widgets_.size())) {
     assert(false);
     return;
   }
 
-  if (i == currentIndex_) {
-    i = currentIndex_ - 1;
+  if (ind == currentIndex_) {
+    ind = currentIndex_ - 1;
 
     Q_EMIT currentIndexChanged(currentIndex_);
   }
 
   WidgetData data;
 
-  if (i >= 0)
-    data = widgets_[size_t(i)];
+  if (ind >= 0)
+    data = widgets_[size_t(ind)];
 
-  for (auto j = size_t(i + 1); j < widgets_.size(); ++j)
+  for (auto j = size_t(ind + 1); j < widgets_.size(); ++j)
     widgets_[j - 1] = widgets_[j];
 
   widgets_.pop_back();
@@ -227,6 +265,8 @@ removeWidget(QWidget *w, bool deleteWidget)
 
     Q_EMIT currentIndexChanged(currentIndex_);
   }
+
+  updateGroupColored();
 }
 
 void
@@ -243,6 +283,24 @@ removeAllWidgets()
   currentIndex_ = -1;
 
   Q_EMIT currentIndexChanged(currentIndex_);
+
+  updateGroupColored();
+}
+
+void
+CQTabSplit::
+updateGroupColored()
+{
+  int ind = 0;
+
+  for (auto &data : widgets_) {
+    bool colored = (currentIndex_ == ind);
+
+    if (data.group)
+      data.group->setTitleColored(colored);
+
+    ++ind;
+  }
 }
 
 bool
@@ -259,12 +317,12 @@ hasWidget(QWidget *w) const
 
 QWidget *
 CQTabSplit::
-widget(int i) const
+widget(int ind) const
 {
-  if (i < 0 || i >= int(widgets_.size()))
+  if (ind < 0 || ind >= int(widgets_.size()))
     return nullptr;
 
-  return widgets_[size_t(i)].w;
+  return widgets_[size_t(ind)].w;
 }
 
 void
@@ -310,6 +368,8 @@ setState(State state)
 {
   if (state_ == state)
     return;
+
+  disconnect(tabWidget_, SIGNAL(currentChanged(int)), this, SLOT(currentIndexSlot(int)));
 
   std::swap(state_, state);
 
@@ -406,6 +466,8 @@ setState(State state)
 
     splitter_->setOrientation(orientation());
   }
+
+  connect(tabWidget_, SIGNAL(currentChanged(int)), this, SLOT(currentIndexSlot(int)));
 }
 
 void
@@ -609,4 +671,24 @@ CQTabSplitTabMenu(CQTabSplitTabWidget *tabWidget) :
   connect(vsplitAction, SIGNAL(triggered()), tabWidget, SLOT(vsplitSlot()));
 
   setMenu(menu);
+}
+
+//---
+
+CQTabSplitGroup::
+CQTabSplitGroup(CQTabSplit *tab, const QString &name, int ind) :
+ CQGroupBox(name), tab_(tab), ind_(ind)
+{
+  setObjectName(QString("group%1").arg(ind));
+
+  setTitleBold(tab->isGroupBold());
+
+  connect(this, SIGNAL(mousePress()), this, SLOT(pressSlot()));
+}
+
+void
+CQTabSplitGroup::
+pressSlot()
+{
+  tab_->setCurrentIndex(ind_);
 }

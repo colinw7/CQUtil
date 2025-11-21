@@ -405,6 +405,8 @@ mousePressEvent(QMouseEvent *e)
   }
 
   QWidget::mousePressEvent(e);
+
+  Q_EMIT mousePress();
 }
 
 void

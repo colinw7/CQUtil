@@ -2,6 +2,7 @@
 #define CQTabSplit_H
 
 #include <CQIconButton.h>
+#include <CQGroupBox.h>
 
 #include <QFrame>
 #include <QSplitter>
@@ -11,8 +12,8 @@
 
 class CQTabSplitSplitterTool;
 class CQTabSplitTabBar;
+class CQTabSplitGroup;
 
-class CQGroupBox;
 class QVBoxLayout;
 
 /*!
@@ -26,6 +27,7 @@ class CQTabSplit : public QFrame {
   Q_PROPERTY(Qt::Orientation orientation  READ orientation    WRITE setOrientation )
   Q_PROPERTY(State           state        READ state          WRITE setState       )
   Q_PROPERTY(bool            grouped      READ isGrouped      WRITE setGrouped     )
+  Q_PROPERTY(bool            groupBold    READ isGroupBold    WRITE setGroupBold   )
   Q_PROPERTY(bool            tabsClosable READ isTabsClosable WRITE setTabsClosable)
   Q_PROPERTY(bool            autoFit      READ isAutoFit      WRITE setAutoFit     )
   Q_PROPERTY(int             currentIndex READ currentIndex   WRITE setCurrentIndex)
@@ -60,6 +62,10 @@ class CQTabSplit : public QFrame {
   bool isGrouped() const { return grouped_; }
   void setGrouped(bool b);
 
+  //! get/set group bolx
+  bool isGroupBold() const { return groupBold_; }
+  void setGroupBold(bool b);
+
   //! get/set grouped (per widget)
   bool isGrouped(QWidget *w) const;
   void setGrouped(QWidget *w, bool b);
@@ -78,6 +84,8 @@ class CQTabSplit : public QFrame {
   int currentIndex() const { return currentIndex_; }
   void setCurrentIndex(int i);
 
+  QWidget *currentWidget() const;
+
   //---
 
   //! get indexed widget
@@ -88,6 +96,7 @@ class CQTabSplit : public QFrame {
 
   //! remove widget
   void removeWidget(QWidget *w, bool deleteWidget=true);
+  void removeWidget(int ind, bool deleteWidget=true);
   void removeAllWidgets();
 
   //! has widget
@@ -128,14 +137,16 @@ class CQTabSplit : public QFrame {
   //! init widget
   void init();
 
+  void updateGroupColored();
+
  private:
   using WidgetP = QPointer<QWidget>;
 
   struct WidgetData {
-    WidgetP      w;                  //!< widget
-    QString      name;               //!< widget name (frou group)
-    CQGroupBox*  group  { nullptr }; //!< group box (if grouped)
-    QVBoxLayout* layout { nullptr }; //!< layout
+    WidgetP          w;                  //!< widget
+    QString          name;               //!< widget name (frou group)
+    CQTabSplitGroup* group  { nullptr }; //!< group box (if grouped)
+    QVBoxLayout*     layout { nullptr }; //!< layout
 
     WidgetData() { }
 
@@ -149,6 +160,7 @@ class CQTabSplit : public QFrame {
   Qt::Orientation orient_       { Qt::Horizontal }; //!< current orientation
   State           state_        { State::HSPLIT };  //!< current state
   bool            grouped_      { false };          //!< is grouped (use group boxes)
+  bool            groupBold_    { false };          //!< is group box bold
   bool            tabsClosable_ { false };          //!< are tabs closable
   bool            autoFit_      { false };          //!< is auto fit
   int             currentIndex_ { -1 };             //!< current index
@@ -223,6 +235,22 @@ class CQTabSplitTabMenu : public CQIconButton {
 
  private:
   CQTabSplitTabWidget* tabWidget_ { nullptr };
+};
+
+//---
+
+class CQTabSplitGroup : public CQGroupBox {
+  Q_OBJECT
+
+ public:
+  CQTabSplitGroup(CQTabSplit *tab, const QString &name, int ind);
+
+ private Q_SLOTS:
+  void pressSlot();
+
+ private:
+  CQTabSplit* tab_ { nullptr };
+  int         ind_ { 0 };
 };
 
 #endif

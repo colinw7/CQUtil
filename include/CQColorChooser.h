@@ -127,13 +127,13 @@ class CQColorChooser : public QWidget {
 
   void setWidgetBackground(QWidget *widget, const QColor &color);
 
- private slots:
+ private Q_SLOTS:
   void textColorChanged();
   void imageButtonClicked();
   void colorButtonClicked();
   void alphaButtonChanged();
 
- signals:
+ Q_SIGNALS:
   void colorChanged(const QColor &color);
   void colorChanged(const QString &colorName);
 

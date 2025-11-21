@@ -1,6 +1,7 @@
 #ifndef CQMENU_H
 #define CQMENU_H
 
+#include <QApplication>
 #include <QMenu>
 #include <QAction>
 #include <QMainWindow>
@@ -14,10 +15,21 @@ class CQMenu {
  public:
   CQMenu(QMainWindow *mainWindow, const QString &name) :
    mainWindow_(mainWindow) {
+    auto *menuBar = mainWindow->menuBar();
+
+    if (menuBar->objectName() == "")
+      menuBar->setObjectName("menubar");
+
     if (name == "|")
-      mainWindow->menuBar()->addSeparator();
-    else
-      menu_ = mainWindow->menuBar()->addMenu(name);
+      menuBar->addSeparator();
+    else {
+      menu_ = menuBar->addMenu(name);
+
+      if (name.length())
+        menu_->setObjectName(name);
+
+      menu_->setFont(qApp->font());
+    }
   }
 
   CQMenu(QWidget *widget, const QString &name="") {
@@ -25,6 +37,8 @@ class CQMenu {
 
     if (name.length())
       menu_->setObjectName(name);
+
+    menu_->setFont(qApp->font());
   }
 
   QMainWindow *getMainWindow() const { return mainWindow_; }
@@ -81,12 +95,12 @@ class CQMenu {
   }
 
  private:
-  typedef std::map<QString, CQMenuItem *> MenuItemMap;
-  typedef std::map<QString, QAction *>    ActionMap;
+  using MenuItemMap = std::map<QString, CQMenuItem *>;
+  using ActionMap   = std::map<QString, QAction *>;
 
-  QMainWindow  *mainWindow_ { nullptr };
-  QMenu        *menu_ { nullptr };
-  QActionGroup *actionGroup_ { nullptr };
+  QMainWindow*  mainWindow_  { nullptr };
+  QMenu*        menu_        { nullptr };
+  QActionGroup* actionGroup_ { nullptr };
   MenuItemMap   menuItemMap_;
   ActionMap     actionMap_;
 };
@@ -112,6 +126,8 @@ class CQMenuItem {
 
     if (type & CHECKED)
       setChecked(true);
+
+    action_->setFont(qApp->font());
   }
 
   CQMenuItem(CQMenu *menu, const QIcon &icon, const QString &name, Type type = NORMAL) :
@@ -125,6 +141,8 @@ class CQMenuItem {
 
     if (type & CHECKED)
       setChecked(true);
+
+    action_->setFont(qApp->font());
   }
 
   CQMenuItem(CQMenu *menu, const QString &name, const QIcon &icon, Type type = NORMAL) :
@@ -138,6 +156,8 @@ class CQMenuItem {
 
     if (type & CHECKED)
       setChecked(true);
+
+    action_->setFont(qApp->font());
   }
 
   QString getName() const { return action_->text(); }
@@ -208,8 +228,8 @@ class CQMenuItem {
   }
 
  private:
-  CQMenu  *menu_ { nullptr };
-  QAction *action_ { nullptr };
+  CQMenu*  menu_ { nullptr };
+  QAction* action_ { nullptr };
 };
 
 //------

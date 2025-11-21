@@ -15,7 +15,7 @@ class CQTreeView : public QTreeView {
 
   virtual void addMenuActions(QMenu *menu);
 
- private slots:
+ private Q_SLOTS:
   void customContextMenuSlot(const QPoint &pos);
 
   void expandAll  (const QModelIndex &ind=QModelIndex());

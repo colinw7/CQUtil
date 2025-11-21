@@ -77,6 +77,8 @@ class CQStyleMgr : public QObject {
   const QFont &fixedFont() const { return fixedFont_; }
   void setFixedFont(const QFont &font);
 
+  void updateFont();
+
  protected:
   CQStyleMgr();
 

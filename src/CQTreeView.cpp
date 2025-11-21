@@ -40,7 +40,7 @@ CQTreeView::
 customContextMenuSlot(const QPoint &pos)
 {
   // Map point to global from the viewport to account for the header.
-  QPoint mpos = viewport()->mapToGlobal(pos);
+  auto mpos = viewport()->mapToGlobal(pos);
 
   auto *menu = new QMenu;
 

@@ -71,7 +71,7 @@ class CQDialog : public QDialog {
 
   void addStretch();
 
- signals:
+ Q_SIGNALS:
   void accepted();
 
  protected:
@@ -80,7 +80,7 @@ class CQDialog : public QDialog {
   virtual void accept() override { }
   virtual void reject() override { }
 
- protected slots:
+ protected Q_SLOTS:
   void acceptSlot();
   void applySlot ();
   void rejectSlot();

@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QWidget>
+#include <QAction>
 
 CQStyleMgr *
 CQStyleMgr::
@@ -121,14 +122,25 @@ setFont(const QFont &font)
 {
   font_ = font;
 
+  updateFont();
+
+  Q_EMIT fontChanged();
+}
+
+void
+CQStyleMgr::
+updateFont()
+{
   qApp->setFont(font_);
 
   const auto &widgets = qApp->allWidgets();
 
-  for (const auto &w : widgets)
+  for (const auto &w : widgets) {
     w->setFont(font_);
 
-  Q_EMIT fontChanged();
+    for (auto *a : w->actions())
+      a->setFont(font_);
+  }
 }
 
 void

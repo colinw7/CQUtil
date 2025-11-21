@@ -157,17 +157,19 @@ class CQGroupBox : public QWidget {
 
   void updateStyle();
 
- signals:
+ Q_SIGNALS:
   void clicked(bool checked);
   void toggled(bool checked);
 
   void collapse(bool collapsed);
 
- public slots:
+  void mousePress();
+
+ public Q_SLOTS:
   void setChecked(bool checked);
   void setCollapsed(bool collapsed);
 
- private slots:
+ private Q_SLOTS:
   void updateSlot();
 
  private:

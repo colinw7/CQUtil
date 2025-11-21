@@ -232,7 +232,11 @@ CQApp::
 
 void
 CQApp::
+#ifdef CQAPP_USE_OBJEDIT
 showMetaEdit(QObject *obj)
+#else
+showMetaEdit(QObject *)
+#endif
 {
 #ifdef CQAPP_USE_OBJEDIT
 #  ifdef CQAPP_USE_OBJEDIT_OBJEDIT

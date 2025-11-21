@@ -33,17 +33,17 @@ CQToolBarMgr()
 //------
 
 CQToolBar::
-CQToolBar(QMainWindow *main_window, const QString &name, Qt::ToolBarArea area) :
- main_window_(main_window)
+CQToolBar(QMainWindow *mainWindow, const QString &name, Qt::ToolBarArea area) :
+ mainWindow_(mainWindow)
 {
   toolbar_ = new QToolBar(name);
 
   toolbar_->setObjectName("toolbar");
 
-  main_window->addToolBar(area, toolbar_);
+  mainWindow->addToolBar(area, toolbar_);
 
 #if 0
-  CQToolBarMgr *mgr = CQToolBarMgrInst;
+  auto *mgr = CQToolBarMgrInst;
 
   if (mgr->iconSize().isValid()) {
     int is = mgr->iconSize().getValue();
@@ -64,7 +64,7 @@ QAction *
 CQToolBar::
 addItem(CQMenuItem *item)
 {
-  QAction *action = item->getAction();
+  auto *action = item->getAction();
 
   return addItem(action);
 }
@@ -89,9 +89,9 @@ QAction *
 CQToolBar::
 addWidget(QWidget *widget, bool checked)
 {
-  QAction *action = toolbar_->addWidget(widget);
+  auto *action = toolbar_->addWidget(widget);
 
-  QAbstractButton *button = qobject_cast<QAbstractButton *>(widget);
+  auto *button = qobject_cast<QAbstractButton *>(widget);
 
   if (button) {
     button->setCheckable(true);

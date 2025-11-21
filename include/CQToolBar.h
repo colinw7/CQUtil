@@ -36,10 +36,10 @@ class CQToolBarMgr {
 
 class CQToolBar {
  public:
-  CQToolBar(QMainWindow *main_window, const QString &name,
+  CQToolBar(QMainWindow *mainWindow, const QString &name,
             Qt::ToolBarArea area=Qt::TopToolBarArea);
 
-  QMainWindow *getMainWindow() const { return main_window_; }
+  QMainWindow *getMainWindow() const { return mainWindow_; }
 
   QToolBar *getToolBar() const { return toolbar_; }
 
@@ -58,8 +58,8 @@ class CQToolBar {
   void setVisible(bool visible);
 
  private:
-  QMainWindow *main_window_ { nullptr };
-  QToolBar    *toolbar_ { nullptr };
+  QMainWindow *mainWindow_ { nullptr };
+  QToolBar    *toolbar_    { nullptr };
 };
 
 #endif
