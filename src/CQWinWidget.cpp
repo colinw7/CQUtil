@@ -89,7 +89,7 @@ void drawGradient(QPainter *painter, const QRect &rect, const QColor &gradientSt
 
 CQWinWidget::
 CQWinWidget(QWidget *parent, const char *name) :
- QWidget(parent), decoration_(HeaderBorderDecoration, SideTop, 10, 1,
+ QWidget(parent), decoration_(HeaderBorderDecoration, HeaderSide::Top, 10, 1,
                               QColor(80, 80, 100), QColor(200, 200, 240))
 {
   if (name)
@@ -130,13 +130,15 @@ fitChild()
 
 void
 CQWinWidget::
-setChildSize(const QSize &size)
+setChildSize(const QSize &size, bool constrain)
 {
   int w = size.width ();
   int h = size.height();
 
-  if (w <= 0) w = 100;
-  if (h <= 0) h = 100;
+  if (constrain) {
+    if (w <= 0) w = 100;
+    if (h <= 0) h = 100;
+  }
 
   int b = getBorder();
 
@@ -146,7 +148,7 @@ setChildSize(const QSize &size)
   if (decoration_.type & HeaderDecoration) {
     int hh = getHeaderHeight();
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
       h += hh;
     else
       w += hh;
@@ -162,7 +164,7 @@ getX() const
   int x = getBorder();
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.headerSide == SideLeft)
+    if (decoration_.headerSide == HeaderSide::Left)
       x += getHeaderHeight();
   }
 
@@ -176,7 +178,7 @@ getY() const
   int y = getBorder();
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.headerSide == SideTop)
+    if (decoration_.headerSide == HeaderSide::Top)
       y += getHeaderHeight();
   }
 
@@ -192,7 +194,7 @@ getWidth() const
   int h = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.headerSide == SideLeft || decoration_.headerSide == SideRight)
+    if (decoration_.headerSide == HeaderSide::Left || decoration_.headerSide == HeaderSide::Right)
       h = getHeaderHeight();
   }
 
@@ -208,7 +210,7 @@ getHeight() const
   int h = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
       h = getHeaderHeight();
   }
 
@@ -262,10 +264,10 @@ setSize(int w, int h)
   int hw = 0, hh = 0;
 
   if (decoration_.type & HeaderDecoration) {
-    if (decoration_.headerSide == SideLeft || decoration_.headerSide == SideRight)
+    if (decoration_.headerSide == HeaderSide::Left || decoration_.headerSide == HeaderSide::Right)
       hw = getHeaderHeight();
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
       hh = getHeaderHeight();
   }
 
@@ -279,7 +281,7 @@ CQWinWidget::
 checkMove(QPoint &p) const
 {
   // widget is fully visible
-  if (constraint_ == VISIBLE_CONSTRAINT) {
+  if (constraint_ == Constraint::VISIBLE) {
     QRect r(p, this->size());
 
     int pw = parentWidget()->width();
@@ -298,7 +300,7 @@ bool
 CQWinWidget::
 checkGeometry(const QRect &rect) const
 {
-  if (constraint_ == VISIBLE_CONSTRAINT) {
+  if (constraint_ == Constraint::VISIBLE) {
     if (rect.x()                 < 0 ||
         rect.y()                 < 0 ||
         rect.x() + rect.width () > parentWidget()->width() ||
@@ -329,13 +331,13 @@ paintEvent(QPaintEvent *)
     // draw background
     auto bgBrush = QBrush(pal.color(QPalette::Window));
 
-    if      (decoration_.headerSide == SideTop)
+    if      (decoration_.headerSide == HeaderSide::Top)
       decoration_.headerRect = QRect(b, b, width() - 2*b, hh);
-    else if (decoration_.headerSide == SideBottom)
+    else if (decoration_.headerSide == HeaderSide::Bottom)
       decoration_.headerRect = QRect(b, height() - b - hh, width() - 2*b, hh);
-    else if (decoration_.headerSide == SideLeft)
+    else if (decoration_.headerSide == HeaderSide::Left)
       decoration_.headerRect = QRect(b, b, hh, height() - 2*b);
-    else if (decoration_.headerSide == SideRight)
+    else if (decoration_.headerSide == HeaderSide::Right)
       decoration_.headerRect = QRect(width() - b - hh, b, hh, height() - 2*b);
 
 #if 1
@@ -351,7 +353,7 @@ paintEvent(QPaintEvent *)
     auto gradientStartColor = barColor.lighter(108);
     auto gradientStopColor  = mergedColors(barColor.darker(108), dark.lighter(150), 70);
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
       drawGradient(&painter, decoration_.headerRect, gradientStartColor, gradientStopColor,
                    DiagDown, palette().button());
     else
@@ -360,6 +362,8 @@ paintEvent(QPaintEvent *)
 #else
     painter.fillRect(decoration_.headerRect, bgBrush);
 #endif
+
+    //---
 
     int b1 = hh - 4;
 
@@ -372,7 +376,7 @@ paintEvent(QPaintEvent *)
     int panelSize = 3;
     int margin    = (decoration_.headerHeight - 2*panelSize - 1)/2;
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom) {
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom) {
       int x1 = width() - b + 2;
 
       int panelWidth = qMax(1, x1 - 2*b - 2*margin);
@@ -408,6 +412,8 @@ paintEvent(QPaintEvent *)
     }
 #endif
 
+    //---
+
     // draw title
     auto text = windowTitle();
 
@@ -420,7 +426,7 @@ paintEvent(QPaintEvent *)
 
       painter.save();
 
-      if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+      if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
         painter.fillRect(QRect(b, b, tw + 4, hh), bgBrush);
       else {
         painter.fillRect(QRect(b, height() - tw - b - 4, hh, tw + 4), bgBrush);
@@ -439,7 +445,7 @@ paintEvent(QPaintEvent *)
     // draw header buttons
     painter.setPen(decoration_.borderColor);
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom) {
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom) {
       int x1 = width() - b + 2;
       int y1 = b + 2;
 
@@ -512,12 +518,12 @@ resizeEvent(QResizeEvent *)
   if (decoration_.type & HeaderDecoration) {
     int hh = getHeaderHeight();
 
-    if      (decoration_.headerSide == SideTop)
+    if      (decoration_.headerSide == HeaderSide::Top)
       y += hh;
-    else if (decoration_.headerSide == SideLeft)
+    else if (decoration_.headerSide == HeaderSide::Left)
       x += hh;
 
-    if (decoration_.headerSide == SideTop || decoration_.headerSide == SideBottom)
+    if (decoration_.headerSide == HeaderSide::Top || decoration_.headerSide == HeaderSide::Bottom)
       h -= hh;
     else
       w -= hh;
@@ -537,15 +543,15 @@ mousePressEvent(QMouseEvent *event)
 {
   pressed_ = true;
 
-  if (editMode() == EDIT_MODE_CLICK) {
+  if (editMode() == EditMode::CLICK) {
     if (state_.moving || state_.resizing) {
-      editMode_ = EDIT_MODE_DRAG;
+      editMode_ = EditMode::DRAG;
 
       mouseReleaseEvent(event);
 
       releaseMouse();
 
-      editMode_ = EDIT_MODE_CLICK;
+      editMode_ = EditMode::CLICK;
 
       return;
     }
@@ -597,7 +603,7 @@ mousePressEvent(QMouseEvent *event)
     if (ops_ & RaiseOp)
       raise();
 
-    if (editMode() == EDIT_MODE_CLICK)
+    if (editMode() == EditMode::CLICK)
       grabMouse();
   }
   else if (event->button() == Qt::MiddleButton) {
@@ -610,7 +616,7 @@ mousePressEvent(QMouseEvent *event)
     if (ops_ & RaiseOp)
       raise();
 
-    if (editMode() == EDIT_MODE_CLICK)
+    if (editMode() == EditMode::CLICK)
       grabMouse();
   }
 }
@@ -714,7 +720,7 @@ mouseReleaseEvent(QMouseEvent *event)
 {
   pressed_ = false;
 
-  if (editMode() == EDIT_MODE_DRAG) {
+  if (editMode() == EditMode::DRAG) {
     if (state_.moving || state_.resizing) {
       mouseMoveEvent(event);
 
@@ -848,7 +854,18 @@ void
 CQWinWidget::
 collapseSlot()
 {
+  state_.collapsed = ! state_.collapsed;
+
+  child_->setVisible(! state_.collapsed);
+
+  if (! state_.collapsed)
+    setChildSize(child_->sizeHint());
+  else
+    setChildSize(QSize(width(), 0), /*constrain*/false);
+
   emit collapse();
+
+  emit collapsed(state_.collapsed);
 }
 
 void

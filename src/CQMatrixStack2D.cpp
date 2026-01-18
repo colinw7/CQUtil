@@ -261,13 +261,13 @@ updateWidgets()
 
     auto label = QString::fromStdString(t.name());
 
-    if      (t.type() == CMatrixTransformType::TRANSLATE) {
+    if      (t.type() == CMatrix2DTransformType::TRANSLATE) {
       label += QString(" %1 %2").arg(t.dx()).arg(t.dy());
     }
-    else if (t.type() == CMatrixTransformType::SCALE2) {
+    else if (t.type() == CMatrix2DTransformType::SCALE2) {
       label += QString(" %1 %2").arg(t.xscale()).arg(t.yscale());
     }
-    else if (t.type() == CMatrixTransformType::ROTATE) {
+    else if (t.type() == CMatrix2DTransformType::ROTATE) {
       auto a = CMathGen::RadToDeg(t.angle());
 
       label += QString(" %1").arg(a);
@@ -428,7 +428,7 @@ updateCurrentIndex()
 
   const auto &t = matrixStack_.transform(ind_);
 
-  if      (t.type() == CMatrixTransformType::TRANSLATE) {
+  if      (t.type() == CMatrix2DTransformType::TRANSLATE) {
     typeLabel_->setText("Translate");
 
     stack_->setCurrentIndex(1);
@@ -436,7 +436,7 @@ updateCurrentIndex()
     translateX_->setValue(t.dx());
     translateY_->setValue(t.dy());
   }
-  else if (t.type() == CMatrixTransformType::SCALE2) {
+  else if (t.type() == CMatrix2DTransformType::SCALE2) {
     typeLabel_->setText("Scale");
 
     stack_->setCurrentIndex(2);
@@ -444,7 +444,7 @@ updateCurrentIndex()
     scaleX_->setValue(t.xscale());
     scaleY_->setValue(t.yscale());
   }
-  else if (t.type() == CMatrixTransformType::ROTATE) {
+  else if (t.type() == CMatrix2DTransformType::ROTATE) {
     typeLabel_->setText("Rotate");
 
     stack_->setCurrentIndex(3);

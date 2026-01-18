@@ -48,28 +48,28 @@ class CQWinWidget : public QWidget {
     HeaderBorderDecoration = (BorderDecoration | HeaderDecoration)
   };
 
-  enum EditMode {
-    EDIT_MODE_DRAG,
-    EDIT_MODE_CLICK
+  enum class EditMode {
+    DRAG,
+    CLICK
   };
 
-  enum HeaderSide {
-    SideLeft,
-    SideRight,
-    SideTop,
-    SideBottom
+  enum class HeaderSide {
+    Left,
+    Right,
+    Top,
+    Bottom
   };
 
-  enum Constraint {
-    NO_CONSTRAINT,
-    VISIBLE_CONSTRAINT,
-    UNCLIPPED_CONSTRAINT
+  enum class Constraint {
+    NONE,
+    VISIBLE,
+    UNCLIPPED
   };
 
  private:
   struct Decoration {
     DecorationType type         { HeaderBorderDecoration };
-    HeaderSide     headerSide   { SideTop };
+    HeaderSide     headerSide   { HeaderSide::Top };
     int            headerHeight { 0 };
     QRect          headerRect;
     int            border       { 0 };
@@ -122,12 +122,13 @@ class CQWinWidget : public QWidget {
     QPoint initPos;
     QSize  initSize;
     QPoint pressPos;
-    bool   moving   { false };
-    bool   resizing { false };
-    bool   resizeL  { false };
-    bool   resizeT  { false };
-    bool   resizeR  { false };
-    bool   resizeB  { false };
+    bool   moving    { false };
+    bool   resizing  { false };
+    bool   resizeL   { false };
+    bool   resizeT   { false };
+    bool   resizeR   { false };
+    bool   resizeB   { false };
+    bool   collapsed { false };
 
     State() { }
   };
@@ -177,6 +178,10 @@ class CQWinWidget : public QWidget {
   void setClosable(bool closable) {
     ops_ = (closable ? ops_ | CloseOp : ops_ & ~CloseOp); updateSize(); }
 
+  bool isCollapsable() const { return ops_ & CollapseOp; }
+  void setCollapsable(bool collapsable) {
+    ops_ = (collapsable ? ops_ | CollapseOp : ops_ & ~CollapseOp); updateSize(); }
+
   bool isTransparent() const { return ! autoFillBackground(); }
   void setTransparent(bool flag=true) { setAutoFillBackground(! flag); update(); }
 
@@ -191,7 +196,7 @@ class CQWinWidget : public QWidget {
 
   void setConstraint(Constraint constraint) { constraint_ = constraint; }
 
-  void setChildSize(const QSize &size);
+  void setChildSize(const QSize &size, bool constrain=true);
 
   //---
 
@@ -243,6 +248,7 @@ class CQWinWidget : public QWidget {
   void closed();
   void expand();
   void collapse();
+  void collapsed(bool);
 
  private:
   void paintEvent(QPaintEvent *event) override;
@@ -274,8 +280,8 @@ class CQWinWidget : public QWidget {
   CollapseButton collapseButton_ { "MINIMIZE" };
   State          state_;
   unsigned int   ops_            { MoveOp | ResizeOp | RaiseOp | LowerOp | CloseOp };
-  EditMode       editMode_       { EDIT_MODE_DRAG };
-  Constraint     constraint_     { NO_CONSTRAINT };
+  EditMode       editMode_       { EditMode::DRAG };
+  Constraint     constraint_     { Constraint::NONE };
 };
 
 //------
