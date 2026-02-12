@@ -125,7 +125,10 @@ void
 CQWinWidget::
 fitChild()
 {
-  setChildSize(child_->sizeHint());
+  if (! state_.collapsed)
+    setChildSize(child_->sizeHint());
+  else
+    setChildSize(QSize(width(), 0), /*constrain*/false);
 }
 
 void
@@ -246,18 +249,18 @@ void
 CQWinWidget::
 setPos(int x, int y)
 {
-  emit geometryChanging();
+  Q_EMIT geometryChanging();
 
   move(x - getX(), y - getY());
 
-  emit geometryChanged();
+  Q_EMIT geometryChanged();
 }
 
 void
 CQWinWidget::
 setSize(int w, int h)
 {
-  emit geometryChanging();
+  Q_EMIT geometryChanging();
 
   int b = getBorder();
 
@@ -273,7 +276,7 @@ setSize(int w, int h)
 
   resize(w + hw + 2*b, h + hh + 2*b);
 
-  emit geometryChanged();
+  Q_EMIT geometryChanged();
 }
 
 bool
@@ -494,7 +497,11 @@ void
 CQWinWidget::
 moveEvent(QMoveEvent *)
 {
+  Q_EMIT geometryChanging();
+
   resizeEvent(nullptr);
+
+  Q_EMIT geometryChanged();
 }
 
 void
@@ -533,7 +540,7 @@ resizeEvent(QResizeEvent *)
     child_->move  (x, y);
     child_->resize(w, h);
 
-    emit geometryChanging();
+    Q_EMIT geometryChanging();
   }
 }
 
@@ -630,8 +637,11 @@ mouseMoveEvent(QMouseEvent *event)
 
     auto p = state_.initPos + d;
 
-    if (checkMove(p))
+    if (checkMove(p)) {
       move(p);
+
+      setMoved(true); // user moved
+    }
   }
   else if (state_.resizing) {
     int dx = 0; int dy = 0;
@@ -729,7 +739,7 @@ mouseReleaseEvent(QMouseEvent *event)
         resize(state_.initSize);
       }
       else {
-        emit geometryChanged();
+        Q_EMIT geometryChanged();
       }
 
       state_.moving   = false;
@@ -836,18 +846,18 @@ void
 CQWinWidget::
 closeSlot()
 {
-  emit closing();
+  Q_EMIT closing();
 
   hide();
 
-  emit closed();
+  Q_EMIT closed();
 }
 
 void
 CQWinWidget::
 expandSlot()
 {
-  emit expand();
+  Q_EMIT expand();
 }
 
 void
@@ -863,9 +873,9 @@ collapseSlot()
   else
     setChildSize(QSize(width(), 0), /*constrain*/false);
 
-  emit collapse();
+  Q_EMIT collapse();
 
-  emit collapsed(state_.collapsed);
+  Q_EMIT collapsed(state_.collapsed);
 }
 
 void
@@ -1049,7 +1059,7 @@ loadImage()
   if (fileName.length())
     setImageName(fileName);
 
-  emit valueChanged();
+  Q_EMIT valueChanged();
 }
 
 //---------------

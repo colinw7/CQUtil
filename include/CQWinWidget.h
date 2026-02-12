@@ -200,6 +200,11 @@ class CQWinWidget : public QWidget {
 
   //---
 
+  bool isMoved() const { return moved_; }
+  void setMoved(bool b) { moved_ = b; }
+
+  //---
+
   // get x/y position inside frame
   int getX() const;
   int getY() const;
@@ -274,6 +279,7 @@ class CQWinWidget : public QWidget {
   QWidget*       child_          { nullptr };
   bool           active_         { false };
   bool           pressed_        { false };
+  bool           moved_          { false };
   Decoration     decoration_;
   CloseButton    closeButton_    { "CLOSE" };
   ExpandButton   expandButton_   { "MAXIMIZE" };
